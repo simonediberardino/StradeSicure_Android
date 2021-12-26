@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Strade Sicure</string>
+    <string name="title_activity_maps">Strade Sicure</string>
+    <string name="buche_attive">Anomalie stradali attive: {number}</string>
+    <string name="segnala_anomalia">Segnala anomalia</string>
+    <string name="indirizzo">Indirizzo</string>
+    <string name="segnalata_da">• Segnalazione di: {username}</string>
+    <string name="indicazioni">• Indicazioni: {indicazioni}</string>
+</resources>

@@ -6,4 +6,7 @@
     <string name="indirizzo">Indirizzo</string>
     <string name="segnalata_da">• Segnalazione di: {username}</string>
     <string name="indicazioni">• Indicazioni: {indicazioni}</string>
+    <string name="distance">• Distanza: {distance}</string>
+    <string name="info">Più info</string>
+    <string name="refresh_in">Refresh in: {time}</string>
 </resources>

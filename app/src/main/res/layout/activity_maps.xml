@@ -19,6 +19,31 @@
             android:layout_height="match_parent"
             tools:context=".MapsActivity"></androidx.fragment.app.FragmentContainerView>
 
+        <TextView
+            android:id="@+id/main_refresh_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="100px"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/red_button_icon"
+            android:button="@android:color/transparent"
+            android:drawableRight="@drawable/ic_baseline_timer_24"
+            android:drawablePadding="16dp"
+            android:fontFamily="@font/carter_one"
+            android:gravity="center|left"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:shadowColor="@color/black"
+            android:shadowDx="2"
+            android:shadowDy="5"
+            android:shadowRadius="1.5"
+            android:text="0:00"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="21px"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include

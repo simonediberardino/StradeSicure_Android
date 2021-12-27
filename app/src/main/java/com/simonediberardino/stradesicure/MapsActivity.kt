@@ -33,7 +33,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: LocationManager
+    private lateinit var userLocation: Location
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var refreshMapTimer: Countdown
     private var lastMarker: Marker? = null
     private var anomaly: ArrayList<Anomaly> = ArrayList()
 
@@ -64,6 +66,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         this.setupMarker()
+        this.setupTimer()
     }
 
     fun setupMarker() {
@@ -87,18 +90,22 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
             return
         }
 
-        val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
 
         googleMap.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
-                LatLng(lastLocation?.latitude!!, lastLocation.longitude),
+                LatLng(userLocation.latitude, userLocation.longitude),
                 12.0f
             )
         )
 
-        this.onLocationChanged(lastLocation)
+        addAnomaly(userLocation)
+        addAnomaly(userLocation)
+        addAnomaly(userLocation)
+        addAnomaly(userLocation)
+        addAnomaly(userLocation)
+        addAnomaly(userLocation)
 
-        addAnomaly(lastLocation)
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.01f, this)
     }
 
@@ -111,20 +118,21 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         val markerOptions = MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
+        userLocation = location
         lastMarker?.remove()
         lastMarker = googleMap.addMarker(markerOptions)!!
 
         this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location)
     }
 
-    fun addAnomaly(location: Location){
-        val height = 64; val width = 64
+    fun addAnomaly(anomalyLocation: Location){
+        val anomalyObj = Anomaly(anomalyLocation, -1)
 
+        val height = 64; val width = 64
         val drawable = getDrawable(R.drawable.buca_icon)
         val bitmap = drawable?.toBitmap(width, height)
 
-        val markerOptions = MarkerOptions().position(LatLng(location.latitude, location.longitude)).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
-        val anomalyObj = Anomaly(location, -1)
+        val markerOptions = MarkerOptions().position(LatLng(anomalyLocation.latitude, anomalyLocation.longitude)).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
         googleMap.addMarker(markerOptions)!!
         anomaly.add(anomalyObj)
@@ -140,12 +148,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         val addressTW = view.findViewById<TextView>(R.id.single_anomaly_title)
         val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
-        val dateTW = view.findViewById<TextView>(R.id.single_anomaly_date)
-        val indicationsTW = view.findViewById<TextView>(R.id.single_anomaly_indications)
+        val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
 
         addressTW.text = getCity(anomalyObj.location)
         reporterTW.text = reporterTW.text.toString().replace("{username}", anomalyObj.spotterId.toString())
-        dateTW.text = Date().day.toString()
+        distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomalyObj.location))
 
         Utility.ridimensionamento(this, parentView)
         gallery.addView(view)
@@ -167,4 +174,30 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         val currentCity = getCity(location)
         // ...
     }
+
+    fun getDistanceString(location1: Location, location2: Location): String {
+        val distanceValue = location1.distanceTo(location2).toInt()
+        return if(distanceValue >= 1000)
+                "${distanceValue/1000} km"
+            else
+                "${distanceValue} m"
+    }
+
+   fun setupTimer(){
+       val refreshTimeout = 5 * 60
+       val timerTW = findViewById<TextView>(R.id.main_refresh_timer)
+       refreshMapTimer = Countdown(refreshTimeout) {
+           this.runOnUiThread {
+                this.refreshMap()
+           }
+       }
+
+       refreshMapTimer.onSecondCallback = Runnable {
+           this.runOnUiThread {
+               timerTW.text = refreshMapTimer.getElapsedTimeString()
+           }
+       }
+
+       refreshMapTimer.start()
+   }
 }

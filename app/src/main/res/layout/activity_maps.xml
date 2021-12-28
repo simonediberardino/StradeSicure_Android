@@ -50,6 +50,9 @@
         android:id="@+id/bottom_sheet_persistent"
         layout="@layout/bottom_sheet_persistent" />
 
+    <include
+        android:id="@+id/top_sheet_persistent"
+        layout="@layout/report_dialog" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 <!--

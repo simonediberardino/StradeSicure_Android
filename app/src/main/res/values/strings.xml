@@ -1,4 +1,5 @@
 <resources>
+    <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strade Sicure</string>
     <string name="title_activity_maps">Strade Sicure</string>
     <string name="buche_attive">Anomalie stradali attive: {number}</string>
@@ -9,4 +10,6 @@
     <string name="distance">• Distanza: {distance}</string>
     <string name="info">Più info</string>
     <string name="refresh_in">Refresh in: {time}</string>
+    <string name="request_permissions">Questa app ha bisogno della tua geolocalizzazione per poter funzionare correttamente.</string>
+    <string name="conferma">Conferma</string>
 </resources>

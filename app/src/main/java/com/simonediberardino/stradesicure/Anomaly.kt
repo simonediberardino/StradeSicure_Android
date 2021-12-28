@@ -1,5 +1,10 @@
 package com.simonediberardino.stradesicure
 
-import android.location.Location
-
-data class Anomaly(val location: Location, val spotterId: Int)
+class Anomaly{
+    lateinit var location: LocationExtended
+    lateinit var spotterId: String
+    lateinit var description: String
+    var stars: Int = 0
+    constructor()
+    constructor(location: LocationExtended, spotterId: String, description: String, stars: Int, )
+}

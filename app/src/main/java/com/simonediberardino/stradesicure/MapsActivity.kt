@@ -2,6 +2,7 @@ package com.simonediberardino.stradesicure
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 
@@ -22,22 +23,35 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.util.*
 import android.location.Geocoder
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import com.github.techisfun.android.topsheet.TopSheetBehavior
+import com.github.techisfun.android.topsheet.TopSheetDialog
+import com.google.firebase.FirebaseApp
+import com.google.firebase.database.DataSnapshot
 import kotlin.collections.ArrayList
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
+    companion object {
+        private val GEOLOCATION_PERMISSION_CODE = 1
+    }
+
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: LocationManager
     private lateinit var userLocation: Location
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var refreshMapTimer: Countdown
     private var lastMarker: Marker? = null
-    private var anomaly: ArrayList<Anomaly> = ArrayList()
+    private var anomalies: ArrayList<Anomaly> = ArrayList()
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,19 +71,37 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
         bottomSheetBehavior.peekHeight = 200
         bottomSheetBehavior.isHideable = false
+
+        val bottomSheet = findViewById<View>(R.id.top_sheet_persistent)
+        topSheetBehavior = TopSheetBehavior.from(bottomSheet)
+        topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+
+        val reportBTN = findViewById<View>(R.id.dialog_report_btn)
+
+        reportBTN.setOnClickListener{
+            topSheetBehavior.state =
+                if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
+                    TopSheetBehavior.STATE_COLLAPSED
+                else
+                    TopSheetBehavior.STATE_EXPANDED
+
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         //this.googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
 
+        this.googleMap.setOnMapClickListener {
+            topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
+        }
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        this.setupMarker()
+        this.setupGPS()
         this.setupTimer()
     }
 
-    fun setupMarker() {
+    fun setupGPS() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -84,12 +116,32 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
-                1001
+                Companion.GEOLOCATION_PERMISSION_CODE
             )
 
             return
+        }else{
+            this.setupMap()
         }
+    }
 
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when(requestCode){
+            Companion.GEOLOCATION_PERMISSION_CODE -> {
+                if( grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                    this.setupMap()
+                }else{
+                    Utility.showDialog(this, getString(R.string.request_permissions))
+                }
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun setupMap(){
         this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
 
         googleMap.animateCamera(
@@ -99,14 +151,16 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
             )
         )
 
-        addAnomaly(userLocation)
-        addAnomaly(userLocation)
-        addAnomaly(userLocation)
-        addAnomaly(userLocation)
-        addAnomaly(userLocation)
-        addAnomaly(userLocation)
+        this.fetchAnomalies(object : RunnablePar {
+            override fun run(any: Any) {
+                showAnomaly(any as Anomaly)
+                storeAnomaly(any)
+            }
+        }) {
+            listAnomalies()
+        }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.01f, this)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -125,17 +179,47 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location)
     }
 
-    fun addAnomaly(anomalyLocation: Location){
-        val anomalyObj = Anomaly(anomalyLocation, -1)
+    fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable){
+        FirebaseClass.getAnomaliesRef().get().addOnCompleteListener { task ->
+            for(it : DataSnapshot in task.result.children){
+                val anomaly = it.getValue(Anomaly::class.java)
+                callback.run(anomaly!!)
+            }
 
+            onCompleteCallback.run()
+        }
+    }
+
+    fun showAnomaly(anomaly: Anomaly) {
         val height = 64; val width = 64
         val drawable = getDrawable(R.drawable.buca_icon)
         val bitmap = drawable?.toBitmap(width, height)
 
-        val markerOptions = MarkerOptions().position(LatLng(anomalyLocation.latitude, anomalyLocation.longitude)).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
+        val markerOptions = MarkerOptions().position(LatLng(
+            anomaly.location.latitude,
+            anomaly.location.longitude
+        )).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
         googleMap.addMarker(markerOptions)!!
-        anomaly.add(anomalyObj)
+    }
+
+    fun storeAnomaly(anomaly: Anomaly){
+        anomalies.add(anomaly)
+        anomalies.sortBy {anomaly.location.distanceTo(userLocation)}
+    }
+
+    fun listAnomalies(){
+        var i = 0
+        val toShow = 5
+        while(i < toShow && i < anomalies.size) {
+            listAnomaly(anomalies[i])
+            i++
+        }
+    }
+
+    fun listAnomaly(anomaly: Anomaly){
+        if(anomaly.location.distanceTo(userLocation) > 15 * 1000)
+            return
 
         val parentLayoutId = R.id.dialog_anomaly_layout
         val parentViewId = R.id.parent
@@ -150,18 +234,18 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
         val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
 
-        addressTW.text = getCity(anomalyObj.location)
-        reporterTW.text = reporterTW.text.toString().replace("{username}", anomalyObj.spotterId.toString())
-        distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomalyObj.location))
+        addressTW.text = getCity(anomaly.location)
+        reporterTW.text = reporterTW.text.toString().replace("{username}", anomaly.spotterId)
+        distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomaly.location))
 
         Utility.ridimensionamento(this, parentView)
         gallery.addView(view)
     }
 
     fun refreshMap(){
-        anomaly.clear()
+        anomalies.clear()
         googleMap.clear()
-        this.setupMarker()
+        this.setupMap()
     }
 
     fun getCity(location: Location): String? {
@@ -175,17 +259,24 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         // ...
     }
 
+    fun reportDialog(){
+        val dialog = TopSheetDialog(this)
+        dialog.setContentView(R.layout.report_dialog)
+        dialog.show()
+    }
+
     fun getDistanceString(location1: Location, location2: Location): String {
         val distanceValue = location1.distanceTo(location2).toInt()
         return if(distanceValue >= 1000)
                 "${distanceValue/1000} km"
             else
-                "${distanceValue} m"
+                "$distanceValue m"
     }
 
    fun setupTimer(){
        val refreshTimeout = 5 * 60
        val timerTW = findViewById<TextView>(R.id.main_refresh_timer)
+
        refreshMapTimer = Countdown(refreshTimeout) {
            this.runOnUiThread {
                 this.refreshMap()

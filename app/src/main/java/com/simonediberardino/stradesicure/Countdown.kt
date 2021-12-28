@@ -50,7 +50,7 @@ class Countdown{
     }
 
     fun getElapsedTimeString(): String {
-        return getMinutesString() + ":" + getSecondsString()
+        return "${getMinutesString()}: ${getSecondsString()}"
     }
 
     init{

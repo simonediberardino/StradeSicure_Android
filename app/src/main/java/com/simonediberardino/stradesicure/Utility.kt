@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,10 @@ object Utility {
         val i = Intent(c, cl)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         c.startActivity(i)
+    }
+
+    fun showDialog(c: AppCompatActivity, message: String){
+        Toast.makeText(c, message, Toast.LENGTH_LONG).show()
     }
 
     // Ridimensiona i componenti in base alla dimensione dello schermo;

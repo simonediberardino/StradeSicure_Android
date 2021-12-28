@@ -16,9 +16,4 @@
         <!-- Customize your theme here. -->
 
     </style>
-    <style name="SheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
-    <!--<item name="android:windowCloseOnTouchOutside">false</item>-->
-    <item name="android:colorBackground">     @android:color/transparent</item>
-
-    </style>
 </resources>

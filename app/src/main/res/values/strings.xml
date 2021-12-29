@@ -15,4 +15,6 @@
     <string name="aggiungi_marker">Indica sulla mappa la posizione precisa dell\'anomalia</string>
     <string name="aggiungi_marker_tut">Per segnalare una posizione diversa tieni premuto sulla mappa sul punto desiderato.</string>
     <string name="tua_posizione">La tua posizione attuale</string>
+    <string name="descrizione">Breve descrizione</string>
+    <string name="gravita">Gravità</string>
 </resources>

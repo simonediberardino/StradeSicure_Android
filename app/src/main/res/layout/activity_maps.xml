@@ -24,7 +24,7 @@
             android:layout_width="125px"
             android:layout_height="125px"
 
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="48dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/round_button"
             android:src="@drawable/ic_baseline_my_location_24"
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="100px"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="48dp"
             android:background="@drawable/red_button_icon"
             android:button="@android:color/transparent"
             android:drawableRight="@drawable/ic_baseline_timer_24"

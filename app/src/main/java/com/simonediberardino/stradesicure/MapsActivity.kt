@@ -2,6 +2,7 @@ package com.simonediberardino.stradesicure
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.util.*
 import android.location.Geocoder
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -41,13 +43,13 @@ import androidx.annotation.NonNull
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
+import android.content.Intent
+import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
+import java.lang.Exception
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
-    companion object {
-        private val GEOLOCATION_PERMISSION_CODE = 1
-    }
-
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: LocationManager
@@ -75,17 +77,18 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
     fun initializeLayout(){
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
-        bottomSheetBehavior.peekHeight = 200
+        bottomSheetBehavior.peekHeight = 350
         bottomSheetBehavior.isHideable = false
 
         val topSheet = findViewById<View>(R.id.top_sheet_persistent)
 
         topSheetBehavior = TopSheetBehavior.from(topSheet)
-        topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+        topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
+        topSheetBehavior.peekHeight = 90
         topSheetBehavior.setTopSheetCallback(object : TopSheetBehavior.TopSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if(newState == TopSheetBehavior.STATE_COLLAPSED)
-                    topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+            override fun onStateChanged(topSheet: View, newState: Int) {
+                if(newState == TopSheetBehavior.STATE_HIDDEN)
+                    topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float){}
@@ -96,20 +99,20 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         reportBTN.setOnClickListener {
             topSheetBehavior.state =
                 if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
-                    TopSheetBehavior.STATE_HIDDEN
+                    TopSheetBehavior.STATE_COLLAPSED
                 else
                     TopSheetBehavior.STATE_EXPANDED
         }
 
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
-            if(topSheetBehavior.state == TopSheetBehavior.STATE_HIDDEN)
+            if(topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED)
                 this.zoomMapToUser()
         }
 
         val backBTN = findViewById<View>(R.id.report_back)
         backBTN.setOnClickListener{
-            topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+            topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
         }
 
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
@@ -160,13 +163,17 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         when(requestCode){
             GEOLOCATION_PERMISSION_CODE -> {
-                if( grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     this.setupMap()
                 }else{
-                    Utility.showDialog(this, getString(R.string.request_permissions))
+                    this.insufficientPermissions()
                 }
             }
         }
+    }
+
+    fun insufficientPermissions(){
+        Utility.showDialog(this, getString(R.string.request_permissions))
     }
 
     fun removeAnomalyMarker(){
@@ -177,30 +184,34 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
     @SuppressLint("MissingPermission")
     fun setupMap() {
-        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
-        this.removeAnomalyMarker()
+        try {
+            this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
+            this.removeAnomalyMarker()
 
-        this.googleMap.setOnMarkerClickListener {
-            when (it) {
-                anomalyMarker -> this.removeAnomalyMarker()
-                lastUserLocMarker -> this.zoomMapToUser()
+            this.googleMap.setOnMarkerClickListener {
+                when (it) {
+                    anomalyMarker -> this.removeAnomalyMarker()
+                    lastUserLocMarker -> this.zoomMapToUser()
+                }
+
+                return@setOnMarkerClickListener false
             }
 
-            return@setOnMarkerClickListener false
-        }
+            this.zoomMapToUser()
 
-        this.zoomMapToUser()
-
-        this.fetchAnomalies(object : RunnablePar {
-            override fun run(any: Any) {
-                showAnomaly(any as Anomaly)
-                storeAnomaly(any)
+            this.fetchAnomalies(object : RunnablePar {
+                override fun run(any: Any) {
+                    showAnomaly(any as Anomaly)
+                    storeAnomaly(any)
+                }
+            }) {
+                listAnomalies()
             }
-        }) {
-            listAnomalies()
-        }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
+        } catch (e: Exception) {
+            this.insufficientPermissions()
+        }
     }
 
     fun zoomMapToUser(){
@@ -227,7 +238,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         lastUserLocMarker?.remove()
         lastUserLocMarker = googleMap.addMarker(markerOptions)!!
 
-        this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location)
+        this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location, this)
     }
 
     fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
@@ -289,7 +300,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
         val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
 
-        addressTW.text = getCity(anomaly.location)
+        addressTW.text = getCity(anomaly.location, this)
         reporterTW.text = reporterTW.text.toString().replace("{username}", anomaly.spotterId)
         distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomaly.location))
 
@@ -303,7 +314,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun updateAnomalyLocation(){
-        val foundAddress = getAddress(anomalyMarker!!.position)
+        val foundAddress = getAddress(anomalyMarker!!.position, this)
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
         addressET.setText(foundAddress)
     }
@@ -314,40 +325,17 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         this.setupMap()
     }
 
-    fun getCity(location: Location): String? {
-        return Geocoder(this, Locale.getDefault()).getFromLocation(
-            location.latitude,
-            location.longitude,
-            1
-        )[0].locality
-    }
-
-    fun getAddress(latLng: LatLng) : String{
-        val location = Location(String())
-        location.latitude = latLng.latitude
-        location.longitude = latLng.longitude
-        return getAddress(location)
-    }
-
-    fun getAddress(location: Location) : String{
-        return Geocoder(this, Locale.getDefault()).getFromLocation(
-            location.latitude,
-            location.longitude,
-            1
-        )[0].getAddressLine(0)
-    }
-
-    fun getAnomaliesInCity(location: Location) : Array<Anomaly> {
+    private fun getAnomaliesInCity(location: Location) : Array<Anomaly> {
         return anomalies.filter {
-            getCity(it.location) == getCity(location)
+            getCity(it.location, this) == getCity(location, this)
         }.toTypedArray()
     }
 
-    fun isInSameCity(location : Location) : Boolean{
-        return getCity(userLocation) == getCity(location)
+    private fun isInSameCity(location : Location) : Boolean{
+        return getCity(userLocation, this) == getCity(location, this)
     }
 
-    fun getDistanceString(location1: Location, location2: Location): String {
+    private fun getDistanceString(location1: Location, location2: Location): String {
         val distanceValue = location1.distanceTo(location2).toInt()
         return if(distanceValue >= 1000)
                 "${distanceValue/1000} km"
@@ -355,13 +343,13 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                 "$distanceValue m"
     }
 
-   fun setupTimer() {
-       val refreshTimeout = 5 * 60
+   private fun setupTimer() {
+       val refreshTimeout = 10
        val timerTW = findViewById<TextView>(R.id.main_refresh_timer)
 
        refreshMapTimer = Countdown(refreshTimeout) {
            this.runOnUiThread {
-                this.refreshMap()
+                refreshMapTimer.start()
            }
        }
 
@@ -373,4 +361,31 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
        refreshMapTimer.start()
    }
+
+    companion object {
+        private const val GEOLOCATION_PERMISSION_CODE = 1
+
+        fun getCity(location: Location, activity: AppCompatActivity): String? {
+            return Geocoder(activity, Locale.getDefault()).getFromLocation(
+                location.latitude,
+                location.longitude,
+                1
+            )[0].locality
+        }
+
+        fun getAddress(latLng: LatLng, activity: AppCompatActivity) : String{
+            val location = Location(String())
+            location.latitude = latLng.latitude
+            location.longitude = latLng.longitude
+            return getAddress(location, activity)
+        }
+
+        fun getAddress(location: Location, activity: AppCompatActivity, ) : String{
+            return Geocoder(activity, Locale.getDefault()).getFromLocation(
+                location.latitude,
+                location.longitude,
+                1
+            )[0].getAddressLine(0)
+        }
+    }
 }

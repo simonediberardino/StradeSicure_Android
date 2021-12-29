@@ -5,8 +5,6 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_bottom"
-    android:paddingBottom="32dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="16dp"
     app:layout_behavior="@string/top_sheet_behavior">
@@ -15,9 +13,22 @@
         android:id="@+id/body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
 
-        app:layout_behavior="@string/top_sheet_behavior">
+        android:background="@drawable/round_bottom"
+        android:paddingLeft="32dp"
+        android:paddingTop="16dp"
+        android:paddingRight="32dp"
+        android:paddingBottom="16dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/report_titolo"
+            app:layout_constraintStart_toEndOf="@+id/report_titolo"
+            app:layout_constraintTop_toTopOf="@+id/report_titolo"
+            app:srcCompat="@drawable/buca_icon" />
 
         <TextView
             android:id="@+id/report_titolo"
@@ -32,12 +43,11 @@
             android:shadowDy="5"
             android:shadowRadius="1.5"
             android:text="@string/segnala_anomalia"
-            android:textColor="@color/darkblue"
-            android:textSize="60px"
+            android:textColor="@color/darkred"
+            android:textSize="55px"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <ImageView
             android:id="@+id/report_back"
@@ -50,27 +60,27 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            app:boxBackgroundColor="@color/white"
-            app:boxStrokeErrorColor="@color/darkblue"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="0dp"
-            app:suffixTextColor="@color/darkblue"
-            app:hintTextColor="@color/darkblue"
-            app:placeholderTextColor="@color/darkblue"
-            app:helperTextTextColor="@color/darkblue"
-            app:counterTextColor="@color/darkblue"
-            android:textColorHint="@color/darkblue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
+            android:textColorHint="@color/darkblue"
+            app:boxBackgroundColor="@color/white"
             app:boxCornerRadiusBottomEnd="8dp"
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeErrorColor="@color/darkblue"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:counterTextColor="@color/darkblue"
+            app:helperTextTextColor="@color/darkblue"
+            app:hintTextColor="@color/darkblue"
             app:layout_constraintEnd_toEndOf="@+id/report_seperator"
             app:layout_constraintStart_toEndOf="@+id/report_circle"
-            app:layout_constraintTop_toBottomOf="@+id/report_seperator">
+            app:layout_constraintTop_toBottomOf="@+id/report_seperator"
+            app:placeholderTextColor="@color/darkblue"
+            app:suffixTextColor="@color/darkblue">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/report_address"
@@ -78,10 +88,47 @@
                 android:layout_height="125px"
                 android:background="@drawable/blue_btn_icon"
                 android:editable="false"
-                android:singleLine="true"
-
                 android:gravity="top|left"
+
                 android:hint="@string/indirizzo"
+                android:singleLine="true"
+                android:textColor="@color/lightgrey"
+                android:textColorHint="@color/darkblue"
+                android:textSize="35px" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColorHint="@color/darkblue"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeErrorColor="@color/darkblue"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:counterTextColor="@color/darkblue"
+            app:helperTextTextColor="@color/darkblue"
+            app:hintTextColor="@color/darkblue"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            app:placeholderTextColor="@color/darkblue"
+            app:suffixTextColor="@color/darkblue">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/report_description"
+                android:layout_width="match_parent"
+                android:layout_height="125px"
+                android:background="@drawable/blue_btn_icon"
+                android:gravity="top|left"
+
+                android:hint="@string/descrizione"
+                android:singleLine="true"
                 android:textColor="@color/lightgrey"
                 android:textColorHint="@color/darkblue"
                 android:textSize="35px" />
@@ -89,8 +136,8 @@
 
         <ImageView
             android:id="@+id/report_circle"
-            android:layout_width="45px"
-            android:layout_height="45px"
+            android:layout_width="40px"
+            android:layout_height="40px"
             app:layout_constraintBottom_toBottomOf="@+id/textInputLayout"
             app:layout_constraintStart_toStartOf="@+id/report_back"
             app:layout_constraintTop_toTopOf="@+id/textInputLayout"
@@ -114,22 +161,21 @@
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:background="@color/lightblue"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/report_confirm"
             app:layout_constraintEnd_toEndOf="@+id/report_circle"
             app:layout_constraintStart_toStartOf="@+id/report_circle"
             app:layout_constraintTop_toBottomOf="@+id/report_circle" />
 
         <RadioButton
             android:id="@+id/report_confirm"
-            android:layout_width="425px"
-            android:layout_height="120px"
+            android:layout_width="350px"
+            android:layout_height="100px"
             android:layout_marginTop="16dp"
             android:alpha="0.85"
             android:background="@drawable/red_button_icon"
             android:button="@android:color/transparent"
-            android:drawableRight="@drawable/buca_icon_adjusted"
             android:fontFamily="@font/carter_one"
-            android:gravity="center|left"
+            android:gravity="center"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:shadowColor="@color/black"
@@ -140,10 +186,49 @@
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="27px"
-            app:layout_constraintBottom_toBottomOf="@+id/dialog_city_icon"
-            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/report_gravita" />
+
+        <TextView
+            android:id="@+id/report_gravita"
+            android:layout_width="200px"
+            android:layout_height="100px"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/blue_btn_icon"
+            android:gravity="center"
+            android:text="@string/gravita"
+            android:textColor="@color/darkblue"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+
+        <ImageView
+            android:id="@+id/report_swiper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/report_confirm"
+            app:srcCompat="@drawable/swiper" />
+
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:maxHeight="10px"
+            android:minHeight="10px"
+            android:progress="50"
+            android:progressDrawable="@drawable/seekbar_style"
+            android:thumb="@drawable/seekbar_thumb"
+            app:layout_constraintBottom_toBottomOf="@+id/report_gravita"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
+            app:layout_constraintStart_toEndOf="@+id/report_gravita"
+            app:layout_constraintTop_toTopOf="@+id/report_gravita" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

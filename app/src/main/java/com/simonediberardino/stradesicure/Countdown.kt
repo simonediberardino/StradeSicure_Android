@@ -7,7 +7,7 @@ class Countdown{
     var curSeconds: Int = 0
     var countdown: Int = -1
 
-    var counter: Thread
+    lateinit var counter: Thread
     var onSecondCallback: Runnable? = null
     var onCompleteCallback: Runnable? = null
 
@@ -24,11 +24,8 @@ class Countdown{
     }
 
     fun start(){
+        this.init()
         counter.start()
-    }
-
-    fun resetTimer(){
-        curSeconds = 0
     }
 
     fun destroy(){
@@ -53,11 +50,11 @@ class Countdown{
         return "${getMinutesString()}: ${getSecondsString()}"
     }
 
-    init{
+    fun init(){
         counter = Thread {
             curSeconds = countdown
 
-            while(curSeconds > 0){
+            while(curSeconds >= 0){
                 try{
                     this.onSecondCallback?.run()
                     Thread.sleep(1000)
@@ -66,6 +63,7 @@ class Countdown{
                     return@Thread
                 }
             }
+
             this.onCompleteCallback?.run()
         }
     }

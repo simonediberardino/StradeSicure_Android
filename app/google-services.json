@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "229674269225",
+    "firebase_url": "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "strade-sicure",
+    "storage_bucket": "strade-sicure.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:229674269225:android:5d053138b7808ba5733a38",
+        "android_client_info": {
+          "package_name": "com.simonediberardino.stradesicure"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "229674269225-ufje80is4m99huddtan5ic5m9qfhl24t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBq3tRFdTHkxEfMwFX8lyyB5ZLQ3oBf6UM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "229674269225-ufje80is4m99huddtan5ic5m9qfhl24t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

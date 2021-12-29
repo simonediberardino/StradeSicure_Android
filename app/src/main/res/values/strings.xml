@@ -12,4 +12,7 @@
     <string name="refresh_in">Refresh in: {time}</string>
     <string name="request_permissions">Questa app ha bisogno della tua geolocalizzazione per poter funzionare correttamente.</string>
     <string name="conferma">Conferma</string>
+    <string name="aggiungi_marker">Indica sulla mappa la posizione precisa dell\'anomalia</string>
+    <string name="aggiungi_marker_tut">Per segnalare una posizione diversa tieni premuto sulla mappa sul punto desiderato.</string>
+    <string name="tua_posizione">La tua posizione attuale</string>
 </resources>

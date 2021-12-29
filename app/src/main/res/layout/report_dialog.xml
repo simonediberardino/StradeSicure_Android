@@ -5,99 +5,147 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_top"
+    android:background="@drawable/round_bottom"
     android:paddingBottom="32dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="16dp"
-    app:layout_behavior="@string/top_sheet_behavior" >
+    app:layout_behavior="@string/top_sheet_behavior">
 
-    <ImageView
-        android:id="@+id/dialog_city_icon"
-        android:layout_width="80px"
-        android:layout_height="80px"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_location_city_24" />
-
-    <TextView
-        android:id="@+id/dialog_city_tw"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="City"
-        android:textColor="@color/black"
-        android:textSize="55px"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/dialog_city_icon"
-        app:layout_constraintEnd_toStartOf="@+id/dialog_report_btn"
-        app:layout_constraintStart_toEndOf="@+id/dialog_city_icon"
-        app:layout_constraintTop_toTopOf="@+id/dialog_city_icon" />
+        android:padding="16dp"
 
-    <TextView
-        android:id="@+id/dialog_anomaly_tw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/buche_attive"
-        android:textColor="@color/darkgrey"
-        app:layout_constraintStart_toStartOf="@+id/dialog_city_icon"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_city_icon" />
+        app:layout_behavior="@string/top_sheet_behavior">
 
-
-    <RadioButton
-        android:id="@+id/dialog_report_btn"
-        android:layout_width="350px"
-        android:layout_height="80px"
-        android:layout_marginEnd="16dp"
-        android:alpha="0.85"
-        android:background="@drawable/red_button_icon"
-        android:button="@android:color/transparent"
-        android:drawableRight="@drawable/buca_icon_adjusted"
-        android:fontFamily="@font/carter_one"
-        android:gravity="center|left"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="5"
-        android:shadowRadius="1.5"
-        android:text="@string/segnala_anomalia"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        android:textSize="21px"
-        app:layout_constraintBottom_toBottomOf="@+id/dialog_city_icon"
-        app:layout_constraintEnd_toEndOf="@+id/view"
-        app:layout_constraintTop_toTopOf="@+id/dialog_city_icon" />
-
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="600px"
-        app:layout_constraintEnd_toEndOf="@+id/view"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toBottomOf="@+id/view">
-
-        <LinearLayout
-            android:id="@+id/dialog_anomaly_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/report_titolo"
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/carter_one"
             android:gravity="center"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:padding="2dp"
+            android:shadowColor="#000"
+            android:shadowDx="2"
+            android:shadowDy="5"
+            android:shadowRadius="1.5"
+            android:text="@string/segnala_anomalia"
+            android:textColor="@color/darkblue"
+            android:textSize="60px"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/view"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/lightgrey"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_anomaly_tw" />
 
+        <ImageView
+            android:id="@+id/report_back"
+            android:layout_width="90px"
+            android:layout_height="90px"
+            app:layout_constraintBottom_toBottomOf="@+id/report_titolo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/report_titolo"
+            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            app:boxBackgroundColor="@color/white"
+            app:boxStrokeErrorColor="@color/darkblue"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:suffixTextColor="@color/darkblue"
+            app:hintTextColor="@color/darkblue"
+            app:placeholderTextColor="@color/darkblue"
+            app:helperTextTextColor="@color/darkblue"
+            app:counterTextColor="@color/darkblue"
+            android:textColorHint="@color/darkblue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/report_seperator"
+            app:layout_constraintStart_toEndOf="@+id/report_circle"
+            app:layout_constraintTop_toBottomOf="@+id/report_seperator">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/report_address"
+                android:layout_width="match_parent"
+                android:layout_height="125px"
+                android:background="@drawable/blue_btn_icon"
+                android:editable="false"
+                android:singleLine="true"
+
+                android:gravity="top|left"
+                android:hint="@string/indirizzo"
+                android:textColor="@color/lightgrey"
+                android:textColorHint="@color/darkblue"
+                android:textSize="35px" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/report_circle"
+            android:layout_width="45px"
+            android:layout_height="45px"
+            app:layout_constraintBottom_toBottomOf="@+id/textInputLayout"
+            app:layout_constraintStart_toStartOf="@+id/report_back"
+            app:layout_constraintTop_toTopOf="@+id/textInputLayout"
+            app:srcCompat="@drawable/blue_circle" />
+
+        <View
+            android:id="@+id/report_seperator"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/lightgrey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/report_titolo" />
+
+        <View
+            android:id="@+id/report_line"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/lightblue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/report_circle"
+            app:layout_constraintStart_toStartOf="@+id/report_circle"
+            app:layout_constraintTop_toBottomOf="@+id/report_circle" />
+
+        <RadioButton
+            android:id="@+id/report_confirm"
+            android:layout_width="425px"
+            android:layout_height="120px"
+            android:layout_marginTop="16dp"
+            android:alpha="0.85"
+            android:background="@drawable/red_button_icon"
+            android:button="@android:color/transparent"
+            android:drawableRight="@drawable/buca_icon_adjusted"
+            android:fontFamily="@font/carter_one"
+            android:gravity="center|left"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:shadowColor="@color/black"
+            android:shadowDx="2"
+            android:shadowDy="5"
+            android:shadowRadius="1.5"
+            android:text="@string/segnala_anomalia"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="27px"
+            app:layout_constraintBottom_toBottomOf="@+id/dialog_city_icon"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

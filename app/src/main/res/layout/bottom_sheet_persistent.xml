@@ -9,7 +9,7 @@
     android:paddingBottom="32dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="16dp"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" >
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <ImageView
         android:id="@+id/dialog_city_icon"

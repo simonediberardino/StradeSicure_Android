@@ -33,9 +33,14 @@ import android.widget.TextView
 import android.widget.Toast
 import com.github.techisfun.android.topsheet.TopSheetBehavior
 import com.github.techisfun.android.topsheet.TopSheetDialog
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
 import kotlin.collections.ArrayList
+import androidx.annotation.NonNull
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
@@ -50,8 +55,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var refreshMapTimer: Countdown
-    private var lastMarker: Marker? = null
-    private var anomalies: ArrayList<Anomaly> = ArrayList()
+    private lateinit var anomalies: ArrayList<Anomaly>
+    private var anomalyMarker: Marker? = null
+    private var lastUserLocMarker: Marker? = null
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,29 +78,55 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         bottomSheetBehavior.peekHeight = 200
         bottomSheetBehavior.isHideable = false
 
-        val bottomSheet = findViewById<View>(R.id.top_sheet_persistent)
-        topSheetBehavior = TopSheetBehavior.from(bottomSheet)
+        val topSheet = findViewById<View>(R.id.top_sheet_persistent)
+
+        topSheetBehavior = TopSheetBehavior.from(topSheet)
         topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+        topSheetBehavior.setTopSheetCallback(object : TopSheetBehavior.TopSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(newState == TopSheetBehavior.STATE_COLLAPSED)
+                    topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float){}
+        })
 
         val reportBTN = findViewById<View>(R.id.dialog_report_btn)
 
-        reportBTN.setOnClickListener{
+        reportBTN.setOnClickListener {
             topSheetBehavior.state =
                 if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
-                    TopSheetBehavior.STATE_COLLAPSED
+                    TopSheetBehavior.STATE_HIDDEN
                 else
                     TopSheetBehavior.STATE_EXPANDED
+        }
 
+        val resetLocationBTN = findViewById<View>(R.id.main_my_location)
+        resetLocationBTN.setOnClickListener{
+            if(topSheetBehavior.state == TopSheetBehavior.STATE_HIDDEN)
+                this.zoomMapToUser()
+        }
+
+        val backBTN = findViewById<View>(R.id.report_back)
+        backBTN.setOnClickListener{
+            topSheetBehavior.state = TopSheetBehavior.STATE_HIDDEN
+        }
+
+        val addressET = findViewById<TextInputEditText>(R.id.report_address)
+        addressET.setOnClickListener{
+            Toast.makeText(this, getString(R.string.aggiungi_marker_tut), Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        this.anomalies = ArrayList()
         this.googleMap = googleMap
-        //this.googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
 
-        this.googleMap.setOnMapClickListener {
-            topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
+        this.googleMap.setOnMapLongClickListener {
+            addAnomalyMarker(it)
+            updateAnomalyLocation()
         }
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         this.setupGPS()
@@ -116,10 +148,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ),
-                Companion.GEOLOCATION_PERMISSION_CODE
-            )
-
-            return
+                GEOLOCATION_PERMISSION_CODE)
         }else{
             this.setupMap()
         }
@@ -130,7 +159,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when(requestCode){
-            Companion.GEOLOCATION_PERMISSION_CODE -> {
+            GEOLOCATION_PERMISSION_CODE -> {
                 if( grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
                     this.setupMap()
                 }else{
@@ -140,16 +169,27 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    fun setupMap(){
-        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
+    fun removeAnomalyMarker(){
+        val addressET = findViewById<TextInputEditText>(R.id.report_address)
+        addressET.setText(getString(R.string.tua_posizione))
+        anomalyMarker?.remove()
+    }
 
-        googleMap.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(userLocation.latitude, userLocation.longitude),
-                12.0f
-            )
-        )
+    @SuppressLint("MissingPermission")
+    fun setupMap() {
+        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
+        this.removeAnomalyMarker()
+
+        this.googleMap.setOnMarkerClickListener {
+            when (it) {
+                anomalyMarker -> this.removeAnomalyMarker()
+                lastUserLocMarker -> this.zoomMapToUser()
+            }
+
+            return@setOnMarkerClickListener false
+        }
+
+        this.zoomMapToUser()
 
         this.fetchAnomalies(object : RunnablePar {
             override fun run(any: Any) {
@@ -163,23 +203,34 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
     }
 
+    fun zoomMapToUser(){
+        val zoomValue = 14f
+        googleMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(userLocation.latitude, userLocation.longitude),
+                zoomValue
+            )
+        )
+    }
+
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onLocationChanged(location: Location) {
         val locationLatLng = LatLng(location.latitude, location.longitude)
 
+        val height = 128; val width = 128
         val drawable = getDrawable(R.drawable.car_icon)
-        val bitmap = drawable?.toBitmap(128, 128)
+        val bitmap = drawable?.toBitmap(width, height)
 
         val markerOptions = MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
         userLocation = location
-        lastMarker?.remove()
-        lastMarker = googleMap.addMarker(markerOptions)!!
+        lastUserLocMarker?.remove()
+        lastUserLocMarker = googleMap.addMarker(markerOptions)!!
 
         this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location)
     }
 
-    fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable){
+    fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
         FirebaseClass.getAnomaliesRef().get().addOnCompleteListener { task ->
             for(it : DataSnapshot in task.result.children){
                 val anomaly = it.getValue(Anomaly::class.java)
@@ -203,22 +254,26 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         googleMap.addMarker(markerOptions)!!
     }
 
-    fun storeAnomaly(anomaly: Anomaly){
+    fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
-        anomalies.sortBy {anomaly.location.distanceTo(userLocation)}
+        anomalies.sortBy{ anomaly.location.distanceTo(userLocation) }
     }
 
-    fun listAnomalies(){
+    fun listAnomalies() {
         var i = 0
         val toShow = 5
         while(i < toShow && i < anomalies.size) {
             listAnomaly(anomalies[i])
             i++
         }
+
+        val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
+        val anomaliesInCity = getAnomaliesInCity(userLocation).size
+        nAnomaliesTW.text = getString(R.string.buche_attive).replace("{number}", anomaliesInCity.toString())
     }
 
-    fun listAnomaly(anomaly: Anomaly){
-        if(anomaly.location.distanceTo(userLocation) > 15 * 1000)
+    fun listAnomaly(anomaly: Anomaly) {
+        if(isInSameCity(anomaly.location))
             return
 
         val parentLayoutId = R.id.dialog_anomaly_layout
@@ -242,27 +297,54 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         gallery.addView(view)
     }
 
-    fun refreshMap(){
+    fun addAnomalyMarker(latLng: LatLng){
+        anomalyMarker?.remove()
+        anomalyMarker = this.googleMap.addMarker(MarkerOptions().position(latLng))
+    }
+
+    fun updateAnomalyLocation(){
+        val foundAddress = getAddress(anomalyMarker!!.position)
+        val addressET = findViewById<TextInputEditText>(R.id.report_address)
+        addressET.setText(foundAddress)
+    }
+
+    fun refreshMap() {
         anomalies.clear()
         googleMap.clear()
         this.setupMap()
     }
 
     fun getCity(location: Location): String? {
-        val gcd = Geocoder(this, Locale.getDefault())
-        val addresses = gcd.getFromLocation(location.latitude, location.longitude, 1)
-        return addresses[0].locality
+        return Geocoder(this, Locale.getDefault()).getFromLocation(
+            location.latitude,
+            location.longitude,
+            1
+        )[0].locality
     }
 
-    fun getAnomaliesInCity(location: Location){
-        val currentCity = getCity(location)
-        // ...
+    fun getAddress(latLng: LatLng) : String{
+        val location = Location(String())
+        location.latitude = latLng.latitude
+        location.longitude = latLng.longitude
+        return getAddress(location)
     }
 
-    fun reportDialog(){
-        val dialog = TopSheetDialog(this)
-        dialog.setContentView(R.layout.report_dialog)
-        dialog.show()
+    fun getAddress(location: Location) : String{
+        return Geocoder(this, Locale.getDefault()).getFromLocation(
+            location.latitude,
+            location.longitude,
+            1
+        )[0].getAddressLine(0)
+    }
+
+    fun getAnomaliesInCity(location: Location) : Array<Anomaly> {
+        return anomalies.filter {
+            getCity(it.location) == getCity(location)
+        }.toTypedArray()
+    }
+
+    fun isInSameCity(location : Location) : Boolean{
+        return getCity(userLocation) == getCity(location)
     }
 
     fun getDistanceString(location1: Location, location2: Location): String {
@@ -273,7 +355,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                 "$distanceValue m"
     }
 
-   fun setupTimer(){
+   fun setupTimer() {
        val refreshTimeout = 5 * 60
        val timerTW = findViewById<TextView>(R.id.main_refresh_timer)
 

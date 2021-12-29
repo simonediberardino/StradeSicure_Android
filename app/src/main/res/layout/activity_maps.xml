@@ -19,12 +19,24 @@
             android:layout_height="match_parent"
             tools:context=".MapsActivity"></androidx.fragment.app.FragmentContainerView>
 
+        <ImageButton
+            android:id="@+id/main_my_location"
+            android:layout_width="125px"
+            android:layout_height="125px"
+
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/round_button"
+            android:src="@drawable/ic_baseline_my_location_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/map"></ImageButton>
+
         <TextView
             android:id="@+id/main_refresh_timer"
             android:layout_width="wrap_content"
             android:layout_height="100px"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/red_button_icon"
             android:button="@android:color/transparent"
             android:drawableRight="@drawable/ic_baseline_timer_24"
@@ -41,7 +53,7 @@
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="21px"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/menu_home">
+        <menu>
+            <item
+                android:icon="@drawable/ic_baseline_map_24"
+                android:title="@string/menu_mappa"/>
+
+            <item
+                android:icon="@drawable/ic_baseline_account_circle_24"
+                android:title="@string/menu_account" />
+        </menu>
+    </item>
+
+    <item android:title="@string/segnalazioni">
+        <menu>
+            <item
+                android:icon="@drawable/ic_baseline_assignment_24"
+                android:title="@string/mie_segnalazioni"/>
+
+            <item
+                android:icon="@drawable/ic_baseline_list_alt_24"
+                android:title="@string/tutte_segnalazioni" />
+        </menu>
+    </item>
+
+    <item android:title="@string/info">
+        <menu>
+            <item
+                android:icon="@drawable/ic_baseline_email_24"
+                android:title="@string/menu_contattaci" />
+        </menu>
+    </item>
+</menu>

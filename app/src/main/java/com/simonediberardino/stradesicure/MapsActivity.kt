@@ -2,51 +2,40 @@ package com.simonediberardino.stradesicure
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Dialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
-import android.content.pm.PackageManager
 import android.location.*
 
 import android.os.Build
+import android.view.*
+import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.graphics.drawable.toBitmap
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.util.*
-import android.location.Geocoder
-import android.os.PersistableBundle
-import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.appcompat.app.ActionBarDrawerToggle
+import com.github.techisfun.android.topsheet.TopSheetBehavior
+import kotlin.collections.ArrayList
+
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import android.widget.TextView
 import android.widget.Toast
-import com.github.techisfun.android.topsheet.TopSheetBehavior
-import com.github.techisfun.android.topsheet.TopSheetDialog
-import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.FirebaseApp
-import com.google.firebase.database.DataSnapshot
-import kotlin.collections.ArrayList
-import androidx.annotation.NonNull
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
-import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import java.lang.Exception
+import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toBitmap
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.database.DataSnapshot
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
@@ -56,7 +45,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var userLocation: Location
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
-    private lateinit var refreshMapTimer: Countdown
     private lateinit var anomalies: ArrayList<Anomaly>
     private var anomalyMarker: Marker? = null
     private var lastUserLocMarker: Marker? = null
@@ -76,10 +64,18 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun initializeLayout(){
+        this.setupBottomSheet()
+        this.setupTopSheet()
+        this.setupButtons()
+    }
+
+    private fun setupBottomSheet(){
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
         bottomSheetBehavior.peekHeight = 350
         bottomSheetBehavior.isHideable = false
+    }
 
+    private fun setupTopSheet(){
         val topSheet = findViewById<View>(R.id.top_sheet_persistent)
 
         topSheetBehavior = TopSheetBehavior.from(topSheet)
@@ -87,18 +83,20 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         topSheetBehavior.peekHeight = 90
         topSheetBehavior.setTopSheetCallback(object : TopSheetBehavior.TopSheetCallback() {
             override fun onStateChanged(topSheet: View, newState: Int) {
-                if(newState == TopSheetBehavior.STATE_HIDDEN)
+                if(newState == TopSheetBehavior.STATE_COLLAPSED)
                     topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float){}
         })
+    }
 
+    @SuppressLint("RtlHardcoded")
+    private fun setupButtons(){
         val reportBTN = findViewById<View>(R.id.dialog_report_btn)
 
         reportBTN.setOnClickListener {
-            topSheetBehavior.state =
-                if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
+            topSheetBehavior.state = if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
                     TopSheetBehavior.STATE_COLLAPSED
                 else
                     TopSheetBehavior.STATE_EXPANDED
@@ -106,8 +104,17 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
-            if(topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED)
+            if(topSheetBehavior.state == TopSheetBehavior.STATE_HIDDEN
+                || topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED)
                 this.zoomMapToUser()
+        }
+
+        val showSideMenuBTN = findViewById<View>(R.id.main_toggle_menu)
+        showSideMenuBTN.setOnClickListener {
+            if(topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED){
+                val drawerLayout = findViewById<DrawerLayout>(R.id.parent)
+                drawerLayout.openDrawer(Gravity.LEFT)
+            }
         }
 
         val backBTN = findViewById<View>(R.id.report_back)
@@ -117,7 +124,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
         addressET.setOnClickListener{
-            Toast.makeText(this, getString(R.string.aggiungi_marker_tut), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                getString(R.string.aggiungi_marker_tut),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -133,7 +144,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         this.setupGPS()
-        this.setupTimer()
     }
 
     fun setupGPS() {
@@ -343,8 +353,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                 "$distanceValue m"
     }
 
+   @SuppressLint("UseCompatLoadingForDrawables")
    private fun setupTimer() {
-       val refreshTimeout = 10
+/*       val refreshTimeout = 10
        val timerTW = findViewById<TextView>(R.id.main_refresh_timer)
 
        refreshMapTimer = Countdown(refreshTimeout) {
@@ -359,7 +370,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
            }
        }
 
-       refreshMapTimer.start()
+       refreshMapTimer.start()*/
    }
 
     companion object {

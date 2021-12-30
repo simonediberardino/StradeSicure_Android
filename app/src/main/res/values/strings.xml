@@ -17,4 +17,15 @@
     <string name="tua_posizione">La tua posizione attuale</string>
     <string name="descrizione">Breve descrizione</string>
     <string name="gravita">Gravità</string>
+    <string name="mappa">Mappa</string>
+    <string name="mie_segnalazioni">Le mie segnalazioni</string>
+    <string name="tutte_segnalazioni">Tutte le segnalazioni</string>
+    <string name="segnalazioni">Segnalazioni</string>
+    <string name="apri_nav">Apri menu</string>
+    <string name="chiudi_nav">Chiudi menu</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_mappa">Mappa</string>
+    <string name="menu_account">Mio profilo</string>
+    <string name="menu_credits">Crediti</string>
+    <string name="menu_contattaci">Contattaci</string>
 </resources>

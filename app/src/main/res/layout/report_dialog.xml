@@ -15,9 +15,9 @@
         android:layout_height="wrap_content"
 
         android:background="@drawable/round_bottom"
-        android:paddingLeft="32dp"
+        android:paddingLeft="16dp"
         android:paddingTop="16dp"
-        android:paddingRight="32dp"
+        android:paddingRight="16dp"
         android:paddingBottom="16dp">
 
         <ImageView
@@ -43,7 +43,7 @@
             android:shadowDy="5"
             android:shadowRadius="1.5"
             android:text="@string/segnala_anomalia"
-            android:textColor="@color/darkred"
+            android:textColor="@color/red"
             android:textSize="55px"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -138,6 +138,7 @@
             android:id="@+id/report_circle"
             android:layout_width="40px"
             android:layout_height="40px"
+            android:layout_marginStart="16dp"
             app:layout_constraintBottom_toBottomOf="@+id/textInputLayout"
             app:layout_constraintStart_toStartOf="@+id/report_back"
             app:layout_constraintTop_toTopOf="@+id/textInputLayout"
@@ -147,7 +148,7 @@
             android:id="@+id/report_seperator"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:background="@color/lightgrey"
@@ -160,6 +161,7 @@
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:background="@color/lightblue"
             app:layout_constraintBottom_toBottomOf="@+id/report_confirm"
             app:layout_constraintEnd_toEndOf="@+id/report_circle"

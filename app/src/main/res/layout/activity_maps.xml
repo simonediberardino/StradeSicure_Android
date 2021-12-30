@@ -1,90 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsActivity">
+    tools:context=".MapsActivity"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/body"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".MapsActivity"></androidx.fragment.app.FragmentContainerView>
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageButton
-            android:id="@+id/main_my_location"
-            android:layout_width="125px"
-            android:layout_height="125px"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/body"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/round_button"
-            android:src="@drawable/ic_baseline_my_location_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/map"></ImageButton>
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:context=".MapsActivity" />
 
-        <TextView
-            android:id="@+id/main_refresh_timer"
-            android:layout_width="wrap_content"
-            android:layout_height="100px"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="48dp"
-            android:background="@drawable/red_button_icon"
-            android:button="@android:color/transparent"
-            android:drawableRight="@drawable/ic_baseline_timer_24"
-            android:drawablePadding="16dp"
-            android:fontFamily="@font/carter_one"
-            android:gravity="center|left"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:shadowColor="@color/black"
-            android:shadowDx="2"
-            android:shadowDy="5"
-            android:shadowRadius="1.5"
-            android:text="0:00"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="21px"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageButton
+                    android:id="@+id/main_my_location"
+                    android:layout_width="125px"
+                    android:layout_height="125px"
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:layout_marginTop="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_baseline_my_location_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/map" />
 
-    <include
-        android:id="@+id/bottom_sheet_persistent"
-        layout="@layout/bottom_sheet_persistent" />
+                <ImageButton
+                    android:id="@+id/main_toggle_menu"
+                    android:layout_width="125px"
+                    android:layout_height="125px"
 
-    <include
-        android:id="@+id/top_sheet_persistent"
-        layout="@layout/report_dialog" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="48dp"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_baseline_menu_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-<!--
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parent"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapsActivity" ></androidx.fragment.app.FragmentContainerView>
+            <include
+                android:id="@+id/bottom_sheet_persistent"
+                layout="@layout/bottom_sheet_persistent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <include
+                android:id="@+id/top_sheet_persistent"
+                layout="@layout/report_dialog" />
 
--->
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/main_navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        app:itemIconPadding="16dp"
+        android:textColorSecondary="@color/darkblue"
+        app:itemIconTint="@color/darkblue"
+        app:itemTextColor="@color/grey"
+        app:headerLayout="@layout/header_side_menu"
+        app:menu="@menu/side_menu"
+        android:layout_gravity="start"
+        app:theme="@style/ThemeOverlay.AppCompat.Light" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

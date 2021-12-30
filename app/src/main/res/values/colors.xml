@@ -20,7 +20,9 @@
     <color name="aquamarine">#33ffba</color>
     <color name="lightred">#FE775B</color>
     <color name="darkred">#FC3232</color>
+    <color name="red">#f74a4a</color>
     <color name= "darkgrey">#292929</color>
+    <color name="grey">#4f4f4f</color>
     <color name= "lightgrey">#808080</color>
     <color name="silver">#F1F1F1</color>
 </resources>

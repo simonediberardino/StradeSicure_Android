@@ -1,4 +1,10 @@
 <resources>
+    <string-array name="stato">
+        <item>Lieve</item>
+        <item>Medio</item>
+        <item>Grave</item>
+        <item>Estremamente grave</item>
+    </string-array>
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strade Sicure</string>
     <string name="title_activity_maps">Strade Sicure</string>
@@ -16,7 +22,7 @@
     <string name="aggiungi_marker_tut">Per segnalare una posizione diversa tieni premuto sulla mappa sul punto desiderato.</string>
     <string name="tua_posizione">La tua posizione attuale</string>
     <string name="descrizione">Breve descrizione</string>
-    <string name="gravita">Gravità</string>
+    <string name="stato">Stato</string>
     <string name="mappa">Mappa</string>
     <string name="mie_segnalazioni">Le mie segnalazioni</string>
     <string name="tutte_segnalazioni">Tutte le segnalazioni</string>

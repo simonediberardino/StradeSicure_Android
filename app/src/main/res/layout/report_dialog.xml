@@ -190,19 +190,46 @@
             android:textSize="27px"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/report_gravita" />
+            app:layout_constraintTop_toBottomOf="@+id/report_stato_title" />
 
         <TextView
-            android:id="@+id/report_gravita"
+            android:id="@+id/report_stato_title"
             android:layout_width="200px"
             android:layout_height="100px"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/blue_btn_icon"
             android:gravity="center"
-            android:text="@string/gravita"
+            android:text="@string/stato"
             android:textColor="@color/darkblue"
             app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+
+        <TextView
+            android:id="@+id/report_stato_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="TextView"
+            android:textColor="@color/lightgrey"
+            android:textSize="30px"
+            app:layout_constraintBottom_toTopOf="@+id/report_stato_bar"
+            app:layout_constraintEnd_toEndOf="@+id/report_stato_bar"
+            app:layout_constraintStart_toStartOf="@+id/report_stato_bar" />
+
+        <SeekBar
+            android:id="@+id/report_stato_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:maxHeight="10px"
+            android:minHeight="10px"
+            android:progress="50"
+            android:progressDrawable="@drawable/seekbar_style"
+            android:thumb="@drawable/seekbar_thumb"
+            app:layout_constraintBottom_toBottomOf="@+id/report_stato_title"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
+            app:layout_constraintStart_toEndOf="@+id/report_stato_title"
+            app:layout_constraintTop_toTopOf="@+id/report_stato_title" />
 
         <ImageView
             android:id="@+id/report_swiper"
@@ -214,22 +241,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/report_confirm"
             app:srcCompat="@drawable/swiper" />
-
-
-        <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:maxHeight="10px"
-            android:minHeight="10px"
-            android:progress="50"
-            android:progressDrawable="@drawable/seekbar_style"
-            android:thumb="@drawable/seekbar_thumb"
-            app:layout_constraintBottom_toBottomOf="@+id/report_gravita"
-            app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
-            app:layout_constraintStart_toEndOf="@+id/report_gravita"
-            app:layout_constraintTop_toTopOf="@+id/report_gravita" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

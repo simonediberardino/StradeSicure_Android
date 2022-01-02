@@ -20,6 +20,7 @@
                 android:right="4dp"
                 android:top="4dp" />
         </shape>
+
     </item>
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
@@ -27,7 +28,7 @@
             <gradient
                 android:angle="45"
                 android:centerX="35%"
-                android:startColor="#47A891"
+                android:startColor="@color/green"
                 android:endColor="@color/green"
                 android:type="linear"
                 />

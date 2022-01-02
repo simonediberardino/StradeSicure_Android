@@ -52,6 +52,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var userLocation: Location
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
     private var anomalyMarker: Marker? = null
     private var lastUserLocMarker: Marker? = null
@@ -73,9 +74,14 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun initializeLayout(){
+        this.setupSideMenu()
         this.setupBottomSheet()
         this.setupReportSheet()
         this.setupButtons()
+    }
+
+    private fun setupSideMenu(){
+        drawerLayout = findViewById(R.id.parent)
     }
 
     private fun setupBottomSheet(){
@@ -88,12 +94,14 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         val topSheet = findViewById<View>(R.id.top_sheet_persistent)
 
         topSheetBehavior = TopSheetBehavior.from(topSheet)
-        topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
         topSheetBehavior.peekHeight = 90
+        topSheetBehavior.isHideable = false
+
+        setTopMenuVisibility(false)
 
         val backBTN = findViewById<View>(R.id.report_back)
         backBTN.setOnClickListener{
-            topSheetBehavior.state = TopSheetBehavior.STATE_COLLAPSED
+            setTopMenuVisibility(false)
         }
 
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
@@ -154,24 +162,21 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         val reportBTN = findViewById<View>(R.id.dialog_report_btn)
 
         reportBTN.setOnClickListener {
-            topSheetBehavior.state = if(topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED)
-                    TopSheetBehavior.STATE_COLLAPSED
-                else
-                    TopSheetBehavior.STATE_EXPANDED
+            setTopMenuVisibility(
+                !isTopMenuShown()
+            )
         }
 
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
-            if(topSheetBehavior.state == TopSheetBehavior.STATE_HIDDEN
-                || topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED)
+            if(!isTopMenuShown())
                 this.zoomMapToUser()
         }
 
         val showSideMenuBTN = findViewById<View>(R.id.main_toggle_menu)
         showSideMenuBTN.setOnClickListener {
-            if(topSheetBehavior.state == TopSheetBehavior.STATE_COLLAPSED){
-                val drawerLayout = findViewById<DrawerLayout>(R.id.parent)
-                drawerLayout.openDrawer(Gravity.LEFT)
+            if(!isTopMenuShown()){
+                setSideMenuVisibility(true)
             }
         }
     }
@@ -228,7 +233,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun insufficientPermissions(){
-        Utility.showDialog(this, getString(R.string.request_permissions))
+        Utility.showToast(this, getString(R.string.request_permissions))
     }
 
     fun removeAnomalyMarker(){
@@ -275,6 +280,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
     fun zoomMapToUser(){
         val zoomValue = 14f
+
         googleMap.map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation.latitude, userLocation.longitude),
@@ -301,9 +307,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     }
 
     fun setAnomaliesListener() {
-        /*
+        /**
             Locks the thread until the first fetch is done, then starts listening for new anomalies
-         */
+        */
         Thread{
             threadLocker.withLock {
                 threadLockerCond.await()
@@ -433,6 +439,62 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         addressET.setText(foundAddress)
     }
 
+    private fun setSideMenuVisibility(flag: Boolean) {
+        if(flag){
+            drawerLayout.openDrawer(Gravity.LEFT)
+        }else{
+            drawerLayout.closeDrawer(Gravity.LEFT)
+        }
+    }
+
+    private fun isSideMenuShown(): Boolean {
+        return drawerLayout.isDrawerOpen(Gravity.LEFT)
+    }
+
+    private fun setTopMenuVisibility(flag: Boolean){
+        topSheetBehavior.state = if(flag){
+            TopSheetBehavior.STATE_EXPANDED
+        }else{
+            TopSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    private fun isTopMenuShown(): Boolean {
+        return topSheetBehavior.state == TopSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun setBottomMenuVisibility(flag: Boolean){
+        bottomSheetBehavior.state = if(flag){
+            BottomSheetBehavior.STATE_EXPANDED
+        }else{
+            BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    private fun isBottomMenuShown(): Boolean{
+        return bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    fun closeMenus() : Boolean {
+        return when {
+            isSideMenuShown() -> {
+                setSideMenuVisibility(false)
+                true
+            }
+            isTopMenuShown() -> {
+                setTopMenuVisibility(false)
+                true
+            }
+            isBottomMenuShown() -> {
+                setBottomMenuVisibility(false)
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
     fun refreshMap() {
         anomalies.clear()
         googleMap.map.clear()
@@ -455,6 +517,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                 "${distanceValue/1000} km"
             else
                 "$distanceValue m"
+    }
+
+    override fun onBackPressed() {
+        if(!closeMenus())
+            super.onBackPressed()
     }
 
    @SuppressLint("UseCompatLoadingForDrawables")

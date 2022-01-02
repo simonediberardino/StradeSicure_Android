@@ -34,4 +34,6 @@
     <string name="menu_account">Mio profilo</string>
     <string name="menu_credits">Crediti</string>
     <string name="menu_contattaci">Contattaci</string>
+    <string name="annulla">Annulla</string>
+    <string name="ok">OK</string>
 </resources>

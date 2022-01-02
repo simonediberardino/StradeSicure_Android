@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable-v24/bordo_text_view.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable-v24/ic_baseline_close_24.xml" value="0.22395833333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_btn_icon.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_btn_icon_not_pressed.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_btn_icon_pressed.xml" value="0.20462962962962963" />
@@ -12,6 +13,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/bordo_text_view.xml" value="0.20833333333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/bottom_border.xml" value="0.20833333333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/buca_icon_adjusted.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/circle_shadow.xml" value="0.382051282051282" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/custom_thumb.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.22395833333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.20462962962962963" />
@@ -51,6 +53,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/bottom_sheet_persistent.xml" value="0.33" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/header_side_menu.xml" value="0.2" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/report_dialog.xml" value="0.33" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/short_dialog.xml" value="0.21829710144927536" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/single_anomaly.xml" value="0.5" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/menu/side_menu.xml" value="0.22" />
       </map>

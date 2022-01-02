@@ -34,6 +34,7 @@
                     android:layout_marginTop="48dp"
                     android:layout_marginEnd="16dp"
                     android:background="@drawable/round_button"
+                    android:elevation="28dp"
                     android:src="@drawable/ic_baseline_my_location_24"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/map" />

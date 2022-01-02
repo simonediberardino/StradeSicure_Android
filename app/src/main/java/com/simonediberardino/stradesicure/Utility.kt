@@ -1,5 +1,7 @@
 package com.simonediberardino.stradesicure
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.DisplayMetrics
@@ -20,11 +22,14 @@ object Utility {
         c.startActivity(i)
     }
 
-    fun showDialog(c: AppCompatActivity, message: String){
+    fun oneLineDialog(c: Context?, title: String?, callback: Runnable?) {
+        CDialog((c as Activity?)!!, title, callback).show()
+    }
+
+    fun showToast(c: AppCompatActivity, message: String){
         Toast.makeText(c, message, Toast.LENGTH_LONG).show()
     }
 
-    // Ridimensiona i componenti in base alla dimensione dello schermo;
     fun ridimensionamento(activity: AppCompatActivity, v: ViewGroup) {
         val displayMetrics = DisplayMetrics()
         activity.windowManager.defaultDisplay.getMetrics(displayMetrics)

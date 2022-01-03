@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lightblue">#18C3FF</color>
     <color name="darkblue">#1881FF</color>
+    <color name="blue">#00AAFF</color>
     <color name="lightorange">#ffa500</color>
     <color name="darkorange">#ff8c00</color>
     <color name="lightyellow">#F0E68C</color>

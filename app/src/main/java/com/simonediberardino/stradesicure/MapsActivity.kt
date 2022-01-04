@@ -2,6 +2,7 @@ package com.simonediberardino.stradesicure
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -43,6 +44,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import android.content.IntentFilter
+
+
+
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
@@ -68,6 +73,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
+        this.registerReceiver(NetworkStatusListener(), intentFilter)
 
         this.initializeLayout()
         super.onPageLoaded()
@@ -257,8 +265,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
                 return@setOnMarkerClickListener false
             }
 
-            this.zoomMapToUser()
-
             this.fetchAnomalies(object : RunnablePar {
                 override fun run(any: Any) {
                     showAnomaly(any as Anomaly)
@@ -275,6 +281,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
         } catch (e: Exception) {
             this.insufficientPermissions()
+        }finally {
+            this.zoomMapToUser()
         }
     }
 
@@ -371,8 +379,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         googleMap.removeMarker(anomaly.location)
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     fun showAnomaly(anomaly: Anomaly) {
-        val height = 64; val width = 64
+        val height = 80; val width = 80
         val drawable = getDrawable(R.drawable.buca_icon)
         val bitmap = drawable?.toBitmap(width, height)
 
@@ -382,7 +391,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
         )).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
         googleMap.addMarker(markerOptions)
-        println("added")
     }
 
     fun storeAnomaly(anomaly: Anomaly) {

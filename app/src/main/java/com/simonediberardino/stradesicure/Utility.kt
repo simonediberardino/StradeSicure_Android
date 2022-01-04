@@ -26,6 +26,21 @@ object Utility {
         CDialog((c as Activity?)!!, title, callback).show()
     }
 
+    fun oneLineDialog(
+        c: Context?,
+        title: String?,
+        option1: String?,
+        option2: String?,
+        firstCallback: Runnable?,
+        secondCallback: Runnable?,
+        dismissCallback: Runnable?
+    ) {
+        CDialog(
+            (c as AppCompatActivity?)!!, title, option1!!, option2!!, firstCallback, secondCallback, dismissCallback
+        ).show()
+    }
+
+
     fun showToast(c: AppCompatActivity, message: String){
         Toast.makeText(c, message, Toast.LENGTH_LONG).show()
     }

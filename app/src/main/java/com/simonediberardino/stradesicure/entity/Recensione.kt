@@ -1,4 +1,4 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.entity
 
 class Recensione{
     lateinit var authorId: String

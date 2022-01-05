@@ -1,4 +1,4 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.entity
 
 open class User{
     lateinit var nome: String

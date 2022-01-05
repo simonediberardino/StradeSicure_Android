@@ -35,7 +35,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activities.MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
             <intent-filter>
@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NetworkStatusListener"
+        <receiver android:name=".misc.NetworkStatusListener"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />

@@ -1,10 +1,11 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.misc
 
 import android.net.ConnectivityManager
 import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.widget.Toast
+import com.simonediberardino.stradesicure.R
 import java.lang.Boolean
 
 

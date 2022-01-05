@@ -5,7 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsActivity"
+    tools:context=".activities.MapsActivity"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
@@ -24,7 +24,7 @@
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:context=".MapsActivity" />
+                    tools:context=".activities.MapsActivity" />
 
                 <ImageButton
                     android:id="@+id/main_my_location"

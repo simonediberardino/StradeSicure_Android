@@ -1,4 +1,4 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.misc
 
 interface RunnablePar : Runnable {
     fun run(any: Any) {}

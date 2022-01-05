@@ -1,14 +1,24 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.firebase
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.simonediberardino.stradesicure.entity.Anomaly
+import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.FbUser
+import com.simonediberardino.stradesicure.entity.User
 
 object FirebaseClass {
     private var DB_REF = "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app"
 
     fun isFirebaseStringValid(string: String?): Boolean {
         val tempString = string?.trim { it <= ' ' }
-        return !(tempString == "null" || tempString?.isEmpty() == true || tempString?.contains(".") == true || tempString?.contains("#") == true || tempString?.contains("$") == true || tempString?.contains("[") == true || tempString?.contains("]") == true)
+        return !((tempString == "null"
+                || tempString?.isEmpty()!!
+                || tempString.contains("."))
+                || tempString.contains("#")
+                || tempString.contains("$")
+                || tempString.contains("[")
+                || tempString.contains("]"))
     }
 
     fun getDBRef(): DatabaseReference {

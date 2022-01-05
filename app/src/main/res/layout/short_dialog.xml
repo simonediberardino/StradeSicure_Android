@@ -64,17 +64,20 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="MissingConstraints" />
 
-        <Button
+        <RadioButton
             android:id="@+id/dialog_btn2"
             android:layout_width="0dp"
             android:layout_height="80px"
+
             android:layout_marginStart="2dp"
-            android:layout_marginLeft="2dp"
             android:layout_marginTop="8dp"
             android:background="@android:color/white"
+            android:button="@android:color/transparent"
             android:clickable="true"
+            android:gravity="center"
             android:padding="5dp"
             android:text="@string/annulla"
+            android:textAllCaps="true"
             android:textColor="#5DBCD2"
             android:textSize="40px"
             android:textStyle="bold"
@@ -82,17 +85,19 @@
             app:layout_constraintStart_toEndOf="@+id/dialog_view12"
             app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
 
-        <Button
+        <RadioButton
             android:id="@+id/dialog_btn1"
             android:layout_width="0dp"
             android:layout_height="80px"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginRight="2dp"
             android:background="@android:color/white"
+            android:button="@android:color/transparent"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:text="@string/ok"
+            android:textAllCaps="true"
             android:textColor="#5DBCD2"
             android:textSize="40px"
             android:textStyle="bold"

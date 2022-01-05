@@ -1,4 +1,4 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.entity
 
 class FbUser : User {
     lateinit var userId: String

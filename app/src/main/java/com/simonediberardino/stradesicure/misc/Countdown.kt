@@ -1,4 +1,4 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.misc
 
 import java.lang.Exception
 import kotlin.properties.Delegates

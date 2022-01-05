@@ -167,7 +167,7 @@
 
         <RadioButton
             android:id="@+id/report_confirm"
-            android:layout_width="400px"
+            android:layout_width="360px"
             android:layout_height="100px"
             android:layout_marginTop="16dp"
             android:alpha="0.85"

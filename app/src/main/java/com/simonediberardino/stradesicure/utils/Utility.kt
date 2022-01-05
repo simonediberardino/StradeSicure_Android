@@ -1,18 +1,15 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.utils
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.DisplayMetrics
 import android.util.TypedValue
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import com.simonediberardino.stradesicure.UI.CDialog
 
 
 object Utility {
@@ -22,12 +19,12 @@ object Utility {
         c.startActivity(i)
     }
 
-    fun oneLineDialog(c: Context?, title: String?, callback: Runnable?) {
-        CDialog((c as Activity?)!!, title, callback).show()
+    fun oneLineDialog(c: AppCompatActivity?, title: String?, callback: Runnable?) {
+        CDialog(c!!, title, callback).show()
     }
 
     fun oneLineDialog(
-        c: Context?,
+        c: AppCompatActivity?,
         title: String?,
         option1: String?,
         option2: String?,
@@ -36,7 +33,7 @@ object Utility {
         dismissCallback: Runnable?
     ) {
         CDialog(
-            (c as AppCompatActivity?)!!, title, option1!!, option2!!, firstCallback, secondCallback, dismissCallback
+            c!!, title, option1!!, option2!!, firstCallback, secondCallback, dismissCallback
         ).show()
     }
 

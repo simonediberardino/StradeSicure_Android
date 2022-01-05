@@ -36,5 +36,6 @@
     <string name="menu_contattaci">Contattaci</string>
     <string name="annulla">Annulla</string>
     <string name="ok">OK</string>
+    <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

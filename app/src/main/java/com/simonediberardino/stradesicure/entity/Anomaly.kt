@@ -1,4 +1,6 @@
-package com.simonediberardino.stradesicure
+package com.simonediberardino.stradesicure.entity
+
+import com.simonediberardino.stradesicure.misc.LocationExtended
 
 class Anomaly{
     lateinit var location: LocationExtended

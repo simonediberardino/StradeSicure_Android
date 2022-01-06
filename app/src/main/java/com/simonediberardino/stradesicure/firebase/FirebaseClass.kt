@@ -45,8 +45,8 @@ object FirebaseClass {
         getAnomaliesRef().push().setValue(anomaly)
     }
 
-    fun addEmailUserToFirebase(email: String, utente: EmailUser){
-        getEmailUsersRef().child(email).setValue(utente)
+    fun addEmailUserToFirebase(utente: EmailUser){
+        getEmailUsersRef().push().setValue(utente)
     }
 
     fun addFbUserToFirebase(userId: String, utente: FbUser){

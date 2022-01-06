@@ -4,50 +4,45 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Bundle
-
-import com.google.android.gms.maps.GoogleMap
-import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import android.location.*
-
 import android.os.Build
+import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import androidx.annotation.RequiresApi
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.gms.maps.model.*
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import java.util.*
-import com.github.techisfun.android.topsheet.TopSheetBehavior
-import kotlin.collections.ArrayList
-
-import androidx.drawerlayout.widget.DrawerLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.drawerlayout.widget.DrawerLayout
+import com.github.techisfun.android.topsheet.TopSheetBehavior
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
-import android.content.IntentFilter
 import com.simonediberardino.stradesicure.*
+import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
 import com.simonediberardino.stradesicure.misc.LocationExtended
-import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
+import java.util.*
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
+import kotlin.concurrent.withLock
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
@@ -67,9 +62,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.initializeLayout()
         this.checkIfLoggedIn()
-        super.onPageLoaded()
     }
 
     override fun initializeLayout(){
@@ -82,7 +75,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
 
     private fun checkIfLoggedIn(){
         if(!LoginHandler.isLoggedIn()){
-            Utility.navigateTo(this, AccountActivity::class.java)
+            Utility.navigateTo(this, LoginActivity::class.java)
         }
     }
 

@@ -1,7 +1,5 @@
 package com.simonediberardino.stradesicure.utils
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -10,6 +8,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simonediberardino.stradesicure.UI.CDialog
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 
 object Utility {
@@ -30,13 +31,30 @@ object Utility {
         option2: String?,
         firstCallback: Runnable?,
         secondCallback: Runnable?,
-        dismissCallback: Runnable?
+        dismissCallback: Runnable?,
     ) {
         CDialog(
             c!!, title, option1!!, option2!!, firstCallback, secondCallback, dismissCallback
         ).show()
     }
 
+    fun getMD5(input: String): String? {
+        return try {
+            val md = MessageDigest.getInstance("MD5")
+            val messageDigest = md.digest(input.toByteArray())
+
+            val no = BigInteger(1, messageDigest)
+
+            var hashtext = no.toString(16)
+            while (hashtext.length < 32) {
+                hashtext = "0$hashtext"
+            }
+            hashtext
+        }
+        catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException(e)
+        }
+    }
 
     fun showToast(c: AppCompatActivity, message: String){
         Toast.makeText(c, message, Toast.LENGTH_LONG).show()

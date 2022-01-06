@@ -40,8 +40,18 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
+    <string name="register">Registrati</string>
     <string name="oppure">Oppure</string>
+    <string name="nome">Nome</string>
+    <string name="cognome">Cognome</string>
+    <string name="haigiaaccount">Hai già un account?</string>
     <string name="nonhaiaccount">Non hai un account?</string>
+    <string name="emailnotvalid">Email non valida</string>
+    <string name="caricamento">Caricamento…</string>
+    <string name="progress">Avanzamento: {progress}</string>
+    <string name="register_success">Registrato correttamente!</string>
+    <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
+    <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

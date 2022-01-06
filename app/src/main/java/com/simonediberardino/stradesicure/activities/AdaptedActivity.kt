@@ -27,11 +27,14 @@ abstract class AdaptedActivity : AppCompatActivity() {
         this.registerReceiver(NetworkStatusListener(), intentFilter)
 
         lastContext = this
+
+        this.initializeLayout()
+        this.onPageLoaded()
     }
 
     abstract fun initializeLayout()
 
-    fun onPageLoaded(){
+    private fun onPageLoaded(){
         Utility.ridimensionamento(this, findViewById(R.id.parent))
     }
 

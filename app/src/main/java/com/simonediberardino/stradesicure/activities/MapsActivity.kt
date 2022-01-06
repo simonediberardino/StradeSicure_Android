@@ -8,11 +8,8 @@ import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.LinearLayout
-import android.widget.SeekBar
+import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -45,7 +43,13 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
 
-class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
+
+
+
+
+
+
+class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, NavigationView.OnNavigationItemSelectedListener{
     private lateinit var googleMap: GoogleMapExtended
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: LocationManager
@@ -95,6 +99,38 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
      */
     private fun setupSideMenu(){
         drawerLayout = findViewById(R.id.parent)
+        val navigationView = findViewById<View>(R.id.main_navigation_view) as NavigationView
+        navigationView.setNavigationItemSelectedListener(this)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_mappa -> {
+                setSideMenuVisibility(false)
+            }
+
+            R.id.menu_profilo -> {
+                Utility.navigateTo(this,
+                if(LoginHandler.isLoggedIn())
+                    MyAccountActivity::class.java
+                    else
+                        LoginActivity::class.java)
+            }
+
+            R.id.menu_mie_segnalazioni -> {
+
+            }
+
+            R.id.menu_tutte_segnalazioni -> {
+
+            }
+
+            R.id.menu_contatti -> {
+
+            }
+        }
+
+        return true
     }
 
     /**

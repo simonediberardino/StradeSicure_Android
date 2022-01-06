@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="24dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/account_back_btn"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/account_top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/blue_background_gradient"
+                android:padding="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/account_icon"
+                    android:layout_width="300px"
+                    android:layout_height="300px"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/account_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingBottom="64dp"
+                    android:text="@string/nome"
+                    android:textColor="@color/white"
+                    android:textSize="50px"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/account_icon"
+                    app:layout_constraintStart_toStartOf="@+id/account_icon"
+                    app:layout_constraintTop_toBottomOf="@+id/account_icon" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="850px"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/account_top"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/account_top">
+
+                <androidx.gridlayout.widget.GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    app:alignmentMode="alignBounds"
+                    app:columnCount="3"
+                    app:rowCount="1">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        app:layout_columnWeight="1"
+                        app:layout_gravity="fill"
+                        app:layout_rowWeight="1">
+
+                        <TextView
+                            android:id="@+id/account_segnalazioni_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="16dp"
+                            android:text="@string/segnalazioni"
+                            android:textColor="@color/darkgrey"
+                            android:textSize="40px"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/account_segnalazioni_number"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="16dp"
+
+                            android:text="0"
+                            android:textColor="@color/blue"
+                            android:textSize="60px" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/view3"
+                        android:layout_width="1dp"
+                        android:layout_height="wrap_content"
+                        android:background="@color/grey"
+                        app:layout_rowWeight="1" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1">
+
+                        <TextView
+                            android:id="@+id/account_recensioni_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="16dp"
+                            android:text="@string/recensioni"
+                            android:textColor="@color/darkgrey"
+                            android:textSize="40px"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/account_recensioni_number"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="16dp"
+
+                            android:text="0"
+                            android:textColor="@color/blue"
+                            android:textSize="60px" />
+                    </LinearLayout>
+
+                </androidx.gridlayout.widget.GridLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/account_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="24dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+                <ImageView
+                    android:id="@+id/account_email_icon"
+                    android:layout_width="100px"
+                    android:layout_height="100px"
+                    android:layout_marginStart="32dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_email_25" />
+
+                <TextView
+                    android:id="@+id/account_email_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="@string/email"
+                    android:textColor="@color/grey"
+                    android:textSize="40px"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/account_email_icon"
+                    app:layout_constraintTop_toTopOf="@+id/account_email_icon" />
+
+                <TextView
+                    android:id="@+id/account_email_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="sample@gmail.com"
+                    android:textColor="@color/lightgrey"
+                    android:textSize="35px"
+                    app:layout_constraintStart_toStartOf="@+id/account_email_title"
+                    app:layout_constraintTop_toBottomOf="@+id/account_email_title" />
+
+                <ImageView
+                    android:id="@+id/account_email_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/account_email_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/account_email_icon"
+                    app:srcCompat="@drawable/ic_baseline_edit_24" />
+
+                <ImageView
+                    android:id="@+id/account_id_icon"
+                    android:layout_width="100px"
+                    android:layout_height="100px"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintEnd_toEndOf="@+id/account_email_icon"
+                    app:layout_constraintStart_toStartOf="@+id/account_email_icon"
+                    app:layout_constraintTop_toBottomOf="@+id/account_email_icon"
+                    app:srcCompat="@drawable/ic_baseline_qr_code_24" />
+
+                <TextView
+                    android:id="@+id/account_id_ttitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="@string/accountid"
+                    android:textColor="@color/grey"
+                    android:textSize="40px"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/account_id_icon"
+                    app:layout_constraintTop_toTopOf="@+id/account_id_icon" />
+
+                <TextView
+                    android:id="@+id/account_id_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="sample123456789"
+                    android:textColor="@color/lightgrey"
+                    android:textSize="35px"
+                    app:layout_constraintStart_toStartOf="@+id/account_id_ttitle"
+                    app:layout_constraintTop_toBottomOf="@+id/account_id_ttitle" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <RadioButton
+        android:id="@+id/account_back_btn"
+        android:layout_width="400px"
+        android:layout_height="100px"
+        android:layout_marginBottom="64dp"
+        android:alpha="0.85"
+        android:background="@drawable/red_button_icon"
+        android:button="@android:color/transparent"
+        android:drawableRight="@drawable/ic_baseline_exit_to_app_24"
+        android:fontFamily="@font/carter_one"
+        android:gravity="center|left"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:shadowColor="@color/black"
+        android:shadowDx="2"
+        android:shadowDy="5"
+        android:shadowRadius="1.5"
+        android:text="@string/indietro"
+        android:textColor="@color/white"
+        android:textSize="35px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

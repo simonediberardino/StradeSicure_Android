@@ -1,7 +1,6 @@
 package com.simonediberardino.stradesicure.login
 
 import com.facebook.AccessToken
-import com.simonediberardino.stradesicure.storage.ApplicationData
 
 object LoginHandler {
     fun isFacebookLoggedIn(): Boolean {
@@ -19,6 +18,6 @@ object LoginHandler {
 
     fun hasValidCredentials(): Boolean{
         // Not implemented yet;
-        return ApplicationData.getAccountID() != null
+        return true
     }
 }

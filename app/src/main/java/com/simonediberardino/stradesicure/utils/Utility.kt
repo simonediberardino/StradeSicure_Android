@@ -1,5 +1,6 @@
 package com.simonediberardino.stradesicure.utils
 
+import android.R
 import android.content.Intent
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -7,17 +8,23 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import com.simonediberardino.stradesicure.UI.CDialog
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
+
+
+
 object Utility {
     fun navigateTo(c: AppCompatActivity, cl: Class<*>?) {
-        val i = Intent(c, cl)
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        c.startActivity(i)
+        val intent = Intent(c, cl)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        val bundle = ActivityOptionsCompat.makeCustomAnimation(c, R.anim.fade_in, R.anim.fade_out).toBundle()
+        c.startActivity(intent, bundle)
     }
 
     fun oneLineDialog(c: AppCompatActivity?, title: String?, callback: Runnable?) {

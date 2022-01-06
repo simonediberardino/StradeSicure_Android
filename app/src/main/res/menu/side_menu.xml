@@ -4,10 +4,12 @@
     <item android:title="@string/menu_home">
         <menu>
             <item
+                android:id="@+id/menu_mappa"
                 android:icon="@drawable/ic_baseline_map_24"
                 android:title="@string/menu_mappa"/>
 
             <item
+                android:id="@+id/menu_profilo"
                 android:icon="@drawable/ic_baseline_account_circle_24"
                 android:title="@string/menu_account" />
         </menu>
@@ -16,10 +18,12 @@
     <item android:title="@string/segnalazioni">
         <menu>
             <item
+                android:id="@+id/menu_mie_segnalazioni"
                 android:icon="@drawable/ic_baseline_assignment_24"
                 android:title="@string/mie_segnalazioni"/>
 
             <item
+                android:id="@+id/menu_tutte_segnalazioni"
                 android:icon="@drawable/ic_baseline_list_alt_24"
                 android:title="@string/tutte_segnalazioni" />
         </menu>
@@ -28,6 +32,7 @@
     <item android:title="@string/info">
         <menu>
             <item
+                android:id="@+id/menu_contatti"
                 android:icon="@drawable/ic_baseline_email_24"
                 android:title="@string/menu_contattaci" />
         </menu>

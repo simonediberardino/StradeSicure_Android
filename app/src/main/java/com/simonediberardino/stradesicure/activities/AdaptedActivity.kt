@@ -32,6 +32,11 @@ abstract class AdaptedActivity : AppCompatActivity() {
         this.onPageLoaded()
     }
 
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.activity_fade_in,R.anim.activity_fade_out);
+    }
+
     abstract fun initializeLayout()
 
     private fun onPageLoaded(){

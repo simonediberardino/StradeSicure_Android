@@ -75,6 +75,9 @@
         app:headerLayout="@layout/header_side_menu"
         app:menu="@menu/side_menu"
         android:layout_gravity="start"
-        app:theme="@style/ThemeOverlay.AppCompat.Light" />
+        app:theme="@style/ThemeOverlay.AppCompat.Light">
+    </com.google.android.material.navigation.NavigationView>
+
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

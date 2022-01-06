@@ -27,4 +27,6 @@
     <color name= "lightgrey">#808080</color>
     <color name="darksilver">#D5D5D5</color>
     <color name="silver">#F1F1F1</color>
+    <color name="pinksalmone">#ff6984</color>
+    <color name="darkpink">#ff5473</color>
 </resources>

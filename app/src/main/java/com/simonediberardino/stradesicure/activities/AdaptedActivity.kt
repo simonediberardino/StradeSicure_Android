@@ -11,7 +11,7 @@ import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
-open class AdaptedActivity : AppCompatActivity() {
+abstract class AdaptedActivity : AppCompatActivity() {
     companion object {
         var lastContext: AdaptedActivity? = null
     }
@@ -28,6 +28,8 @@ open class AdaptedActivity : AppCompatActivity() {
 
         lastContext = this
     }
+
+    abstract fun initializeLayout()
 
     fun onPageLoaded(){
         Utility.ridimensionamento(this, findViewById(R.id.parent))

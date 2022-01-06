@@ -1,4 +1,5 @@
 <resources>
+    <string name="facebook_app_id">473625777492322</string> <string name="fb_login_protocol_scheme">fb473625777492322</string>
     <string-array name="stato">
         <item>Lieve</item>
         <item>Medio</item>
@@ -36,6 +37,11 @@
     <string name="menu_contattaci">Contattaci</string>
     <string name="annulla">Annulla</string>
     <string name="ok">OK</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="oppure">Oppure</string>
+    <string name="nonhaiaccount">Non hai un account?</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

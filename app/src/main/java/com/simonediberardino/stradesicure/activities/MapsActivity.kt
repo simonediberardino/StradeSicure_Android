@@ -42,6 +42,7 @@ import android.content.IntentFilter
 import com.simonediberardino.stradesicure.*
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
+import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
 import com.simonediberardino.stradesicure.misc.LocationExtended
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
@@ -67,15 +68,22 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.initializeLayout()
+        this.checkIfLoggedIn()
         super.onPageLoaded()
     }
 
-    private fun initializeLayout(){
+    override fun initializeLayout(){
         this.setContentView()
         this.setupSideMenu()
         this.setupBottomSheet()
         this.setupReportSheet()
         this.setupButtons()
+    }
+
+    private fun checkIfLoggedIn(){
+        if(!LoginHandler.isLoggedIn()){
+            Utility.navigateTo(this, AccountActivity::class.java)
+        }
     }
 
     /**

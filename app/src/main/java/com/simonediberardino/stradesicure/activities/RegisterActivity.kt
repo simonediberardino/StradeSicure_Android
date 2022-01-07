@@ -29,7 +29,6 @@ class RegisterActivity : AdaptedActivity() {
         val loginBtn = this.findViewById<View>(R.id.register_login_text)
         loginBtn.setOnClickListener { onBackPressed() }
 
-
         val profileImage = this.findViewById<ImageView>(R.id.register_profile_image)
 
         profileImage.setOnClickListener { startGalleryActivity() }
@@ -41,8 +40,7 @@ class RegisterActivity : AdaptedActivity() {
         val email = this.findViewById<EditText>(R.id.register_email_et).text.toString().trim()
         val passwordRaw = this.findViewById<EditText>(R.id.register_password_et).text.toString().trim()
         
-        val convertedEmail: String = email.replace("_", ".")
-        val isValidEmail = !TextUtils.isEmpty(convertedEmail) && Patterns.EMAIL_ADDRESS.matcher(convertedEmail).matches()
+        val isValidEmail = !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
         if (!isValidEmail) {
             val message = this.getString(R.string.emailnotvalid)
             Utility.oneLineDialog(this, message, null)
@@ -64,7 +62,16 @@ class RegisterActivity : AdaptedActivity() {
 
         val passwordEncrypted = Utility.getMD5(passwordRaw)
 
-        val emailUser = EmailUser(firstName, lastName, convertedEmail, passwordEncrypted!!)
+        FirebaseClass.getEmailUsersRef().get().addOnCompleteListener { snap ->
+            val isEmailRegistered: Boolean = snap.result.children.any{
+                it.child("email").value.toString().equals(email, ignoreCase = true)
+            }
+
+            if(isEmailRegistered)
+                Utility.showToast(this, "email registered")
+        }
+
+        val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
         uploadProfilePicToFirebase(emailUser){
             FirebaseClass.addEmailUserToFirebase(emailUser)
             Utility.showToast(this, getString(R.string.register_success))

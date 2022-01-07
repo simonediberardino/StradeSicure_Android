@@ -5,6 +5,8 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.utils.Utility
 
 
@@ -26,6 +28,14 @@ class LoginActivity : AdaptedActivity() {
             imageUri = data?.data
             profileImage.setImageURI(imageUri)
         }
+    }
+
+    fun onLogin(loggedUser: User){
+        LoginHandler.deviceUser = loggedUser
+    }
+
+    fun onLogout(){
+        LoginHandler.deviceUser = null
     }
 
 }

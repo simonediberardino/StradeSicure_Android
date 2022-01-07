@@ -4,12 +4,18 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.*
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,14 +27,17 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.simonediberardino.stradesicure.*
+import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
@@ -39,7 +48,6 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
 
@@ -53,11 +61,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     private lateinit var googleMap: GoogleMapExtended
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: LocationManager
-    private lateinit var userLocation: Location
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
+    private var userLocation: Location? = null
     private var anomalyMarker: Marker? = null
     private var lastUserLocMarker: Marker? = null
     private var threadLocker = ReentrantLock()
@@ -264,6 +272,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
+        this.setupMap()
         this.setupGPS()
         this.setAnomaliesListener()
     }
@@ -288,8 +297,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 ),
                 GEOLOCATION_PERMISSION_CODE
             )
-        }else{
-            this.setupMap()
         }
     }
 
@@ -299,9 +306,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
         when(requestCode){
             GEOLOCATION_PERMISSION_CODE -> {
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    this.setupMap()
-                }else{
+                if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     this.insufficientPermissions()
                 }
             }
@@ -321,7 +326,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     @SuppressLint("MissingPermission")
     private fun setupMap() {
         try {
-            this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!)
+            this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER))
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.5f, this)
+        } catch (e: Exception) {
+            this.insufficientPermissions()
+        }finally {
             this.removeAnomalyMarker()
 
             this.googleMap.map.setOnMarkerClickListener {
@@ -333,7 +342,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 return@setOnMarkerClickListener false
             }
 
-            this.fetchAnomalies(object : RunnablePar {
+            fetchAnomalies(object : RunnablePar {
                 override fun run(any: Any) {
                     showAnomaly(any as Anomaly)
                     storeAnomaly(any)
@@ -346,20 +355,19 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 listAnomalies()
             }
 
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 2f, this)
-        } catch (e: Exception) {
-            this.insufficientPermissions()
-        }finally {
             this.zoomMapToUser()
         }
     }
 
     private fun zoomMapToUser(){
+        if(userLocation == null)
+            return
+
         val zoomValue = 14f
 
         googleMap.map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
-                LatLng(userLocation.latitude, userLocation.longitude),
+                LatLng(userLocation!!.latitude, userLocation!!.longitude),
                 zoomValue
             )
         )
@@ -367,6 +375,17 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onLocationChanged(location: Location) {
+        this.onLocationChanged(location as Location?)
+    }
+
+    @JvmName("onLocationChanged1")
+    fun onLocationChanged(location: Location?){
+        val currentCityTW = this.findViewById<TextView>(R.id.dialog_city_tw)
+        if(location == null){
+            currentCityTW.text = getString(R.string.citynotfound)
+            return
+        }
+
         val locationLatLng = LatLng(location.latitude, location.longitude)
 
         val height = 128; val width = 128
@@ -378,9 +397,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         userLocation = location
         lastUserLocMarker?.remove()
         lastUserLocMarker = googleMap.map.addMarker(markerOptions)
-
-        this.findViewById<TextView>(R.id.dialog_city_tw).text = getCity(location, this)
     }
+
 
     private fun setAnomaliesListener() {
         /**
@@ -450,7 +468,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
-        anomalies.sortBy{ anomaly.location.distanceTo(userLocation) }
+
+        if(userLocation != null)
+            anomalies.sortBy{ anomaly.location.distanceTo(userLocation) }
     }
 
     private fun listAnomalies() {
@@ -560,7 +580,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     private fun refreshMap() {}
 
-    private fun getAnomaliesInCity(location: Location) : Array<Anomaly> {
+    private fun getAnomaliesInCity(location: Location?) : Array<Anomaly> {
+        if(location == null)
+            return emptyArray()
+
         return anomalies.filter {
             getCity(it.location, this) == getCity(location, this)
         }.toTypedArray()
@@ -570,7 +593,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         return getCity(userLocation, this) == getCity(location, this)
     }
 
-    private fun getDistanceString(location1: Location, location2: Location): String {
+    private fun getDistanceString(location1: Location?, location2: Location?): String {
+        if(location1 == null || location2 == null)
+            return getString(R.string.posizionenontrovata)
+
         val distanceValue = location1.distanceTo(location2).toInt()
         return if(distanceValue >= 1000)
                 "${distanceValue/1000} km"
@@ -586,7 +612,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     companion object {
         private const val GEOLOCATION_PERMISSION_CODE = 1
 
-        fun getCity(location: Location, activity: AppCompatActivity): String? {
+        fun getCity(location: Location?, activity: AppCompatActivity): String? {
+            if(location == null)
+                return activity.getString(R.string.citynotfound)
+
             return Geocoder(activity, Locale.getDefault()).getFromLocation(
                 location.latitude,
                 location.longitude,

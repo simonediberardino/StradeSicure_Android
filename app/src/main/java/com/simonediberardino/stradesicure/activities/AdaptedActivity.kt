@@ -34,7 +34,7 @@ abstract class AdaptedActivity : AppCompatActivity() {
 
     override fun finish() {
         super.finish()
-        overridePendingTransition(R.anim.activity_fade_in,R.anim.activity_fade_out);
+        overridePendingTransition(R.anim.activity_fade_in, R.anim.activity_fade_out);
     }
 
     abstract fun initializeLayout()
@@ -42,5 +42,4 @@ abstract class AdaptedActivity : AppCompatActivity() {
     private fun onPageLoaded(){
         Utility.ridimensionamento(this, findViewById(R.id.parent))
     }
-
 }

@@ -53,6 +53,8 @@
     <string name="accountid">ID Account</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
+    <string name="citynotfound">Città sconosciuta</string>
+    <string name="posizionenontrovata">Posizione non trovata</string>
     <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>

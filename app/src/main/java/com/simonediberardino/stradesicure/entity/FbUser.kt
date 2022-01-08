@@ -1,11 +1,8 @@
 package com.simonediberardino.stradesicure.entity
 
 class FbUser : User {
-    lateinit var userId: String
     constructor() {}
-    constructor(nome: String, cognome: String, userId: String) : super(nome, cognome) {
-        this.userId = userId
-    }
+    constructor(nome: String, cognome: String, userId: String) : super(nome, cognome, userId){}
 }
 
 

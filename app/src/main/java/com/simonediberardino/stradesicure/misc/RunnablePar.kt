@@ -1,6 +1,6 @@
 package com.simonediberardino.stradesicure.misc
 
 interface RunnablePar : Runnable {
-    fun run(any: Any) {}
+    fun run(p: Any?)
     override fun run() {}
 }

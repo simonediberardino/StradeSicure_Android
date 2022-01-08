@@ -67,15 +67,19 @@ class RegisterActivity : AdaptedActivity() {
                 it.child("email").value.toString().equals(email, ignoreCase = true)
             }
 
-            if(isEmailRegistered)
-                Utility.showToast(this, "email registered")
-        }
+            if(isEmailRegistered) {
+                val message = this.getString(R.string.emailgiaregistrata)
+                Utility.oneLineDialog(this, message, null)
+                return@addOnCompleteListener
+            }
 
-        val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
-        uploadProfilePicToFirebase(emailUser){
-            FirebaseClass.addEmailUserToFirebase(emailUser)
-            Utility.showToast(this, getString(R.string.register_success))
-            Utility.navigateTo(this, MapsActivity::class.java)
+            val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
+            uploadProfilePicToFirebase(emailUser){
+                FirebaseClass.addEmailUserToFirebase(emailUser)
+                LoginActivity.onLogin(emailUser)
+                Utility.showToast(this, getString(R.string.register_success))
+                Utility.goToMainMenu(this)
+            }
         }
     }
 
@@ -94,7 +98,7 @@ class RegisterActivity : AdaptedActivity() {
         }
 
         val progressDialog = ProgressDialog(this)
-        val reference: StorageReference = storageReference.child("images/" + emailUser.email)
+        val reference: StorageReference = storageReference.child("images/" + emailUser.uniqueId)
 
         reference.putFile(uploadedImage!!)
             .addOnSuccessListener {

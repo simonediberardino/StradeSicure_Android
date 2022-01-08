@@ -212,7 +212,7 @@
                     app:srcCompat="@drawable/ic_baseline_qr_code_24" />
 
                 <TextView
-                    android:id="@+id/account_id_ttitle"
+                    android:id="@+id/account_id_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
@@ -230,8 +230,8 @@
                     android:text="sample123456789"
                     android:textColor="@color/lightgrey"
                     android:textSize="35px"
-                    app:layout_constraintStart_toStartOf="@+id/account_id_ttitle"
-                    app:layout_constraintTop_toBottomOf="@+id/account_id_ttitle" />
+                    app:layout_constraintStart_toStartOf="@+id/account_id_title"
+                    app:layout_constraintTop_toBottomOf="@+id/account_id_title" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

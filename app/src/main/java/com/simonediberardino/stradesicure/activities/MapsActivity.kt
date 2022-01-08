@@ -15,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -168,13 +167,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         }
 
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
-        addressET.setOnClickListener{
-            Toast.makeText(
-                this,
-                getString(R.string.aggiungi_marker_tut),
-                Toast.LENGTH_LONG
-            ).show()
-        }
+        addressET.setOnClickListener{ howToReportAnomaly() }
 
         val statusBar = findViewById<SeekBar>(R.id.report_stato_bar)
         updateStatusDescription(statusBar.progress)
@@ -190,14 +183,22 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
         val confirmBtn = findViewById<View>(R.id.report_confirm)
         confirmBtn.setOnClickListener {
-            val anomalyLocation = latLngToLocation(
-                (if(anomalyMarker == null)
-                    lastUserLocMarker?.position
-                else
-                    anomalyMarker!!.position)!!
-            )
+            if(LoginHandler.deviceUser == null){
+                Utility.oneLineDialog(this, this.getString(R.string.nonloggato), null)
+                return@setOnClickListener
+            }
 
-            val spotterId = "-1"
+            if(userLocation == null && anomalyMarker == null){
+                howToReportAnomaly()
+                return@setOnClickListener
+            }
+
+            val anomalyLocation = if(anomalyMarker == null)
+                    locationToLocationExtended(userLocation!!)
+                else
+                    latLngToLocation(anomalyMarker!!.position)
+
+            val spotterId = LoginHandler.deviceUser!!.uniqueId
             val description = findViewById<TextInputEditText>(R.id.report_description).text.toString().trim()
             val stato = statusBar.progress
 
@@ -218,6 +219,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 removeAnomalyMarker()
             }
         }
+    }
+
+    private fun howToReportAnomaly(){
+        Utility.showToast(this, getString(R.string.aggiungi_marker_tut))
     }
 
     /**
@@ -319,7 +324,16 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     private fun removeAnomalyMarker(){
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
-        addressET.setText(getString(R.string.tua_posizione))
+
+        addressET.setText(
+            getString(
+                if(userLocation != null)
+                    R.string.tua_posizione
+                else
+                    R.string.posizionenontrovata
+            )
+        )
+
         anomalyMarker?.remove()
     }
 
@@ -343,9 +357,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             }
 
             fetchAnomalies(object : RunnablePar {
-                override fun run(any: Any) {
-                    showAnomaly(any as Anomaly)
-                    storeAnomaly(any)
+                override fun run(p: Any?) {
+                    showAnomaly(p as Anomaly)
+                    storeAnomaly(p)
                 }
             }) {
                 threadLocker.withLock {
@@ -397,6 +411,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         userLocation = location
         lastUserLocMarker?.remove()
         lastUserLocMarker = googleMap.map.addMarker(markerOptions)
+
+        currentCityTW.text = getCity(location, this)
     }
 
 
@@ -643,6 +659,13 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             location.latitude = latLng.latitude
             location.longitude = latLng.longitude
             return location
+        }
+
+        fun locationToLocationExtended(location: Location): LocationExtended {
+            val locationExtended = LocationExtended()
+            locationExtended.latitude = location.latitude
+            locationExtended.longitude = location.longitude
+            return locationExtended
         }
     }
 }

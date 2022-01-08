@@ -13,6 +13,8 @@ class ProgressDialog(appCompatActivity: AppCompatActivity) : Dialog(appCompatAct
             field = value
             this.findViewById<TextView>(R.id.load_dialog_descr).text =
                 this.context.getString(R.string.progress).replace("{progress}", progress.toString())
+            if(progress >= 100)
+                this.dismiss()
         }
 
     init{

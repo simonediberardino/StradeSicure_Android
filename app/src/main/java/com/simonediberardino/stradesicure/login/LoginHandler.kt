@@ -12,15 +12,19 @@ object LoginHandler {
     }
 
     fun isEmailLoggedIn(): Boolean{
-        return hasValidCredentials()
+        return deviceUser != null
     }
 
     fun isLoggedIn(): Boolean {
         return isEmailLoggedIn() || isFacebookLoggedIn()
     }
 
+    fun getFullName(user: User): String{
+        return "${user.nome} ${user.cognome}"
+    }
+
     fun hasValidCredentials(): Boolean{
         // Not implemented yet;
-        return true
+        return false
     }
 }

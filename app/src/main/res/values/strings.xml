@@ -20,7 +20,7 @@
     <string name="request_permissions">Questa app ha bisogno della tua geolocalizzazione per poter funzionare correttamente.</string>
     <string name="conferma">Conferma</string>
     <string name="aggiungi_marker">Indica sulla mappa la posizione precisa dell\'anomalia</string>
-    <string name="aggiungi_marker_tut">Per segnalare una posizione diversa tieni premuto sulla mappa sul punto desiderato.</string>
+    <string name="aggiungi_marker_tut">Per segnalare una posizione tieni premuto sulla mappa sul punto desiderato.</string>
     <string name="tua_posizione">La tua posizione attuale</string>
     <string name="descrizione">Breve descrizione</string>
     <string name="stato">Stato</string>
@@ -54,6 +54,10 @@
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
     <string name="citynotfound">Città sconosciuta</string>
+    <string name="loginsuccess">Login effettuato correttamente!</string>
+    <string name="nonloggato">Devi effettuare l\'accesso per utilizzare questa funzionalità.</string>
+    <string name="credenzialierrate">Credenziali errate, riprova.</string>
+    <string name="emailgiaregistrata">Questa email è già stata registrata.</string>
     <string name="posizionenontrovata">Posizione non trovata</string>
     <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>

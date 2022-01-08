@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import com.simonediberardino.stradesicure.UI.CDialog
+import com.simonediberardino.stradesicure.activities.MapsActivity
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -25,6 +26,10 @@ object Utility {
 
         val bundle = ActivityOptionsCompat.makeCustomAnimation(c, R.anim.fade_in, R.anim.fade_out).toBundle()
         c.startActivity(intent, bundle)
+    }
+
+    fun goToMainMenu(c: AppCompatActivity){
+        Utility.navigateTo(c, MapsActivity::class.java)
     }
 
     fun oneLineDialog(c: AppCompatActivity?, title: String?, callback: Runnable?) {

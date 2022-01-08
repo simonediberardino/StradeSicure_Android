@@ -1,15 +1,22 @@
 package com.simonediberardino.stradesicure.firebase
 
+import android.graphics.BitmapFactory
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.simonediberardino.stradesicure.activities.AdaptedActivity
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.misc.RunnablePar
+import java.net.URL
+
 
 object FirebaseClass {
     private var DB_REF = "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app"
-
+    private var STOR_REF = "gs://strade-sicure.appspot.com"
     fun isFirebaseStringValid(string: String?): Boolean {
         val tempString = string?.trim { it <= ' ' }
         return !((tempString == "null"
@@ -21,6 +28,10 @@ object FirebaseClass {
                 || tempString.contains("]"))
     }
 
+    fun getStorageRef(): StorageReference {
+        return FirebaseStorage.getInstance(STOR_REF).reference
+
+    }
     fun getDBRef(): DatabaseReference {
         return FirebaseDatabase.getInstance(DB_REF).reference
     }
@@ -55,6 +66,59 @@ object FirebaseClass {
 
     fun addUserToFirebase(email: String, utente: User?) {
         getDBRef().child(email).setValue(utente)
+    }
+
+    fun getReferenceByUser(user: User): DatabaseReference {
+        return if(user is EmailUser) getEmailUsersRef() else getFbUsersRef()
+    }
+
+    fun getAnomaliesByUser(user: User, callback: RunnablePar) {
+        println("USERID ${user.uniqueId}")
+        getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
+            val count = dataSnapshot.result.children.count {
+                it.child("spotterId").value.toString().equals(user.uniqueId, ignoreCase = true)
+            }
+
+            callback.run(count)
+        }
+    }
+
+    fun getReportsByUser(user: User, callback: RunnablePar) {
+        getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
+            val count = dataSnapshot.result.children.count {
+                it.child("authorId").value.toString().equals(user.uniqueId, ignoreCase = true)
+            }
+            callback.run(count)
+        }
+    }
+
+    fun getSnapshotFromUser(user: User, callback: RunnablePar) {
+        getReferenceByUser(user).get().addOnCompleteListener { dataSnapshot ->
+            val userFound = dataSnapshot.result.children.find {
+                it.child("uniqueId").value.toString().equals(user.uniqueId, ignoreCase = true)
+            }
+
+            callback.run(userFound)
+        }
+    }
+
+    fun getProfileImage(user: User, callback: RunnablePar){
+        getStorageRef().child("images/${user.uniqueId}").downloadUrl
+            .addOnSuccessListener {
+                println("scusaaaa ${it.toString()}")
+
+                getImageFromUrl(it.toString(), callback)
+            }.addOnFailureListener {
+            }
+    }
+
+    fun getImageFromUrl(imageUrl: String, callback: RunnablePar){
+        Thread{
+            val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
+            AdaptedActivity.lastContext?.runOnUiThread {
+                callback.run(bitmap)
+            }
+        }.start()
     }
 
     fun <T> editFieldFirebase(referString: String, field: String, child: String, value: T) {

@@ -53,6 +53,7 @@
     <string name="accountid">ID Account</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
+    <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>
     <string name="citynotfound">Città sconosciuta</string>
     <string name="loginsuccess">Login effettuato correttamente!</string>
     <string name="nonloggato">Devi effettuare l\'accesso per utilizzare questa funzionalità.</string>

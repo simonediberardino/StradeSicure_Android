@@ -1,6 +1,7 @@
 package com.simonediberardino.stradesicure.firebase
 
 import android.graphics.BitmapFactory
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -60,20 +61,20 @@ object FirebaseClass {
         getEmailUsersRef().push().setValue(utente)
     }
 
-    fun addFbUserToFirebase(userId: String, utente: FbUser){
-        getFbUsersRef().child(userId).setValue(utente)
-    }
-
-    fun addUserToFirebase(email: String, utente: User?) {
-        getDBRef().child(email).setValue(utente)
+    fun addFbUserToFirebase(utente: FbUser){
+        getFbUsersRef().push().setValue(utente)
     }
 
     fun getReferenceByUser(user: User): DatabaseReference {
         return if(user is EmailUser) getEmailUsersRef() else getFbUsersRef()
     }
 
+    inline fun <reified T> getReferenceByUser(): DatabaseReference {
+        return if(T::class.java == EmailUser::class.java) getEmailUsersRef() else getFbUsersRef()
+    }
+
+
     fun getAnomaliesByUser(user: User, callback: RunnablePar) {
-        println("USERID ${user.uniqueId}")
         getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
             val count = dataSnapshot.result.children.count {
                 it.child("spotterId").value.toString().equals(user.uniqueId, ignoreCase = true)
@@ -92,23 +93,37 @@ object FirebaseClass {
         }
     }
 
-    fun getSnapshotFromUser(user: User, callback: RunnablePar) {
-        getReferenceByUser(user).get().addOnCompleteListener { dataSnapshot ->
+    inline fun <reified T> getUserSnapshotById(userId: String, callback: RunnablePar) {
+        getReferenceByUser<T>().get().addOnCompleteListener { dataSnapshot ->
             val userFound = dataSnapshot.result.children.find {
-                it.child("uniqueId").value.toString().equals(user.uniqueId, ignoreCase = true)
+                it.child("uniqueId").value.toString().equals(userId, ignoreCase = true)
             }
 
             callback.run(userFound)
         }
     }
 
-    fun getProfileImage(user: User, callback: RunnablePar){
-        getStorageRef().child("images/${user.uniqueId}").downloadUrl
-            .addOnSuccessListener {
-                println("scusaaaa ${it.toString()}")
+    inline fun <reified T> getUserObjectById(userId: String, callback: RunnablePar) {
+        getUserSnapshotById<T>(userId, object : RunnablePar {
+            override fun run(p: Any?) {
+                val snapshot = p as DataSnapshot?
+                callback.run(snapshot?.getValue(T::class.java))
+            }
+        })
+    }
 
+    fun getSnapshotFromUser(user: User, callback: RunnablePar) {
+        if(user is EmailUser)
+            getUserSnapshotById<EmailUser>(user.uniqueId, callback)
+        else
+            getUserSnapshotById<FbUser>(user.uniqueId, callback)
+    }
+
+    fun getProfileImage(user: User, callback: RunnablePar){
+        getStorageRef().child("images/${user.uniqueId}")
+            .downloadUrl
+            .addOnSuccessListener {
                 getImageFromUrl(it.toString(), callback)
-            }.addOnFailureListener {
             }
     }
 

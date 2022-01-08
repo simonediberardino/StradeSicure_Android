@@ -1,16 +1,28 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.os.Build
 import android.view.View
 import android.widget.EditText
+import androidx.annotation.RequiresApi
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
+import com.simonediberardino.stradesicure.misc.RunnablePar
+import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 
 
 class LoginActivity : AdaptedActivity() {
+    private lateinit var callbackManager: CallbackManager
+
     override fun initializeLayout() {
         setContentView(R.layout.activity_login)
 
@@ -20,10 +32,12 @@ class LoginActivity : AdaptedActivity() {
         }
 
         val loginButton = this.findViewById<View>(R.id.login_login_button)
-        loginButton.setOnClickListener { handleLogin() }
+        loginButton.setOnClickListener { handleLoginEmail() }
+
+        this.handleLoginFB()
     }
 
-    fun handleLogin() {
+    fun handleLoginEmail() {
         val enteredEmail = this.findViewById<EditText>(R.id.login_email_et).text.toString().lowercase()
         val enteredPassword = this.findViewById<EditText>(R.id.login_password_et).text.toString().lowercase()
         val encryptedPassword = Utility.getMD5(enteredPassword)
@@ -44,13 +58,49 @@ class LoginActivity : AdaptedActivity() {
         }
     }
 
+    // TODO: Update data;
+    fun handleLoginFB(){
+        val loginButton = findViewById<LoginButton>(R.id.login_facebook_button)
+
+        callbackManager = CallbackManager.Factory.create()
+
+        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            override fun onSuccess(loginResult: LoginResult) {
+                val token = loginResult.accessToken
+                val userId = token.userId
+
+                FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar{
+                    override fun run(p: Any?) {
+                        var loggedUser = p as FbUser?
+
+                        if(loggedUser == null){
+                            loggedUser = RegisterActivity.registerFbUser(userId)
+                        }
+
+                        onLogin(loggedUser)
+                    }
+
+                })
+            }
+
+            override fun onCancel() {
+            }
+
+            override fun onError(e: FacebookException) {
+            }
+        })
+    }
+
     companion object {
-        fun onLogin(loggedUser: User){
-            LoginHandler.deviceUser = loggedUser
+        inline fun <reified T> onLogin(loggedUser: T){
+            LoginHandler.deviceUser = loggedUser as User
+            ApplicationData.setSavedAccount<T>(loggedUser)
         }
 
         fun onLogout(){
             LoginHandler.deviceUser = null
+            ApplicationData.setSavedAccount<User>(null)
         }
     }
 }

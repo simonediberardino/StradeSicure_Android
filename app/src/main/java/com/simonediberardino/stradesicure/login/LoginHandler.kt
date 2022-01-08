@@ -1,7 +1,9 @@
 package com.simonediberardino.stradesicure.login
 
 import com.facebook.AccessToken
+import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.storage.ApplicationData
 
 object LoginHandler {
     var deviceUser: User? = null
@@ -11,12 +13,16 @@ object LoginHandler {
         return accessToken != null || accessToken?.isExpired == true
     }
 
-    fun isEmailLoggedIn(): Boolean{
-        return deviceUser != null
+    fun isEmailLoggedIn(): Boolean {
+        return if(deviceUser == null){
+            ApplicationData.getSavedAccount<EmailUser>() == null
+        }else{
+            true
+        }
     }
 
     fun isLoggedIn(): Boolean {
-        return isEmailLoggedIn() || isFacebookLoggedIn()
+        return deviceUser != null
     }
 
     fun getFullName(user: User): String{

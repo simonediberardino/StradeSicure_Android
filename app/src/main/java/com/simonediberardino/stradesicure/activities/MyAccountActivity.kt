@@ -16,16 +16,27 @@ class MyAccountActivity : AdaptedActivity() {
         const val singleStepValue = 100/totalSteps
     }
 
-    private val progressDialog: ProgressDialog
-    private val nameTW: TextView
-    private val emailTW: TextView
-    private val reportsTW: TextView
-    private val reviewsTW: TextView
-    private val userIDTW: TextView
-    private val profileImageIV: CircleImageView
+    private lateinit var progressDialog: ProgressDialog
+    private lateinit var nameTW: TextView
+    private lateinit var emailTW: TextView
+    private lateinit var reportsTW: TextView
+    private lateinit var reviewsTW: TextView
+    private lateinit var userIDTW: TextView
+    private lateinit var profileImageIV: CircleImageView
 
-    init{
-        progressDialog = ProgressDialog(this)
+    override fun initializeLayout() {
+        this.setContentView(R.layout.activity_account)
+        this.setupDialog()
+        this.setProfileName()
+        this.setProfileEmail()
+        this.setAnomaliesNumber()
+        this.setReportsNumber()
+        this.setUserId()
+        this.setProfileImage()
+    }
+
+    private fun setupDialog(){
+        progressDialog = ProgressDialog(lastContext!!)
 
         nameTW = findViewById(R.id.account_name)
         emailTW = findViewById(R.id.account_email_text)
@@ -33,16 +44,6 @@ class MyAccountActivity : AdaptedActivity() {
         reviewsTW = findViewById(R.id.account_recensioni_number)
         userIDTW = findViewById(R.id.account_id_text)
         profileImageIV = findViewById(R.id.account_icon)
-    }
-
-    override fun initializeLayout() {
-        this.setContentView(R.layout.activity_account)
-        this.setProfileName()
-        this.setProfileEmail()
-        this.setAnomaliesNumber()
-        this.setReportsNumber()
-        this.setUserId()
-        this.setProfileImage()
     }
 
     private fun setProfileName() {

@@ -8,11 +8,13 @@ import android.util.Patterns
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import com.facebook.Profile
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.utils.Utility
 
@@ -24,7 +26,7 @@ class RegisterActivity : AdaptedActivity() {
         setContentView(R.layout.activity_register)
 
         val registerBtn = this.findViewById<View>(R.id.register_register_button)
-        registerBtn.setOnClickListener { registerUser() }
+        registerBtn.setOnClickListener { registerEmailUser() }
 
         val loginBtn = this.findViewById<View>(R.id.register_login_text)
         loginBtn.setOnClickListener { onBackPressed() }
@@ -34,7 +36,7 @@ class RegisterActivity : AdaptedActivity() {
         profileImage.setOnClickListener { startGalleryActivity() }
     }
 
-    private fun registerUser() {
+    private fun registerEmailUser() {
         val firstName = this.findViewById<EditText>(R.id.register_name_et).text.toString().trim()
         val lastName = this.findViewById<EditText>(R.id.register_surname_et).text.toString().trim()
         val email = this.findViewById<EditText>(R.id.register_email_et).text.toString().trim()
@@ -121,6 +123,17 @@ class RegisterActivity : AdaptedActivity() {
         if (resultCode == RESULT_OK && reqCode == 100) {
             uploadedImage = data?.data
             profileImage.setImageURI(uploadedImage)
+        }
+    }
+
+    companion object{
+        fun registerFbUser(userId: String): FbUser {
+            val createdUser = Profile.getCurrentProfile()
+            val firstName = createdUser.firstName
+            val lastName = createdUser.lastName
+            val loggedUser = FbUser(firstName, lastName, userId)
+            FirebaseClass.addFbUserToFirebase(loggedUser)
+            return loggedUser
         }
     }
 }

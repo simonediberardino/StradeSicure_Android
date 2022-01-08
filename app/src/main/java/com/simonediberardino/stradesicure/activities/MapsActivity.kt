@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.drawerlayout.widget.DrawerLayout
+import com.facebook.Profile
 import com.github.techisfun.android.topsheet.TopSheetBehavior
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -39,22 +40,18 @@ import com.google.firebase.database.DatabaseError
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.Anomaly
+import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
 import com.simonediberardino.stradesicure.misc.LocationExtended
 import com.simonediberardino.stradesicure.misc.RunnablePar
+import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-
-
-
-
-
-
-
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, NavigationView.OnNavigationItemSelectedListener{
     private lateinit var googleMap: GoogleMapExtended
@@ -73,7 +70,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.checkIfLoggedIn()
+        this.fetchUserData()
     }
 
     override fun initializeLayout(){
@@ -84,9 +81,37 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         this.setupButtons()
     }
 
-    private fun checkIfLoggedIn(){
-        if(!LoginHandler.isLoggedIn()){
-            Utility.navigateTo(this, LoginActivity::class.java)
+    private fun fetchUserData() {
+        if(LoginHandler.deviceUser != null)
+            return
+
+        if(LoginHandler.isFacebookLoggedIn()){
+            val userId = Profile.getCurrentProfile().id
+            FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar{
+                override fun run(p: Any?) {
+                    val fbUser = p as FbUser?
+                    if(fbUser != null)
+                        LoginActivity.onLogin(fbUser)
+                }
+            })
+        }else{
+            val storedAccount = ApplicationData.getSavedAccount<EmailUser>()
+            if (storedAccount != null) {
+                FirebaseClass.getUserObjectById<EmailUser>(storedAccount.uniqueId, object : RunnablePar{
+                    override fun run(p: Any?) {
+                        val retrievedUser = p as EmailUser?
+                        val passwordOnDatabase = retrievedUser?.password
+                        val passwordOnDevice = storedAccount.password
+
+                        if(passwordOnDatabase.equals(passwordOnDevice, ignoreCase = true)){
+                            LoginActivity.onLogin(retrievedUser)
+                        }else{
+                            Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
+                            LoginActivity.onLogout()
+                        }
+                    }
+                })
+            }
         }
     }
 
@@ -221,21 +246,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         }
     }
 
-    private fun howToReportAnomaly(){
-        Utility.showToast(this, getString(R.string.aggiungi_marker_tut))
-    }
-
-    /**
-     * Updates the textview attached to the anomaly status seekbar
-     */
-    private fun updateStatusDescription(value: Int){
-        val statusValueTT = findViewById<TextView>(R.id.report_stato_value)
-        val statusArray = resources.getStringArray(R.array.stato)
-        val maxIndex = statusArray.size - 1
-        val index = (maxIndex * value) / 100
-        statusValueTT.text = statusArray[index]
-    }
-
     /**
      * Sets the listener of the buttons of the activity;
      */
@@ -316,6 +326,21 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 }
             }
         }
+    }
+
+    private fun howToReportAnomaly(){
+        Utility.showToast(this, getString(R.string.aggiungi_marker_tut))
+    }
+
+    /**
+     * Updates the textview attached to the anomaly status seekbar
+     */
+    private fun updateStatusDescription(value: Int){
+        val statusValueTT = findViewById<TextView>(R.id.report_stato_value)
+        val statusArray = resources.getStringArray(R.array.stato)
+        val maxIndex = statusArray.size - 1
+        val index = (maxIndex * value) / 100
+        statusValueTT.text = statusArray[index]
     }
 
     private fun insufficientPermissions(){

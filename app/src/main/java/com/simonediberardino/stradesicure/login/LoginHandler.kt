@@ -14,19 +14,18 @@ object LoginHandler {
     }
 
     fun isEmailLoggedIn(): Boolean {
-        return if(deviceUser == null){
-            ApplicationData.getSavedAccount<EmailUser>() == null
-        }else{
-            true
-        }
+        val storedUser = ApplicationData.getSavedAccount<User>()
+        return storedUser is EmailUser
     }
 
     fun isLoggedIn(): Boolean {
         return deviceUser != null
     }
 
-    fun getFullName(user: User): String{
-        return "${user.nome} ${user.cognome}"
+    fun getFullName(user: User?): String{
+        return if(user == null)
+            "undefined"
+        else "${user.nome} ${user.cognome}"
     }
 
     fun hasValidCredentials(): Boolean{

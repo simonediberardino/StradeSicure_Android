@@ -9,7 +9,7 @@
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strade Sicure</string>
     <string name="title_activity_maps">Strade Sicure</string>
-    <string name="buche_attive">Anomalie stradali attive: {number}</string>
+    <string name="anomalie_citta">Anomalie stradali nella tua città: {number}</string>
     <string name="segnala_anomalia">Segnala anomalia</string>
     <string name="indirizzo">Indirizzo</string>
     <string name="segnalata_da">• Segnalazione di: {username}</string>
@@ -61,6 +61,7 @@
     <string name="emailgiaregistrata">Questa email è già stata registrata.</string>
     <string name="posizionenontrovata">Posizione non trovata</string>
     <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
+    <string name="nessunaanomaliacitta">Impossibile trovare anomalie nella tua città.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>

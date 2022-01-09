@@ -42,6 +42,7 @@ import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
+import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
@@ -61,6 +62,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
+    private var areMarkerShown = true
     private var userLocation: Location? = null
     private var anomalyMarker: Marker? = null
     private var lastUserLocMarker: Marker? = null
@@ -170,7 +172,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
      */
     private fun setupBottomSheet(){
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
-        bottomSheetBehavior.peekHeight = 350
+        bottomSheetBehavior.peekHeight = 400
         bottomSheetBehavior.isHideable = false
     }
 
@@ -276,18 +278,13 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     /**
      * Called when the map is ready: initializes the map, the GPS and the Firebase listener;
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onMapReady(googleMap: GoogleMap) {
         this.anomalies = ArrayList()
         this.googleMap = GoogleMapExtended(googleMap)
 
-        this.googleMap.map.setOnMapLongClickListener {
-            addAnomalyMarker(it)
-            updateAnomalyLocation()
-        }
-
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        this.setupMap()
         this.setupGPS()
         this.setAnomaliesListener()
     }
@@ -295,6 +292,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     /**
      * Sets up the GPS, called when the map is ready;
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun setupGPS() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -312,9 +310,13 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 ),
                 GEOLOCATION_PERMISSION_CODE
             )
+        }else{
+            this.setupUserLocation()
+            this.setupMap()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -323,7 +325,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             GEOLOCATION_PERMISSION_CODE -> {
                 if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     this.insufficientPermissions()
+                }else{
+                    this.setupUserLocation()
                 }
+                this.setupMap()
             }
         }
     }
@@ -363,38 +368,51 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     }
 
     @SuppressLint("MissingPermission")
+    private fun setupUserLocation(){
+        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER))
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.5f, this)
+
+        this.removeAnomalyMarker()
+        this.zoomMapToUser()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun setupMap() {
-        try {
-            this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER))
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.5f, this)
-        } catch (e: Exception) {
-            this.insufficientPermissions()
-        }finally {
-            this.removeAnomalyMarker()
-
-            this.googleMap.map.setOnMarkerClickListener {
-                when (it) {
-                    anomalyMarker -> this.removeAnomalyMarker()
-                    lastUserLocMarker -> this.zoomMapToUser()
-                }
-
-                return@setOnMarkerClickListener false
+        this.googleMap.map.setOnMarkerClickListener {
+            when (it) {
+                anomalyMarker -> this.removeAnomalyMarker()
+                lastUserLocMarker -> this.zoomMapToUser()
             }
 
-            fetchAnomalies(object : RunnablePar {
-                override fun run(p: Any?) {
-                    showAnomaly(p as Anomaly)
-                    storeAnomaly(p)
-                }
-            }) {
-                threadLocker.withLock {
-                    threadLockerCond.signalAll()
-                }
+            return@setOnMarkerClickListener false
+        }
 
-                listAnomalies()
+        this.googleMap.map.setOnMapLongClickListener {
+            addAnomalyMarker(it)
+            updateAnomalyLocation()
+        }
+
+        this.googleMap.map.setOnCameraChangeListener {
+            val minZoom = 11
+            if(it.zoom < minZoom){
+                if(areMarkerShown)
+                    setMarkersVisibility(false)
+            }else{
+                if(!areMarkerShown)
+                    setMarkersVisibility(true)
             }
+        }
 
-            this.zoomMapToUser()
+        fetchAnomalies(object : RunnablePar {
+            override fun run(p: Any?) {
+                showAnomaly(p as Anomaly)
+                storeAnomaly(p)
+            }
+        }) {
+            threadLocker.withLock {
+                threadLockerCond.signalAll()
+            }
+            listAnomalies()
         }
     }
 
@@ -410,6 +428,11 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 zoomValue
             )
         )
+    }
+
+    private fun setMarkersVisibility(flag: Boolean){
+        this.areMarkerShown = flag
+        this.googleMap.markers.forEach { it.isVisible = flag }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -504,17 +527,32 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             anomaly.location.longitude
         )).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
 
+        markerOptions.visible(areMarkerShown)
+
         googleMap.addMarker(markerOptions)
     }
 
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
-
-        if(userLocation != null)
-            anomalies.sortBy{ anomaly.location.distanceTo(userLocation) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun listAnomalies() {
+        val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
+
+        anomalies.forEach {
+            println("ISINCITY ${isInSameCity(it.location)}")
+        }
+
+        val hasAnomalyInCity: Boolean = anomalies.stream().anyMatch { isInSameCity(it.location) }
+
+        if(!hasAnomalyInCity){
+            nAnomaliesTW.text = getString(R.string.nessunaanomaliacitta)
+            return
+        }
+
+        anomalies.sortBy{ it.location.distanceTo(userLocation) }
+
         var i = 0
         val toShow = 5
         while(i < toShow && i < anomalies.size) {
@@ -522,13 +560,12 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             i++
         }
 
-        val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
         val anomaliesInCity = getAnomaliesInCity(userLocation).size
-        nAnomaliesTW.text = getString(R.string.buche_attive).replace("{number}", anomaliesInCity.toString())
+        nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.toString())
     }
 
     private fun listAnomaly(anomaly: Anomaly) {
-        if(isInSameCity(anomaly.location))
+        if(!isInSameCity(anomaly.location))
             return
 
         val parentLayoutId = R.id.dialog_anomaly_layout
@@ -545,8 +582,16 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
 
         addressTW.text = getCity(anomaly.location, this)
-        reporterTW.text = reporterTW.text.toString().replace("{username}", anomaly.spotterId)
         distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomaly.location))
+
+        FirebaseClass.getUserObjectById<User>(
+            anomaly.spotterId,
+            object : RunnablePar {
+                override fun run(p: Any?) {
+                    val user = p as User?
+                    reporterTW.text = reporterTW.text.toString().replace("{username}", LoginHandler.getFullName(user))
+                }
+            })
 
         Utility.ridimensionamento(this, parentView)
         gallery.addView(view)

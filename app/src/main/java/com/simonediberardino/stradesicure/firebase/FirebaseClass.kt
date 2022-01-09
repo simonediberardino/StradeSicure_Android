@@ -69,10 +69,9 @@ object FirebaseClass {
         return if(user is EmailUser) getEmailUsersRef() else getFbUsersRef()
     }
 
-    inline fun <reified T> getReferenceByUser(): DatabaseReference {
+    inline fun <reified T: User> getReferenceByUser(): DatabaseReference {
         return if(T::class.java == EmailUser::class.java) getEmailUsersRef() else getFbUsersRef()
     }
-
 
     fun getAnomaliesByUser(user: User, callback: RunnablePar) {
         getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
@@ -93,7 +92,17 @@ object FirebaseClass {
         }
     }
 
-    inline fun <reified T> getUserSnapshotById(userId: String, callback: RunnablePar) {
+    fun getGenericUserSnapshotById(userId: String, callback: RunnablePar){
+        getUserSnapshotById<EmailUser>(userId, callback)
+        getUserSnapshotById<FbUser>(userId, callback)
+    }
+
+    inline fun <reified T: User> getUserSnapshotById(userId: String, callback: RunnablePar) {
+        if(T::class.java == User::class.java) {
+            getGenericUserSnapshotById(userId, callback)
+            return
+        }
+
         getReferenceByUser<T>().get().addOnCompleteListener { dataSnapshot ->
             val userFound = dataSnapshot.result.children.find {
                 it.child("uniqueId").value.toString().equals(userId, ignoreCase = true)
@@ -103,7 +112,7 @@ object FirebaseClass {
         }
     }
 
-    inline fun <reified T> getUserObjectById(userId: String, callback: RunnablePar) {
+    inline fun <reified T: User> getUserObjectById(userId: String, callback: RunnablePar) {
         getUserSnapshotById<T>(userId, object : RunnablePar {
             override fun run(p: Any?) {
                 val snapshot = p as DataSnapshot?

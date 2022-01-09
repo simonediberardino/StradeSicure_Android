@@ -20,14 +20,14 @@ import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-class LoginActivity : AdaptedActivity() {
+class LoginActivity : AdaptedActivity(true) {
     private lateinit var callbackManager: CallbackManager
 
     override fun initializeLayout() {
         setContentView(R.layout.activity_login)
 
-        val registerBtn = this.findViewById<View>(R.id.login_register_button)
-        registerBtn.setOnClickListener {
+        val registerButton = this.findViewById<View>(R.id.login_register_button)
+        registerButton.setOnClickListener {
             Utility.navigateTo(this, RegisterActivity::class.java)
         }
 

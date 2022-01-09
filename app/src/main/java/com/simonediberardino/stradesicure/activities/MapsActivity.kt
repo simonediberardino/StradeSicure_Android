@@ -132,7 +132,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
      * Initializes the left side menu;
      */
     private fun setupSideMenu(){
-        drawerLayout = findViewById(R.id.parent)
+        drawerLayout = findViewById(R.id.main_drawerLayout)
         val navigationView = findViewById<View>(R.id.main_navigation_view) as NavigationView
         navigationView.setNavigationItemSelectedListener(this)
     }

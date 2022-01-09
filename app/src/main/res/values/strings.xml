@@ -51,6 +51,7 @@
     <string name="progress">Avanzamento: {progress}</string>
     <string name="recensioni">Recensioni</string>
     <string name="accountid">ID Account</string>
+    <string name="logout">Logout</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
     <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>

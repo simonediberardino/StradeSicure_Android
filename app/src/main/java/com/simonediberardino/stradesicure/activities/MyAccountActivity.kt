@@ -1,6 +1,7 @@
 package com.simonediberardino.stradesicure.activities
 
 import android.graphics.Bitmap
+import android.view.View
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
@@ -10,7 +11,7 @@ import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import de.hdodenhof.circleimageview.CircleImageView
 
-class MyAccountActivity : AdaptedActivity() {
+class MyAccountActivity : AdaptedActivity(true) {
     companion object {
         const val totalSteps = 4
         const val singleStepValue = 100/totalSteps
@@ -26,6 +27,7 @@ class MyAccountActivity : AdaptedActivity() {
 
     override fun initializeLayout() {
         this.setContentView(R.layout.activity_account)
+        this.setupListeners()
         this.setupDialog()
         this.setProfileName()
         this.setProfileEmail()
@@ -33,6 +35,10 @@ class MyAccountActivity : AdaptedActivity() {
         this.setReportsNumber()
         this.setUserId()
         this.setProfileImage()
+    }
+
+    private fun setupListeners(){
+
     }
 
     private fun setupDialog(){

@@ -12,7 +12,7 @@
         android:layout_height="0dp"
         android:layout_marginBottom="24dp"
         android:background="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/account_back_btn"
+        app:layout_constraintBottom_toTopOf="@+id/account_logout_btn"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -239,7 +239,7 @@
     </ScrollView>
 
     <RadioButton
-        android:id="@+id/account_back_btn"
+        android:id="@+id/account_logout_btn"
         android:layout_width="400px"
         android:layout_height="100px"
         android:layout_marginBottom="64dp"
@@ -255,7 +255,7 @@
         android:shadowDx="2"
         android:shadowDy="5"
         android:shadowRadius="1.5"
-        android:text="@string/indietro"
+        android:text="@string/logout"
         android:textColor="@color/white"
         android:textSize="35px"
         app:layout_constraintBottom_toBottomOf="parent"

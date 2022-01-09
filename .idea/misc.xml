@@ -79,6 +79,17 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/short_dialog.xml" value="0.25" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/single_anomaly.xml" value="0.5" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/menu/side_menu.xml" value="0.22" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_background_gradient.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_background_static.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_arrow_back_25.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/transparent.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/actionbar.xml" value="0.264" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_account.xml" value="0.25" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_login.xml" value="0.25" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_maps.xml" value="0.2" />
+        <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_register.xml" value="0.25" />
       </map>
     </option>
   </component>

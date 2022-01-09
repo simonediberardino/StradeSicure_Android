@@ -19,7 +19,7 @@ import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-class RegisterActivity : AdaptedActivity() {
+class RegisterActivity : AdaptedActivity(true) {
     private var uploadedImage: Uri? = null
     
     override fun initializeLayout() {
@@ -32,7 +32,6 @@ class RegisterActivity : AdaptedActivity() {
         loginBtn.setOnClickListener { onBackPressed() }
 
         val profileImage = this.findViewById<ImageView>(R.id.register_profile_image)
-
         profileImage.setOnClickListener { startGalleryActivity() }
     }
 

@@ -38,21 +38,6 @@ abstract class AdaptedActivity(private val showTopBar: Boolean) : AppCompatActiv
         this.onPageLoaded()
     }
 
-    override fun finish() {
-        super.finish()
-/*
-        overridePendingTransition(R.anim.activity_fade_in, R.anim.activity_fade_out);
-*/
-    }
-
-    abstract fun initializeLayout()
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun onPageLoaded(){
-        this.setupTopbar()
-        Utility.ridimensionamento(this, findViewById(R.id.parent))
-    }
-
     private fun setupTopbar(){
         if(!showTopBar)
             return
@@ -78,4 +63,13 @@ abstract class AdaptedActivity(private val showTopBar: Boolean) : AppCompatActiv
 
         parent.addView(backButton)
     }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    protected fun onPageLoaded(){
+        this.setupTopbar()
+        Utility.ridimensionamento(this, findViewById(R.id.parent))
+    }
+
+    abstract fun initializeLayout()
+    open fun setContentView(){}
 }

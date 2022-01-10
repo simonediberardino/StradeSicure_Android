@@ -7,7 +7,7 @@
         <item>Estremamente grave</item>
     </string-array>
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
-    <string name="app_name">Strade Sicure</string>
+    <string name="app_name">Strada Sicura</string>
     <string name="title_activity_maps">Strade Sicure</string>
     <string name="anomalie_citta">Anomalie stradali nella tua città: {number}</string>
     <string name="segnala_anomalia">Segnala anomalia</string>
@@ -52,6 +52,7 @@
     <string name="recensioni">Recensioni</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
+    <string name="logout_success">Disconnesso con successo!</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
     <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>

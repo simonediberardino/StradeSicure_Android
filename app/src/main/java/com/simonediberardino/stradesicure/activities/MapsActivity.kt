@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.Profile
 import com.github.techisfun.android.topsheet.TopSheetBehavior
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -60,6 +61,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     private lateinit var locationManager: LocationManager
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
+    private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
     private var areMarkerShown = true
@@ -97,30 +99,28 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                 }
             })
         }else{
-            val storedAccount = ApplicationData.getSavedAccount<EmailUser>()
-            if (storedAccount != null) {
-                FirebaseClass.getUserObjectById<EmailUser>(storedAccount.uniqueId, object : RunnablePar{
-                    override fun run(p: Any?) {
-                        val retrievedUser = p as EmailUser?
-                        val passwordOnDatabase = retrievedUser?.password
-                        val passwordOnDevice = storedAccount.password
+            val storedAccount = ApplicationData.getSavedAccount<EmailUser>() ?: return
+            FirebaseClass.getUserObjectById<EmailUser>(storedAccount.uniqueId, object : RunnablePar{
+                override fun run(p: Any?) {
+                    val retrievedUser = p as EmailUser?
+                    val passwordOnDatabase = retrievedUser?.password
+                    val passwordOnDevice = storedAccount.password
 
-                        if(passwordOnDatabase.equals(passwordOnDevice, ignoreCase = true)){
-                            LoginActivity.onLogin(retrievedUser)
-                        }else{
-                            Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
-                            LoginActivity.onLogout()
-                        }
+                    if(passwordOnDatabase.equals(passwordOnDevice, ignoreCase = true)){
+                        LoginActivity.onLogin(retrievedUser)
+                    }else{
+                        Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
+                        LoginActivity.onLogout()
                     }
-                })
-            }
+                }
+            })
         }
     }
 
     /**
      * Sets the content of the activity;
      */
-    private fun setContentView(){
+    override fun setContentView(){
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -170,10 +170,17 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     /**
      * Initializes the bottom menu;
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun setupBottomSheet(){
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
         bottomSheetBehavior.peekHeight = 400
         bottomSheetBehavior.isHideable = false
+
+        refreshLayout = findViewById(R.id.dialog_refresh_layout)
+        refreshLayout.setOnRefreshListener {
+            this.listAnomalies()
+            refreshLayout.isRefreshing = false
+        }
     }
 
     /**
@@ -538,12 +545,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun listAnomalies() {
+        val anomaliesContainer = findViewById<LinearLayout>(R.id.dialog_anomaly_layout)
+        anomaliesContainer.removeAllViews()
+
         val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
-
-        anomalies.forEach {
-            println("ISINCITY ${isInSameCity(it.location)}")
-        }
-
         val hasAnomalyInCity: Boolean = anomalies.stream().anyMatch { isInSameCity(it.location) }
 
         if(!hasAnomalyInCity){
@@ -683,11 +688,23 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         if(location1 == null || location2 == null)
             return getString(R.string.posizionenontrovata)
 
-        val distanceValue = location1.distanceTo(location2).toInt()
-        return if(distanceValue >= 1000)
-                "${distanceValue/1000} km"
-            else
-                "$distanceValue m"
+        val distanceInMeters = location1.distanceTo(location2)
+        val distanceInKm = getDistanceInKm(distanceInMeters.toInt())
+
+        return if(distanceInMeters.toInt() == distanceInKm.toInt())
+            "${distanceInMeters.toInt()} m"
+        else "$distanceInKm km"
+    }
+
+    /**
+     * @return the distance in km if it's greater than 1000m, else the distance in meters;
+     */
+    private fun getDistanceInKm(distanceValue: Int): Float {
+        return if(distanceValue >= 1000){
+            ((distanceValue/100).toFloat()/10)
+        }else{
+            distanceValue.toFloat()
+        }
     }
 
     override fun onBackPressed() {

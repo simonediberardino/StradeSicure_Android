@@ -2,6 +2,7 @@ package com.simonediberardino.stradesicure.activities
 
 import android.graphics.Bitmap
 import android.view.View
+import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
@@ -9,12 +10,13 @@ import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
+import com.simonediberardino.stradesicure.utils.Utility
 import de.hdodenhof.circleimageview.CircleImageView
 
 class MyAccountActivity : AdaptedActivity(true) {
     companion object {
-        const val totalSteps = 4
-        const val singleStepValue = 100/totalSteps
+        private const val totalSteps = 4
+        private const val singleStepValue = 100/totalSteps
     }
 
     private lateinit var progressDialog: ProgressDialog
@@ -24,6 +26,7 @@ class MyAccountActivity : AdaptedActivity(true) {
     private lateinit var reviewsTW: TextView
     private lateinit var userIDTW: TextView
     private lateinit var profileImageIV: CircleImageView
+    private lateinit var logoutBtn: RadioButton
 
     override fun initializeLayout() {
         this.setContentView(R.layout.activity_account)
@@ -37,10 +40,6 @@ class MyAccountActivity : AdaptedActivity(true) {
         this.setProfileImage()
     }
 
-    private fun setupListeners(){
-
-    }
-
     private fun setupDialog(){
         progressDialog = ProgressDialog(lastContext!!)
 
@@ -50,6 +49,17 @@ class MyAccountActivity : AdaptedActivity(true) {
         reviewsTW = findViewById(R.id.account_recensioni_number)
         userIDTW = findViewById(R.id.account_id_text)
         profileImageIV = findViewById(R.id.account_icon)
+    }
+
+    private fun setupListeners(){
+        logoutBtn = findViewById(R.id.account_logout_btn)
+        logoutBtn.setOnClickListener{ doLogout() }
+    }
+
+    private fun doLogout(){
+        LoginActivity.onLogout()
+        Utility.showToast(this, getString(R.string.logout_success))
+        Utility.goToMainMenu(this)
     }
 
     private fun setProfileName() {
@@ -109,6 +119,4 @@ class MyAccountActivity : AdaptedActivity(true) {
             }
         )
     }
-
-
 }

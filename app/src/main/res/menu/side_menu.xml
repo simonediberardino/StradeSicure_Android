@@ -35,6 +35,10 @@
                 android:id="@+id/menu_contatti"
                 android:icon="@drawable/ic_baseline_email_24"
                 android:title="@string/menu_contattaci" />
+            <item
+                android:id="@+id/menu_impostazioni"
+                android:icon="@drawable/ic_baseline_settings_24"
+                android:title="@string/menu_impostazioni" />
         </menu>
     </item>
 </menu>

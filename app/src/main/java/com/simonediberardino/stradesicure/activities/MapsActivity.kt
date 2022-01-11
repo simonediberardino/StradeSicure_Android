@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ChildEventListener
@@ -77,6 +78,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         this.fetchUserData()
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun initializeLayout(){
         this.setContentView()
         this.setupSideMenu()
@@ -161,6 +163,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
             R.id.menu_contatti -> {
 
+            }
+
+            R.id.menu_impostazioni -> {
+                Utility.navigateTo(this, SettingsActivity::class.java)
             }
         }
 
@@ -585,6 +591,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         val addressTW = view.findViewById<TextView>(R.id.single_anomaly_title)
         val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
         val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
+        val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
 
         addressTW.text = getCity(anomaly.location, this)
         distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomaly.location))
@@ -597,6 +604,15 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
                     reporterTW.text = reporterTW.text.toString().replace("{username}", LoginHandler.getFullName(user))
                 }
             })
+
+        moreBTN.setOnClickListener {
+            val moreDialog = BottomSheetDialog(this)
+            moreDialog.setContentView(R.layout.anomaly_more_dialog)
+            this.googleMap.map.mapType = GoogleMap.MAP_TYPE_HYBRID;
+
+            val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
+            moreDialog.show()
+        }
 
         Utility.ridimensionamento(this, parentView)
         gallery.addView(view)

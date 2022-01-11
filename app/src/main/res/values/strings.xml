@@ -6,6 +6,12 @@
         <item>Grave</item>
         <item>Estremamente grave</item>
     </string-array>
+
+    <string-array name="maptheme">
+        <item>Classico</item>
+        <item>Satellite</item>
+    </string-array>
+
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strada Sicura</string>
     <string name="title_activity_maps">Strade Sicure</string>
@@ -15,7 +21,7 @@
     <string name="segnalata_da">• Segnalazione di: {username}</string>
     <string name="indicazioni">• Indicazioni: {indicazioni}</string>
     <string name="distance">• Distanza: {distance}</string>
-    <string name="info">Più info</string>
+    <string name="info">Di più</string>
     <string name="refresh_in">Refresh in: {time}</string>
     <string name="request_permissions">Questa app ha bisogno della tua geolocalizzazione per poter funzionare correttamente.</string>
     <string name="conferma">Conferma</string>
@@ -35,6 +41,7 @@
     <string name="menu_account">Mio profilo</string>
     <string name="menu_credits">Crediti</string>
     <string name="menu_contattaci">Contattaci</string>
+    <string name="menu_impostazioni">Impostazioni</string>
     <string name="annulla">Annulla</string>
     <string name="ok">OK</string>
     <string name="email">Email</string>
@@ -50,11 +57,15 @@
     <string name="caricamento">Caricamento…</string>
     <string name="progress">Avanzamento: {progress}</string>
     <string name="recensioni">Recensioni</string>
+    <string name="mapstyle">Stile mappa</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
     <string name="logout_success">Disconnesso con successo!</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>
+    <string name="googlestreet">Google Street</string>
+    <string name="recensione">Recensione</string>
+    <string name="rimuovi">Rimuovi</string>
     <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>
     <string name="citynotfound">Città sconosciuta</string>
     <string name="loginsuccess">Login effettuato correttamente!</string>

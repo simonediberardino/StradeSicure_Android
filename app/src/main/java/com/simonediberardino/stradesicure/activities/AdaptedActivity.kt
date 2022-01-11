@@ -1,33 +1,27 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.annotation.SuppressLint
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
-import android.widget.ImageView
+import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-abstract class AdaptedActivity(private val showTopBar: Boolean) : AppCompatActivity() {
-    constructor() : this(false)
-
+abstract class AdaptedActivity : AppCompatActivity() {
     companion object {
         var lastContext: AdaptedActivity? = null
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
         this.registerReceiver(NetworkStatusListener(), intentFilter)
@@ -38,30 +32,14 @@ abstract class AdaptedActivity(private val showTopBar: Boolean) : AppCompatActiv
         this.onPageLoaded()
     }
 
-    private fun setupTopbar(){
-        if(!showTopBar)
-            return
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun setupTopbar() {
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.drawable.topbar))
+        supportActionBar?.setCustomView(R.layout.topbar)
 
-        val parent = findViewById<ViewGroup>(R.id.parent)
-
-        val backButtonSize = 100
-        val backButton = ImageView(this)
-        backButton.setImageResource(R.drawable.ic_baseline_arrow_back_25)
-
-        val layoutParams = ConstraintLayout.LayoutParams(backButtonSize, backButtonSize)
-        layoutParams.leftToLeft = parent.id
-        layoutParams.topToTop = parent.id
-        layoutParams.leftMargin = 32
-        layoutParams.topMargin = 32
-
-        backButton.layoutParams = layoutParams;
-
-        backButton.requestLayout()
-        backButton.setOnClickListener {
-            onBackPressed()
-        }
-
-        parent.addView(backButton)
+        val backBtn = findViewById<View>(R.id.topbar_lefticon)
+        backBtn?.setOnClickListener { onBackPressed() }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)

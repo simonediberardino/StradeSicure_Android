@@ -20,7 +20,7 @@ import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-class LoginActivity : AdaptedActivity(true) {
+class LoginActivity : AdaptedActivity() {
     private lateinit var callbackManager: CallbackManager
 
     override fun initializeLayout() {

@@ -1,7 +1,6 @@
 package com.simonediberardino.stradesicure.activities
 
 import android.graphics.Bitmap
-import android.view.View
 import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
@@ -13,7 +12,7 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import de.hdodenhof.circleimageview.CircleImageView
 
-class MyAccountActivity : AdaptedActivity(true) {
+class MyAccountActivity : AdaptedActivity() {
     companion object {
         private const val totalSteps = 4
         private const val singleStepValue = 100/totalSteps

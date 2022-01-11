@@ -19,7 +19,7 @@ import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-class RegisterActivity : AdaptedActivity(true) {
+class RegisterActivity : AdaptedActivity() {
     private var uploadedImage: Uri? = null
     
     override fun initializeLayout() {

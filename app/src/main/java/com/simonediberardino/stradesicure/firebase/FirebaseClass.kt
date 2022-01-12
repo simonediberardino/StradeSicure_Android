@@ -58,11 +58,27 @@ object FirebaseClass {
     }
 
     fun addEmailUserToFirebase(utente: EmailUser){
-        getEmailUsersRef().push().setValue(utente)
+        addEmailUserToFirebase(utente, null)
+    }
+
+    fun addEmailUserToFirebase(utente: EmailUser, callback: RunnablePar?){
+        getEmailUsersRef().push().setValue(utente).addOnCompleteListener {
+            getSnapshotFromUser(
+                utente,
+                object : RunnablePar{
+                    override fun run(p: Any?) {
+                        callback?.run(p as DataSnapshot?)
+                    }
+                })
+        }
     }
 
     fun addFbUserToFirebase(utente: FbUser){
-        getFbUsersRef().push().setValue(utente)
+        addFbUserToFirebase(utente, null)
+    }
+
+    fun addFbUserToFirebase(utente: FbUser, callback: RunnablePar?){
+        getFbUsersRef().push().setValue(utente).addOnCompleteListener { callback?.run(it) }
     }
 
     fun getReferenceByUser(user: User): DatabaseReference {
@@ -95,6 +111,14 @@ object FirebaseClass {
     fun getGenericUserSnapshotById(userId: String, callback: RunnablePar){
         getUserSnapshotById<EmailUser>(userId, callback)
         getUserSnapshotById<FbUser>(userId, callback)
+    }
+
+    inline fun <reified T: User> getUserSnapshotId(userId: String, callback: RunnablePar){
+        getUserSnapshotById<T>(userId, object : RunnablePar{
+            override fun run(p: Any?) {
+                callback.run((p as DataSnapshot?)?.ref?.key)
+            }
+        })
     }
 
     inline fun <reified T: User> getUserSnapshotById(userId: String, callback: RunnablePar) {

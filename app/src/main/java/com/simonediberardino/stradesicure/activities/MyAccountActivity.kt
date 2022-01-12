@@ -3,9 +3,9 @@ package com.simonediberardino.stradesicure.activities
 import android.graphics.Bitmap
 import android.widget.RadioButton
 import android.widget.TextView
-import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ProgressDialog
+import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
@@ -94,17 +94,15 @@ class MyAccountActivity : AdaptedActivity() {
     }
 
     private fun setUserId() {
-        FirebaseClass.getSnapshotFromUser(
-            LoginHandler.deviceUser!!,
+        FirebaseClass.getUserSnapshotId<EmailUser>(
+            LoginHandler.deviceUser!!.uniqueId,
             object : RunnablePar {
                 override fun run(p: Any?) {
-                    val dataSnapshot = p as DataSnapshot
-                    val userId = dataSnapshot.ref.key
+                    val userId = p as String?
                     userIDTW.text = userId
                     progressDialog.progress = progressDialog.progress + singleStepValue
                 }
-            }
-        )
+            })
     }
 
     private fun setProfileImage() {

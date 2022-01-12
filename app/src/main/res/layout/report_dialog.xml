@@ -39,7 +39,7 @@
             android:gravity="center"
             android:padding="2dp"
             android:text="@string/segnala_anomalia"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="55px"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -148,7 +148,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:background="@color/lightgrey"
+            android:background="@color/darksilver"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/report_titolo" />

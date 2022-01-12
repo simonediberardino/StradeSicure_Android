@@ -52,7 +52,7 @@ open class CSpinner(val context: AppCompatActivity, val parent: ViewGroup) : Vie
         builder.create().show()
     }
 
-    fun apply(){
+    fun apply() {
         selectItem(0)
         parent.addView(content)
     }

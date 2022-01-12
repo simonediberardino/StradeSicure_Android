@@ -38,7 +38,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/caricamento"
-        android:textColor="@color/black"
+        android:textColor="@color/darkgrey"
         android:textSize="50px"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/dialog_report_btn"
@@ -114,7 +114,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/lightgrey"
+        android:background="@color/darksilver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dialog_anomaly_tw" />

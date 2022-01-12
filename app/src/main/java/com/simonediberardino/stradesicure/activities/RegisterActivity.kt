@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import com.facebook.Profile
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.simonediberardino.stradesicure.R
@@ -16,6 +17,7 @@ import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
+import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 
 
@@ -75,12 +77,18 @@ class RegisterActivity : AdaptedActivity() {
             }
 
             val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
-            uploadProfilePicToFirebase(emailUser){
-                FirebaseClass.addEmailUserToFirebase(emailUser)
-                LoginActivity.onLogin(emailUser)
-                Utility.showToast(this, getString(R.string.register_success))
-                Utility.goToMainMenu(this)
-            }
+            FirebaseClass.addEmailUserToFirebase(
+                emailUser,
+                object : RunnablePar{
+                    override fun run(p: Any?) {
+                        val dataSnapshot = p as DataSnapshot?
+                        uploadProfilePicToFirebase(dataSnapshot!!) {
+                            LoginActivity.onLogin(emailUser)
+                            Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
+                            Utility.goToMainMenu(this@RegisterActivity)
+                        }
+                    }
+                })
         }
     }
 
@@ -90,7 +98,7 @@ class RegisterActivity : AdaptedActivity() {
         startActivityForResult(gallery, PICK_IMAGE)
     }
 
-    private fun uploadProfilePicToFirebase(emailUser: EmailUser, callback: Runnable){
+    private fun uploadProfilePicToFirebase(dataSnapshot: DataSnapshot, callback: Runnable){
         val storageReference = FirebaseStorage.getInstance().reference
 
         if(uploadedImage == null){
@@ -99,10 +107,11 @@ class RegisterActivity : AdaptedActivity() {
         }
 
         val progressDialog = ProgressDialog(this)
-        val reference: StorageReference = storageReference.child("images/" + emailUser.uniqueId)
+        val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
 
         reference.putFile(uploadedImage!!)
             .addOnSuccessListener {
+                println("FINISHHHH!")
                 progressDialog.dismiss()
                 callback.run()
             }

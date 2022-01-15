@@ -43,6 +43,7 @@
     <string name="menu_contattaci">Contattaci</string>
     <string name="menu_impostazioni">Impostazioni</string>
     <string name="annulla">Annulla</string>
+    <string name="logout_confirm">Sei sicuro di volerti disconnettere?</string>
     <string name="ok">OK</string>
     <string name="email">Email</string>
     <string name="password">Password</string>

@@ -52,7 +52,9 @@ class MyAccountActivity : AdaptedActivity() {
 
     private fun setupListeners(){
         logoutBtn = findViewById(R.id.account_logout_btn)
-        logoutBtn.setOnClickListener{ doLogout() }
+        logoutBtn.setOnClickListener{
+            Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
+        }
     }
 
     private fun doLogout(){
@@ -110,7 +112,8 @@ class MyAccountActivity : AdaptedActivity() {
             LoginHandler.deviceUser!!,
             object : RunnablePar {
                 override fun run(p: Any?) {
-                    profileImageIV.setImageBitmap(p as Bitmap)
+                    if(p != null)
+                        profileImageIV.setImageBitmap(p as Bitmap)
                     progressDialog.progress = progressDialog.progress + singleStepValue
                 }
             }

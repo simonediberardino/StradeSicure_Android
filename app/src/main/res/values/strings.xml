@@ -77,6 +77,7 @@
     <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
     <string name="nessunaanomaliacitta">Impossibile trovare anomalie nella tua città.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
+    <string name="noimagewarn">Non hai impostato una foto profilo, vuoi continuare lo stesso?</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

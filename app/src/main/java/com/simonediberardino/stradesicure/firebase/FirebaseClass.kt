@@ -153,11 +153,25 @@ object FirebaseClass {
     }
 
     fun getProfileImage(user: User, callback: RunnablePar){
-        getStorageRef().child("images/${user.uniqueId}")
-            .downloadUrl
-            .addOnSuccessListener {
-                getImageFromUrl(it.toString(), callback)
+        getUserSnapshotId<User>(
+            user.uniqueId,
+            object : RunnablePar{
+                override fun run(p: Any?) {
+                    val userId = p as String?
+
+                    if(userId != null){
+                        getStorageRef().child("images/${userId}")
+                            .downloadUrl
+                            .addOnSuccessListener {
+                                getImageFromUrl(it.toString(), callback)
+                            }.addOnFailureListener {
+                                callback.run(null)
+                            }
+                    }
+                }
+
             }
+        )
     }
 
     fun getImageFromUrl(imageUrl: String, callback: RunnablePar){

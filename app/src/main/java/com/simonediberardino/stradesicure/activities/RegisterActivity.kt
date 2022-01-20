@@ -77,18 +77,27 @@ class RegisterActivity : AdaptedActivity() {
             }
 
             val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
-            FirebaseClass.addEmailUserToFirebase(
-                emailUser,
-                object : RunnablePar{
-                    override fun run(p: Any?) {
-                        val dataSnapshot = p as DataSnapshot?
-                        uploadProfilePicToFirebase(dataSnapshot!!) {
-                            LoginActivity.onLogin(emailUser)
-                            Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
-                            Utility.goToMainMenu(this@RegisterActivity)
+
+            val finalCallback = Runnable {
+                FirebaseClass.addEmailUserToFirebase(
+                    emailUser,
+                    object : RunnablePar {
+                        override fun run(p: Any?) {
+                            val dataSnapshot = p as DataSnapshot?
+                            uploadProfilePicToFirebase(dataSnapshot!!) {
+                                LoginActivity.onLogin(emailUser)
+                                Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
+                                Utility.goToMainMenu(this@RegisterActivity)
+                            }
                         }
-                    }
-                })
+                    })
+            }
+
+            if(uploadedImage == null)
+                Utility.oneLineDialog(this, getString(R.string.noimagewarn)){
+                    finalCallback.run()
+                }
+            else finalCallback.run()
         }
     }
 

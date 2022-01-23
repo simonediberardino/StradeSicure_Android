@@ -90,28 +90,32 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         if(LoginHandler.isFacebookLoggedIn()){
             val userId = Profile.getCurrentProfile().id
-            FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar{
-                override fun run(p: Any?) {
-                    val fbUser = p as FbUser?
-                    if(fbUser != null)
-                        LoginActivity.onLogin(fbUser)
-                }
+            FirebaseClass.getUserObjectById<FbUser>(
+                userId,
+                object : RunnablePar{
+                    override fun run(p: Any?) {
+                        val fbUser = p as FbUser?
+                        if(fbUser != null)
+                            LoginActivity.onLogin(fbUser)
+                    }
             })
         }else{
             val storedAccount = ApplicationData.getSavedAccount<EmailUser>() ?: return
-            FirebaseClass.getUserObjectById<EmailUser>(storedAccount.uniqueId, object : RunnablePar{
-                override fun run(p: Any?) {
-                    val retrievedUser = p as EmailUser?
-                    val passwordOnDatabase = retrievedUser?.password
-                    val passwordOnDevice = storedAccount.password
+            FirebaseClass.getUserObjectById<EmailUser>(
+                storedAccount.uniqueId,
+                object : RunnablePar{
+                    override fun run(p: Any?) {
+                        val retrievedUser = p as EmailUser?
+                        val passwordOnDatabase = retrievedUser?.password
+                        val passwordOnDevice = storedAccount.password
 
-                    if(passwordOnDatabase == passwordOnDevice){
-                        LoginActivity.onLogin(retrievedUser)
-                    }else{
-                        Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
-                        LoginActivity.onLogout()
+                        if(passwordOnDatabase == passwordOnDevice){
+                            LoginActivity.onLogin(retrievedUser)
+                        }else{
+                            Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
+                            LoginActivity.onLogout()
+                        }
                     }
-                }
             })
         }
     }

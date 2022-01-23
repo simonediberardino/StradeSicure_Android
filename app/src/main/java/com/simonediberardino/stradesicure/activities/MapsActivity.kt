@@ -2,14 +2,11 @@ package com.simonediberardino.stradesicure.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -24,14 +21,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.Profile
 import com.github.techisfun.android.topsheet.TopSheetBehavior
+import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
@@ -56,10 +52,16 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, NavigationView.OnNavigationItemSelectedListener{
+
+
+
+
+
+
+class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     private lateinit var googleMap: GoogleMapExtended
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var locationManager: LocationManager
+    private lateinit var locationManager: FusedLocationProviderClient
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var refreshLayout: SwipeRefreshLayout
@@ -69,6 +71,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
     private var userLocation: Location? = null
     private var anomalyMarker: Marker? = null
     private var lastUserLocMarker: Marker? = null
+    private var lastUserLocCircle: Circle? = null
     private var threadLocker = ReentrantLock()
     private var threadLockerCond = threadLocker.newCondition()
 
@@ -296,8 +299,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         this.anomalies = ArrayList()
         this.googleMap = GoogleMapExtended(googleMap)
 
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
         this.setupGPS()
         this.setAnomaliesListener()
     }
@@ -382,11 +383,28 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
     @SuppressLint("MissingPermission")
     private fun setupUserLocation(){
-        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER))
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0.5f, this)
+        val locationRequest = LocationRequest.create()
+        locationRequest.interval = 1000
+        locationRequest.fastestInterval = 1000
+        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
-        this.removeAnomalyMarker()
-        this.zoomMapToUser()
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                this@MapsActivity.onLocationChanged(locationResult?.lastLocation)
+            }
+        }
+
+        locationManager = LocationServices.getFusedLocationProviderClient(this)
+        locationManager.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+
+        locationManager.lastLocation.addOnSuccessListener(this) {
+                this.onLocationChanged(it)
+                this.removeAnomalyMarker()
+                this.zoomMapToUser()
+            }
+            .addOnFailureListener(this) {
+                this.insufficientPermissions()
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -406,14 +424,16 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         }
 
         this.googleMap.map.setOnCameraChangeListener {
-            val minZoom = 11
-            if(it.zoom < minZoom){
+            val minMarkerZoom = 11
+            if(it.zoom < minMarkerZoom){
                 if(areMarkerShown)
                     setMarkersVisibility(false)
             }else{
                 if(!areMarkerShown)
                     setMarkersVisibility(true)
             }
+
+            refreshLocationCircle()
         }
 
         fetchAnomalies(object : RunnablePar {
@@ -427,6 +447,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
             }
             listAnomalies()
         }
+    }
+
+    private fun getMapZoom(): Float {
+        return googleMap.map.cameraPosition.zoom
     }
 
     private fun zoomMapToUser(){
@@ -448,9 +472,9 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
         this.googleMap.markers.forEach { it.isVisible = flag }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    override fun onLocationChanged(location: Location) {
-        this.onLocationChanged(location as Location?)
+    private fun refreshLocationCircle(){
+        val minCircleZoom = 15
+        lastUserLocCircle?.isVisible = getMapZoom() > minCircleZoom
     }
 
     @JvmName("onLocationChanged1")
@@ -463,15 +487,31 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, LocationListener, Na
 
         val locationLatLng = LatLng(location.latitude, location.longitude)
 
-        val height = 128; val width = 128
-        val drawable = getDrawable(R.drawable.car_icon)
+        val height = 33; val width = 33
+        val drawable = getDrawable(R.drawable.location_icon)
         val bitmap = drawable?.toBitmap(width, height)
 
-        val markerOptions = MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap!!))
+        val markerOptions = MarkerOptions()
+            .position(locationLatLng)
+            .icon(BitmapDescriptorFactory
+                .fromBitmap(bitmap!!))
+
+        val circleOptions = CircleOptions()
+            .center(markerOptions.position)
+            .radius(100.0)
+            .strokeColor(0xf1E90FF)
+            .fillColor(0x301E90FF)
+            .strokeWidth(10f)
+
 
         userLocation = location
+
+        lastUserLocCircle?.remove()
         lastUserLocMarker?.remove()
         lastUserLocMarker = googleMap.map.addMarker(markerOptions)
+        lastUserLocCircle = googleMap.map.addCircle(circleOptions)
+
+        refreshLocationCircle()
 
         currentCityTW.text = getCity(location, this)
     }

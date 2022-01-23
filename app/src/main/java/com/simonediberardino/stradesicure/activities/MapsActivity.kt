@@ -52,12 +52,6 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-
-
-
-
-
-
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     private lateinit var googleMap: GoogleMapExtended
     private lateinit var binding: ActivityMapsBinding
@@ -111,7 +105,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
                     val passwordOnDatabase = retrievedUser?.password
                     val passwordOnDevice = storedAccount.password
 
-                    if(passwordOnDatabase.equals(passwordOnDevice, ignoreCase = true)){
+                    if(passwordOnDatabase == passwordOnDevice){
                         LoginActivity.onLogin(retrievedUser)
                     }else{
                         Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
@@ -503,7 +497,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             .fillColor(0x301E90FF)
             .strokeWidth(10f)
 
-
         userLocation = location
 
         lastUserLocCircle?.remove()
@@ -515,7 +508,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         currentCityTW.text = getCity(location, this)
     }
-
 
     private fun setAnomaliesListener() {
         /**

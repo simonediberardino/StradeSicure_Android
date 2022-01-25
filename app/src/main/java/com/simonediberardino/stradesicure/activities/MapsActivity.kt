@@ -61,6 +61,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
+    private lateinit var notWarnedAnomalies: ArrayList<Anomaly>
     private var areMarkerShown = true
     private var userLocation: Location? = null
     private var anomalyMarker: Marker? = null
@@ -471,19 +472,19 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun refreshLocationCircle(){
-        val minCircleZoom = 15
+        val minCircleZoom = 16
         lastUserLocCircle?.isVisible = getMapZoom() > minCircleZoom
     }
 
     @JvmName("onLocationChanged1")
-    fun onLocationChanged(location: Location?){
+    fun onLocationChanged(newLocation: Location?){
         val currentCityTW = this.findViewById<TextView>(R.id.dialog_city_tw)
-        if(location == null){
+        if(newLocation == null){
             currentCityTW.text = getString(R.string.citynotfound)
             return
         }
 
-        val locationLatLng = LatLng(location.latitude, location.longitude)
+        val locationLatLng = LatLng(newLocation.latitude, newLocation.longitude)
 
         val height = 33; val width = 33
         val drawable = getDrawable(R.drawable.location_icon)
@@ -501,7 +502,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             .fillColor(0x301E90FF)
             .strokeWidth(10f)
 
-        userLocation = location
+        if(newLocation.distanceTo(userLocation) > 100)
+            checkNearbyAnomalies()
+
+        userLocation = newLocation
 
         lastUserLocCircle?.remove()
         lastUserLocMarker?.remove()
@@ -510,7 +514,28 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         refreshLocationCircle()
 
-        currentCityTW.text = getCity(location, this)
+        currentCityTW.text = getCity(userLocation, this)
+    }
+
+    private fun checkNearbyAnomalies(){
+        val radiusAnomaly = 200
+        val nearestAnomaly = getNearestNotWarnedAnomaly() ?: return
+
+        if(nearestAnomaly.location.distanceTo(userLocation) < radiusAnomaly){
+            warnAnomaly(nearestAnomaly)
+        }
+    }
+
+    private fun getNearestNotWarnedAnomaly(): Anomaly? {
+        return if(notWarnedAnomalies.size > 0 )
+            notWarnedAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
+        else null
+    }
+
+    private fun warnAnomaly(anomaly: Anomaly){
+        notWarnedAnomalies.remove(anomaly)
+        val distanceInKm = getDistanceInKm(anomaly.location.distanceTo(userLocation).toInt())
+        Utility.showToast(this, "Anomalia nelle vicinanze: $distanceInKm")
     }
 
     private fun setAnomaliesListener() {
@@ -563,6 +588,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun removeAnomaly(anomaly: Anomaly){
         googleMap.removeMarker(anomaly.location)
+        anomalies.remove(anomaly)
+        notWarnedAnomalies.remove(anomaly)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -583,6 +610,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
+        notWarnedAnomalies.add(anomaly)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -720,8 +748,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             }
         }
     }
-
-    private fun refreshMap() {}
 
     private fun getAnomaliesInCity(location: Location?) : Array<Anomaly> {
         if(location == null)

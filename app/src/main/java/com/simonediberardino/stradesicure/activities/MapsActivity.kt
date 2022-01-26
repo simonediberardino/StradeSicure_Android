@@ -7,6 +7,7 @@ import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -37,10 +38,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
-import com.simonediberardino.stradesicure.entity.Anomaly
-import com.simonediberardino.stradesicure.entity.EmailUser
-import com.simonediberardino.stradesicure.entity.FbUser
-import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.entity.*
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
@@ -50,7 +48,11 @@ import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
+
+
+
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     private lateinit var googleMap: GoogleMapExtended
@@ -62,6 +64,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
     private lateinit var notWarnedAnomalies: ArrayList<Anomaly>
+    private lateinit var TTS: TTS
     private var areMarkerShown = true
     private var userLocation: Location? = null
     private var anomalyMarker: Marker? = null
@@ -73,6 +76,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.setupTTS()
         this.fetchUserData()
     }
 
@@ -83,6 +87,14 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
         this.setupBottomSheet()
         this.setupReportSheet()
         this.setupButtons()
+    }
+
+    private fun setupTTS(){
+        TTS = TTS(this) {
+            TTS.speak("Text to Speech inizializzato correttamente!")
+        }
+
+        TTS.language = Locale.ITALY
     }
 
     private fun fetchUserData() {
@@ -296,6 +308,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onMapReady(googleMap: GoogleMap) {
         this.anomalies = ArrayList()
+        this.notWarnedAnomalies = ArrayList()
         this.googleMap = GoogleMapExtended(googleMap)
 
         this.setupGPS()
@@ -502,8 +515,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             .fillColor(0x301E90FF)
             .strokeWidth(10f)
 
-        if(newLocation.distanceTo(userLocation) > 100)
-            checkNearbyAnomalies()
+        // TODO: This condition is always false
+        if(userLocation != null)
+            if(newLocation.distanceTo(userLocation) > 100)
+                checkNearbyAnomalies()
 
         userLocation = newLocation
 

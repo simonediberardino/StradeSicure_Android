@@ -58,7 +58,7 @@ class MyAccountActivity : AdaptedActivity() {
     }
 
     private fun doLogout(){
-        LoginActivity.onLogout()
+        LoginHandler.doLogout()
         Utility.showToast(this, getString(R.string.logout_success))
         Utility.goToMainMenu(this)
     }

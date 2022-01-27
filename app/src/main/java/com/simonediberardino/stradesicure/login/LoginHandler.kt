@@ -28,8 +28,13 @@ object LoginHandler {
         else "${user.nome} ${user.cognome}"
     }
 
-    fun hasValidCredentials(): Boolean{
-        // Not implemented yet;
-        return false
+    inline fun <reified T> doLogin(loggedUser: T){
+        deviceUser = loggedUser as User
+        ApplicationData.setSavedAccount<T>(loggedUser)
+    }
+
+    fun doLogout(){
+        deviceUser = null
+        ApplicationData.setSavedAccount<User>(null)
     }
 }

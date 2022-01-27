@@ -51,7 +51,7 @@ class LoginActivity : AdaptedActivity() {
             if(matchedUser == null || matchedUser.password != encryptedPassword){
                 Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate), null)
             }else{
-                onLogin(matchedUser)
+                LoginHandler.doLogin(matchedUser)
                 Utility.showToast(this, this.getString(R.string.loginsuccess))
                 Utility.goToMainMenu(this)
             }
@@ -78,7 +78,7 @@ class LoginActivity : AdaptedActivity() {
                             loggedUser = RegisterActivity.registerFbUser(userId)
                         }
 
-                        onLogin(loggedUser)
+                        LoginHandler.doLogin(loggedUser)
                     }
 
                 })
@@ -90,17 +90,5 @@ class LoginActivity : AdaptedActivity() {
             override fun onError(e: FacebookException) {
             }
         })
-    }
-
-    companion object {
-        inline fun <reified T> onLogin(loggedUser: T){
-            LoginHandler.deviceUser = loggedUser as User
-            ApplicationData.setSavedAccount<T>(loggedUser)
-        }
-
-        fun onLogout(){
-            LoginHandler.deviceUser = null
-            ApplicationData.setSavedAccount<User>(null)
-        }
     }
 }

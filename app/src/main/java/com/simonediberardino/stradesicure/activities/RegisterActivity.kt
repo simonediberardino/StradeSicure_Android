@@ -17,6 +17,7 @@ import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
+import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 
@@ -85,7 +86,7 @@ class RegisterActivity : AdaptedActivity() {
                         override fun run(p: Any?) {
                             val dataSnapshot = p as DataSnapshot?
                             uploadProfilePicToFirebase(dataSnapshot!!) {
-                                LoginActivity.onLogin(emailUser)
+                                LoginHandler.doLogin(emailUser)
                                 Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
                                 Utility.goToMainMenu(this@RegisterActivity)
                             }

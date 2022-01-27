@@ -32,7 +32,7 @@ open class CSpinner(val context: AppCompatActivity, val parent: ViewGroup) : Vie
 
     open fun onSelectedItem(){}
 
-    private fun selectItem(index: Int){
+    fun selectItem(index: Int){
         if(options == null)
             return
 

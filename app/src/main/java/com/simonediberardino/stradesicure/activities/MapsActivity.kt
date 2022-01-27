@@ -55,7 +55,7 @@ import kotlin.concurrent.withLock
 
 
 class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
-    private lateinit var googleMap: GoogleMapExtended
+    private var googleMap: GoogleMapExtended? = null
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: FusedLocationProviderClient
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -109,7 +109,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
                     override fun run(p: Any?) {
                         val fbUser = p as FbUser?
                         if(fbUser != null)
-                            LoginActivity.onLogin(fbUser)
+                            LoginHandler.doLogin(fbUser)
                     }
             })
         }else{
@@ -123,10 +123,10 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
                         val passwordOnDevice = storedAccount.password
 
                         if(passwordOnDatabase == passwordOnDevice){
-                            LoginActivity.onLogin(retrievedUser)
+                            LoginHandler.doLogin(retrievedUser)
                         }else{
                             Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
-                            LoginActivity.onLogout()
+                            LoginHandler.doLogout()
                         }
                     }
             })
@@ -310,9 +310,16 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
         this.anomalies = ArrayList()
         this.notWarnedAnomalies = ArrayList()
         this.googleMap = GoogleMapExtended(googleMap)
+        this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
 
         this.setupGPS()
         this.setAnomaliesListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(this.googleMap != null)
+            this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
     }
 
     /**
@@ -421,7 +428,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setupMap() {
-        this.googleMap.map.setOnMarkerClickListener {
+        this.googleMap?.map?.setOnMarkerClickListener {
             when (it) {
                 anomalyMarker -> this.removeAnomalyMarker()
                 lastUserLocMarker -> this.zoomMapToUser()
@@ -430,12 +437,12 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             return@setOnMarkerClickListener false
         }
 
-        this.googleMap.map.setOnMapLongClickListener {
+        this.googleMap?.map?.setOnMapLongClickListener {
             addAnomalyMarker(it)
             updateAnomalyLocation()
         }
 
-        this.googleMap.map.setOnCameraChangeListener {
+        this.googleMap?.map?.setOnCameraChangeListener {
             val minMarkerZoom = 11
             if(it.zoom < minMarkerZoom){
                 if(areMarkerShown)
@@ -462,7 +469,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun getMapZoom(): Float {
-        return googleMap.map.cameraPosition.zoom
+        return googleMap!!.map.cameraPosition.zoom
     }
 
     private fun zoomMapToUser(){
@@ -471,7 +478,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         val zoomValue = 14f
 
-        googleMap.map.animateCamera(
+        googleMap?.map?.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation!!.latitude, userLocation!!.longitude),
                 zoomValue
@@ -481,7 +488,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun setMarkersVisibility(flag: Boolean){
         this.areMarkerShown = flag
-        this.googleMap.markers.forEach { it.isVisible = flag }
+        this.googleMap?.markers?.forEach { it.isVisible = flag }
     }
 
     private fun refreshLocationCircle(){
@@ -524,8 +531,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         lastUserLocCircle?.remove()
         lastUserLocMarker?.remove()
-        lastUserLocMarker = googleMap.map.addMarker(markerOptions)
-        lastUserLocCircle = googleMap.map.addCircle(circleOptions)
+        lastUserLocMarker = googleMap?.map?.addMarker(markerOptions)
+        lastUserLocCircle = googleMap?.map?.addCircle(circleOptions)
 
         refreshLocationCircle()
 
@@ -542,7 +549,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun getNearestNotWarnedAnomaly(): Anomaly? {
-        return if(notWarnedAnomalies.size > 0 )
+        return if(notWarnedAnomalies.size > 0)
             notWarnedAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
         else null
     }
@@ -602,7 +609,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun removeAnomaly(anomaly: Anomaly){
-        googleMap.removeMarker(anomaly.location)
+        googleMap?.removeMarker(anomaly.location)
         anomalies.remove(anomaly)
         notWarnedAnomalies.remove(anomaly)
     }
@@ -620,7 +627,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
         markerOptions.visible(areMarkerShown)
 
-        googleMap.addMarker(markerOptions)
+        googleMap?.addMarker(markerOptions)
     }
 
     private fun storeAnomaly(anomaly: Anomaly) {
@@ -687,7 +694,6 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
         moreBTN.setOnClickListener {
             val moreDialog = BottomSheetDialog(this)
             moreDialog.setContentView(R.layout.anomaly_more_dialog)
-            this.googleMap.map.mapType = GoogleMap.MAP_TYPE_HYBRID;
 
             val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
             moreDialog.show()
@@ -699,7 +705,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun addAnomalyMarker(latLng: LatLng){
         anomalyMarker?.remove()
-        anomalyMarker = this.googleMap.map.addMarker(MarkerOptions().position(latLng))
+        anomalyMarker = this.googleMap?.map?.addMarker(MarkerOptions().position(latLng))
     }
 
     private fun updateAnomalyLocation(){

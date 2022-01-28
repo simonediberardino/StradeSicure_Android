@@ -12,7 +12,7 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import de.hdodenhof.circleimageview.CircleImageView
 
-class MyAccountActivity : AdaptedActivity() {
+class MyAccountActivity : SSActivity() {
     companion object {
         private const val totalSteps = 4
         private const val singleStepValue = 100/totalSteps
@@ -40,7 +40,7 @@ class MyAccountActivity : AdaptedActivity() {
     }
 
     private fun setupDialog(){
-        progressDialog = ProgressDialog(lastContext!!)
+        progressDialog = ProgressDialog(currentContext!!)
 
         nameTW = findViewById(R.id.account_name)
         emailTW = findViewById(R.id.account_email_text)

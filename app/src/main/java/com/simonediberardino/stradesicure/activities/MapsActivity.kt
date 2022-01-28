@@ -2,12 +2,13 @@ package com.simonediberardino.stradesicure.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.*
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.speech.tts.TextToSpeech
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -30,13 +31,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.CBottomSheetDialog
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.*
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
@@ -54,7 +55,7 @@ import kotlin.concurrent.withLock
 
 
 
-class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
+class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     private var googleMap: GoogleMapExtended? = null
     private lateinit var binding: ActivityMapsBinding
     private lateinit var locationManager: FusedLocationProviderClient
@@ -63,7 +64,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var anomalies: ArrayList<Anomaly>
-    private lateinit var notWarnedAnomalies: ArrayList<Anomaly>
+    private lateinit var notEncounteredAnomalies: ArrayList<Anomaly>
     private lateinit var TTS: TTS
     private var areMarkerShown = true
     private var userLocation: Location? = null
@@ -90,9 +91,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun setupTTS(){
-        TTS = TTS(this) {
-            TTS.speak("Text to Speech inizializzato correttamente!")
-        }
+        TTS = TTS(this)
+        { TTS.speak("Text to Speech inizializzato correttamente!") }
 
         TTS.language = Locale.ITALY
     }
@@ -308,7 +308,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onMapReady(googleMap: GoogleMap) {
         this.anomalies = ArrayList()
-        this.notWarnedAnomalies = ArrayList()
+        this.notEncounteredAnomalies = ArrayList()
         this.googleMap = GoogleMapExtended(googleMap)
         this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
 
@@ -463,8 +463,8 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
         }) {
             threadLocker.withLock {
                 threadLockerCond.signalAll()
+                listAnomalies()
             }
-            listAnomalies()
         }
     }
 
@@ -549,13 +549,13 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     }
 
     private fun getNearestNotWarnedAnomaly(): Anomaly? {
-        return if(notWarnedAnomalies.size > 0)
-            notWarnedAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
+        return if(notEncounteredAnomalies.size > 0)
+            notEncounteredAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
         else null
     }
 
     private fun warnAnomaly(anomaly: Anomaly){
-        notWarnedAnomalies.remove(anomaly)
+        notEncounteredAnomalies.remove(anomaly)
         val distanceInKm = getDistanceInKm(anomaly.location.distanceTo(userLocation).toInt())
         Utility.showToast(this, "Anomalia nelle vicinanze: $distanceInKm")
     }
@@ -611,7 +611,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
     private fun removeAnomaly(anomaly: Anomaly){
         googleMap?.removeMarker(anomaly.location)
         anomalies.remove(anomaly)
-        notWarnedAnomalies.remove(anomaly)
+        notEncounteredAnomalies.remove(anomaly)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -632,7 +632,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
 
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
-        notWarnedAnomalies.add(anomaly)
+        notEncounteredAnomalies.add(anomaly)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -692,11 +692,7 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
             })
 
         moreBTN.setOnClickListener {
-            val moreDialog = BottomSheetDialog(this)
-            moreDialog.setContentView(R.layout.anomaly_more_dialog)
-
-            val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
-            moreDialog.show()
+            setupMoreAnomalyDialog(anomaly)
         }
 
         Utility.ridimensionamento(this, parentView)
@@ -712,6 +708,29 @@ class MapsActivity : AdaptedActivity(), OnMapReadyCallback, NavigationView.OnNav
         val foundAddress = getAddress(anomalyMarker!!.position, this)
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
         addressET.setText(foundAddress)
+    }
+
+    private fun setupMoreAnomalyDialog(anomaly: Anomaly){
+        val moreDialog = CBottomSheetDialog(this)
+        moreDialog.setContentView(R.layout.anomaly_more_dialog)
+
+        val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
+        streetBtn?.setOnClickListener {
+            val streetViewURI = Uri.parse("google.streetview:cbll=${anomaly.location.latitude},${anomaly.location.longitude}")
+            val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
+            streetViewIntent.setPackage ("com.google.android.apps.maps");
+            startActivity (streetViewIntent);
+        }
+        
+        val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
+        removeBtn?.setOnClickListener {
+            if(notEncounteredAnomalies.contains(anomaly)){
+                Utility.oneLineDialog(this, getString(R.string.anomalia_non_visitata), null)
+            }else{
+                //TODO
+            }
+        }
+        moreDialog.show()
     }
 
     private fun setSideMenuVisibility(flag: Boolean) {

@@ -6,7 +6,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.simonediberardino.stradesicure.activities.AdaptedActivity
+import com.simonediberardino.stradesicure.activities.SSActivity
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
@@ -177,7 +177,7 @@ object FirebaseClass {
     fun getImageFromUrl(imageUrl: String, callback: RunnablePar){
         Thread{
             val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
-            AdaptedActivity.lastContext?.runOnUiThread {
+            SSActivity.currentContext?.runOnUiThread {
                 callback.run(bitmap)
             }
         }.start()

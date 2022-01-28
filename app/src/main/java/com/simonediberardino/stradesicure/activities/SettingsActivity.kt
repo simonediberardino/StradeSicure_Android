@@ -10,7 +10,7 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 
-class SettingsActivity : AdaptedActivity() {
+class SettingsActivity : SSActivity() {
     override fun initializeLayout() {
         setContentView(R.layout.activity_settings)
         this.setupMapThemeSpinner()

@@ -1,7 +1,6 @@
 package com.simonediberardino.stradesicure.UI
 
 
-import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
@@ -21,9 +20,8 @@ class CDialog(
     var option2: String,
     firstCallback: Runnable?,
     secondCallback: Runnable?,
-    dismissCallback: Runnable?
-) :
-    Dialog(c), View.OnClickListener {
+    dismissCallback: Runnable?) : Dialog(c), View.OnClickListener {
+
     var firstCallback: Runnable
     var secondCallback: Runnable
     var dismissCallback: Runnable?
@@ -41,6 +39,7 @@ class CDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.short_dialog)
+
         val parentView = findViewById<ViewGroup>(R.id.dialog_parent)
         val title = findViewById<TextView>(R.id.dialog_title)
         val btn1 = findViewById<Button>(R.id.dialog_btn1)

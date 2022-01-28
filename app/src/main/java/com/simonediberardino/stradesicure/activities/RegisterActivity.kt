@@ -22,7 +22,7 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 
 
-class RegisterActivity : AdaptedActivity() {
+class RegisterActivity : SSActivity() {
     private var uploadedImage: Uri? = null
     
     override fun initializeLayout() {

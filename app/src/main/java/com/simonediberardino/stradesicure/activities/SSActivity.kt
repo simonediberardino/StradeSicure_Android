@@ -12,10 +12,9 @@ import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
-
-abstract class AdaptedActivity : AppCompatActivity() {
+abstract class SSActivity : AppCompatActivity() {
     companion object {
-        var lastContext: AdaptedActivity? = null
+        var currentContext: SSActivity? = null
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -26,7 +25,7 @@ abstract class AdaptedActivity : AppCompatActivity() {
         val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
         this.registerReceiver(NetworkStatusListener(), intentFilter)
 
-        lastContext = this
+        currentContext = this
 
         this.initializeLayout()
         this.onPageLoaded()

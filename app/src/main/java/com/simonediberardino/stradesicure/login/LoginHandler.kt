@@ -1,6 +1,8 @@
 package com.simonediberardino.stradesicure.login
 
 import com.facebook.AccessToken
+import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.activities.SSActivity
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.storage.ApplicationData
@@ -24,7 +26,7 @@ object LoginHandler {
 
     fun getFullName(user: User?): String{
         return if(user == null)
-            "undefined"
+            SSActivity.currentContext?.getString(R.string.account_eliminato)!!
         else "${user.nome} ${user.cognome}"
     }
 

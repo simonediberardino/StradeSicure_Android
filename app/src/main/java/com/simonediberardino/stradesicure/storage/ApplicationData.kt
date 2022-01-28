@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.android.gms.maps.GoogleMap
 import com.google.gson.Gson
-import com.simonediberardino.stradesicure.activities.AdaptedActivity
+import com.simonediberardino.stradesicure.activities.SSActivity
 
 object ApplicationData {
     const val DATA_ID = "data"
@@ -14,7 +14,7 @@ object ApplicationData {
     val ACCOUNT_DEFAULT = null
 
     fun getApplicationData(): SharedPreferences {
-        return AdaptedActivity.lastContext?.getSharedPreferences(DATA_ID, Context.MODE_PRIVATE)!!
+        return SSActivity.currentContext?.getSharedPreferences(DATA_ID, Context.MODE_PRIVATE)!!
     }
 
     inline fun <reified T> getSavedAccount(): T? {

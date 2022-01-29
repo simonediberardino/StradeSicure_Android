@@ -66,7 +66,7 @@ class RegisterActivity : SSActivity() {
 
         val passwordEncrypted = Utility.getMD5(passwordRaw)
 
-        FirebaseClass.getEmailUsersRef().get().addOnCompleteListener { snap ->
+        FirebaseClass.emailUsersRef.get().addOnCompleteListener { snap ->
             val isEmailRegistered: Boolean = snap.result.children.any{
                 it.child("email").value.toString().equals(email, ignoreCase = true)
             }

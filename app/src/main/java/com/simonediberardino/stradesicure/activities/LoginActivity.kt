@@ -12,11 +12,9 @@ import com.facebook.login.widget.LoginButton
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
-import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
-import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 
 
@@ -42,7 +40,7 @@ class LoginActivity : SSActivity() {
         val enteredPassword = this.findViewById<EditText>(R.id.login_password_et).text.toString().lowercase()
         val encryptedPassword = Utility.getMD5(enteredPassword)
 
-        FirebaseClass.getEmailUsersRef().get().addOnCompleteListener { users ->
+        FirebaseClass.emailUsersRef.get().addOnCompleteListener { users ->
             val matchedUser: EmailUser? =
                 users.result.children.find {
                 it.child("uniqueId").value.toString().equals(enteredEmail, ignoreCase = true)
@@ -52,7 +50,7 @@ class LoginActivity : SSActivity() {
                 Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate), null)
             }else{
                 LoginHandler.doLogin(matchedUser)
-                Utility.showToast(this, this.getString(R.string.loginsuccess))
+                Utility.showToast(this, this.getString(R.string.login_success))
                 Utility.goToMainMenu(this)
             }
         }

@@ -15,6 +15,7 @@ class SettingsActivity : SSActivity() {
         setContentView(R.layout.activity_settings)
         this.setupMapThemeSpinner()
         this.setupLogoutBtn()
+        this.setupLoginButton()
     }
 
     private fun setupMapThemeSpinner(){
@@ -47,9 +48,30 @@ class SettingsActivity : SSActivity() {
         val button = CButton(this, mainLayout)
 
         button.title = getString(R.string.logout)
+        button.description = getString(R.string.logout_description)
+        button.question = getString(R.string.logout_confirm)
+
         button.setOnConfirmListener {
             LoginHandler.doLogout()
+            Utility.goToMainMenu(this)
             Utility.showToast(this, getString(R.string.logout_success))
+        }
+
+        button.apply()
+    }
+
+    private fun setupLoginButton(){
+        if(LoginHandler.isLoggedIn())
+            return
+
+        val mainLayout = findViewById<ViewGroup>(R.id.settings_viewgroup_2)
+        val button = CButton(this, mainLayout)
+
+        button.title = getString(R.string.login)
+        button.description = getString(R.string.login_description)
+
+        button.setOnConfirmListener {
+            Utility.navigateTo(this, LoginActivity::class.java)
         }
 
         button.apply()

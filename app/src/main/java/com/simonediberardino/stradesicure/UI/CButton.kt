@@ -2,17 +2,12 @@ package com.simonediberardino.stradesicure.UI
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Dialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.simonediberardino.stradesicure.R as R
-import com.simonediberardino.stradesicure.misc.RunnablePar
-import android.content.DialogInterface
-
-import android.R as R2
+import com.simonediberardino.stradesicure.R
 
 
 
@@ -24,6 +19,8 @@ open class CButton(val context: AppCompatActivity, val parent: ViewGroup) : View
     private var content: View
     private var onConfirmListener: Runnable
     private var onDenyListener: Runnable
+
+    var question: String? = null
 
     var options: Array<String>? = null
 
@@ -45,6 +42,7 @@ open class CButton(val context: AppCompatActivity, val parent: ViewGroup) : View
             descriptionTV.text = value
         }
 
+
     fun setOnConfirmListener(onConfirmListener: Runnable){
         this.onConfirmListener = onConfirmListener
     }
@@ -55,7 +53,6 @@ open class CButton(val context: AppCompatActivity, val parent: ViewGroup) : View
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun showConfirmDialog(){
-
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(
@@ -87,6 +84,10 @@ open class CButton(val context: AppCompatActivity, val parent: ViewGroup) : View
         options = arrayOf(context.getString(R.string.conferma), context.getString(R.string.annulla))
         onConfirmListener = Runnable {}
         onDenyListener = Runnable {}
-        content.setOnClickListener { showConfirmDialog() }
+        content.setOnClickListener {
+            if(question == null)
+                this.onConfirmListener.run()
+            else showConfirmDialog()
+        }
     }
 }

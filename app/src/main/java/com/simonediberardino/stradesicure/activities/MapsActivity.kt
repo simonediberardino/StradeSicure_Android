@@ -49,11 +49,9 @@ import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import java.util.function.Predicate
 import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
-
-
-
 
 class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     private var googleMap: GoogleMapExtended? = null
@@ -105,7 +103,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             val userId = Profile.getCurrentProfile().id
             FirebaseClass.getUserObjectById<FbUser>(
                 userId,
-                object : RunnablePar{
+                object : RunnablePar {
                     override fun run(p: Any?) {
                         val fbUser = p as FbUser?
                         if(fbUser != null)
@@ -569,7 +567,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 threadLockerCond.await()
 
                 var index = 0
-                FirebaseClass.getAnomaliesRef().addChildEventListener(
+                FirebaseClass.anomaliesRef.addChildEventListener(
                     object : ChildEventListener {
                         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                             index++
@@ -582,6 +580,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                             storeAnomaly(anomalyAdded)
                         }
 
+                        @RequiresApi(Build.VERSION_CODES.N)
                         override fun onChildRemoved(snapshot: DataSnapshot) {
                             val anomalyRemoved = snapshot.getValue(Anomaly::class.java)
                             removeAnomaly(anomalyRemoved!!)
@@ -598,7 +597,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
 
     private fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
-        FirebaseClass.getAnomaliesRef().get().addOnCompleteListener { task ->
+        FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
             for(it : DataSnapshot in task.result.children){
                 val anomaly = it.getValue(Anomaly::class.java)
                 callback.run(anomaly!!)
@@ -608,10 +607,12 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun removeAnomaly(anomaly: Anomaly){
+        val predicate = Predicate<Anomaly>{ it.location == anomaly.location }
+        anomalies.removeIf(predicate)
+        notEncounteredAnomalies.removeIf(predicate)
         googleMap?.removeMarker(anomaly.location)
-        anomalies.remove(anomaly)
-        notEncounteredAnomalies.remove(anomaly)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -718,8 +719,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         streetBtn?.setOnClickListener {
             val streetViewURI = Uri.parse("google.streetview:cbll=${anomaly.location.latitude},${anomaly.location.longitude}")
             val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
-            streetViewIntent.setPackage ("com.google.android.apps.maps");
-            startActivity (streetViewIntent);
+            streetViewIntent.setPackage ("com.google.android.apps.maps")
+            startActivity (streetViewIntent)
         }
         
         val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
@@ -727,8 +728,9 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             if(notEncounteredAnomalies.contains(anomaly)){
                 Utility.oneLineDialog(this, getString(R.string.anomalia_non_visitata), null)
             }else{
-                //TODO
             }
+            FirebaseClass.deleteAnomalyFirebase(anomaly)
+
         }
         moreDialog.show()
     }

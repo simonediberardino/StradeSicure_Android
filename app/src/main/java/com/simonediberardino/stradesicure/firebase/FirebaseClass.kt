@@ -18,43 +18,38 @@ import java.net.URL
 object FirebaseClass {
     private var DB_REF = "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app"
     private var STOR_REF = "gs://strade-sicure.appspot.com"
-    fun isFirebaseStringValid(string: String?): Boolean {
-        val tempString = string?.trim { it <= ' ' }
-        return !((tempString == "null"
-                || tempString?.isEmpty()!!
-                || tempString.contains("."))
-                || tempString.contains("#")
-                || tempString.contains("$")
-                || tempString.contains("[")
-                || tempString.contains("]"))
-    }
 
-    fun getStorageRef(): StorageReference {
-        return FirebaseStorage.getInstance(STOR_REF).reference
+    val storageRef: StorageReference
+        get() {
+            return FirebaseStorage.getInstance(STOR_REF).reference
+        }
 
-    }
-    fun getDBRef(): DatabaseReference {
-        return FirebaseDatabase.getInstance(DB_REF).reference
-    }
+    val dbRef: DatabaseReference
+        get() {
+            return FirebaseDatabase.getInstance(DB_REF).reference
+        }
 
-    fun getEmailUsersRef() : DatabaseReference{
-        return FirebaseDatabase.getInstance(DB_REF).reference.child("EmailUsers")
-    }
+    val emailUsersRef: DatabaseReference
+        get() {
+            return FirebaseDatabase.getInstance(DB_REF).reference.child("EmailUsers")
+        }
 
-    fun getFbUsersRef() : DatabaseReference{
-        return FirebaseDatabase.getInstance(DB_REF).reference.child("FbUsers")
-    }
+    val fbUsersRef: DatabaseReference
+        get() {
+            return FirebaseDatabase.getInstance(DB_REF).reference.child("FbUsers")
+        }
 
-    fun getAnomaliesRef() : DatabaseReference{
-        return FirebaseDatabase.getInstance(DB_REF).reference.child("Anomalies")
-    }
+    val anomaliesRef: DatabaseReference
+        get() {
+            return FirebaseDatabase.getInstance(DB_REF).reference.child("Anomalies")
+        }
 
     fun getSpecificField(referString: String, path: String): DatabaseReference {
         return FirebaseDatabase.getInstance(referString).getReference(path)
     }
 
     fun addAnomalyToFirebase(anomaly: Anomaly){
-        getAnomaliesRef().push().setValue(anomaly)
+        anomaliesRef.push().setValue(anomaly)
     }
 
     fun addEmailUserToFirebase(utente: EmailUser){
@@ -62,7 +57,7 @@ object FirebaseClass {
     }
 
     fun addEmailUserToFirebase(utente: EmailUser, callback: RunnablePar?){
-        getEmailUsersRef().push().setValue(utente).addOnCompleteListener {
+        emailUsersRef.push().setValue(utente).addOnCompleteListener {
             getSnapshotFromUser(
                 utente,
                 object : RunnablePar{
@@ -78,19 +73,19 @@ object FirebaseClass {
     }
 
     fun addFbUserToFirebase(utente: FbUser, callback: RunnablePar?){
-        getFbUsersRef().push().setValue(utente).addOnCompleteListener { callback?.run(it) }
+        fbUsersRef.push().setValue(utente).addOnCompleteListener { callback?.run(it) }
     }
 
     fun getReferenceByUser(user: User): DatabaseReference {
-        return if(user is EmailUser) getEmailUsersRef() else getFbUsersRef()
+        return if(user is EmailUser) emailUsersRef else fbUsersRef
     }
 
     inline fun <reified T: User> getReferenceByUser(): DatabaseReference {
-        return if(T::class.java == EmailUser::class.java) getEmailUsersRef() else getFbUsersRef()
+        return if(T::class.java == EmailUser::class.java) emailUsersRef else fbUsersRef
     }
 
     fun getAnomaliesByUser(user: User, callback: RunnablePar) {
-        getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
+        anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
             val count = dataSnapshot.result.children.count {
                 it.child("spotterId").value.toString().equals(user.uniqueId, ignoreCase = true)
             }
@@ -100,7 +95,7 @@ object FirebaseClass {
     }
 
     fun getReportsByUser(user: User, callback: RunnablePar) {
-        getAnomaliesRef().get().addOnCompleteListener { dataSnapshot ->
+        anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
             val count = dataSnapshot.result.children.count {
                 it.child("authorId").value.toString().equals(user.uniqueId, ignoreCase = true)
             }
@@ -136,6 +131,14 @@ object FirebaseClass {
         }
     }
 
+    fun getAnomalySnapshot(anomaly: Anomaly, callback: RunnablePar){
+        anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
+            callback.run(dataSnapshot.result.children.find{
+                it.getValue(Anomaly::class.java)!!.location == anomaly.location
+            })
+        }
+    }
+
     inline fun <reified T: User> getUserObjectById(userId: String, callback: RunnablePar) {
         getUserSnapshotById<T>(userId, object : RunnablePar {
             override fun run(p: Any?) {
@@ -160,7 +163,7 @@ object FirebaseClass {
                     val userId = p as String?
 
                     if(userId != null){
-                        getStorageRef().child("images/${userId}")
+                        storageRef.child("images/${userId}")
                             .downloadUrl
                             .addOnSuccessListener {
                                 getImageFromUrl(it.toString(), callback)
@@ -188,7 +191,16 @@ object FirebaseClass {
         update.child(child).setValue(value)
     }
 
-    fun <T> deleteFieldFirebase(referString: String, field: String, child: String) {
-        getSpecificField(referString, field).child(child).removeValue()
+    fun deleteAnomalyFirebase(anomaly: Anomaly){
+        getAnomalySnapshot(anomaly, object : RunnablePar{
+            override fun run(p: Any?) {
+                deleteFieldFirebase(anomaliesRef, (p as DataSnapshot?)?.ref?.key)
+            }
+        } )
+    }
+
+    fun deleteFieldFirebase(reference: DatabaseReference, child: String?) {
+        if(child != null)
+            reference.child(child).removeValue()
     }
 }

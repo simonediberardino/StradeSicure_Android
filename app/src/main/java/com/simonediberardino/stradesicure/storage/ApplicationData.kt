@@ -9,8 +9,8 @@ import com.simonediberardino.stradesicure.activities.SSActivity
 object ApplicationData {
     const val DATA_ID = "data"
     const val ACCOUNT_ID = "ACCOUNT_ID"
-    const val MAP_STYLE_ID = "MAP_STYLE_ID"
-    const val MAP_STYLE_DEFAULT = GoogleMap.MAP_TYPE_NORMAL.toString()
+    private const val MAP_STYLE_ID = "MAP_STYLE_ID"
+    private const val MAP_STYLE_DEFAULT = GoogleMap.MAP_TYPE_NORMAL.toString()
     val ACCOUNT_DEFAULT = null
 
     fun getApplicationData(): SharedPreferences {

@@ -71,7 +71,9 @@
     <string name="rimuovi">Rimuovi</string>
     <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>
     <string name="citynotfound">Città sconosciuta</string>
-    <string name="loginsuccess">Login effettuato correttamente!</string>
+    <string name="login_success">Login effettuato correttamente!</string>
+    <string name="login_description">Effettua il login e sblocca tutte le funzionalità dell\'app</string>
+    <string name="logout_description">Disconnetti il tuo profilo da Strada Sicura</string>
     <string name="nonloggato">Devi effettuare l\'accesso per utilizzare questa funzionalità.</string>
     <string name="credenzialierrate">Credenziali errate, riprova.</string>
     <string name="emailgiaregistrata">Questa email è già stata registrata.</string>

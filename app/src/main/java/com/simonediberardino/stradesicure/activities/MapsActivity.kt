@@ -54,23 +54,38 @@ import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
 class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
+    /** Google map object provided by Google; */
     private var googleMap: GoogleMapExtended? = null
-    private lateinit var binding: ActivityMapsBinding
+    private lateinit var mapBinding: ActivityMapsBinding
+
+    /** Wheter markers are shown or not; */
+    private var areMarkerShown = true
+    /** Exact user location; */
+    private var userLocation: Location? = null
+    /** User location updated every 100 meters; */
+    private var intervalUserLocation: Location? = null
+    /** Anomaly marker placed by the user; */
+    private var anomalyMarker: Marker? = null
+    /** Location icon placed on the user location updated every time the user location changes; */
+    private var userLocMarker: Marker? = null
+    /** Circle placed on the user location updated every time the user location changes; */
+    private var userLocCircle: Circle? = null
+    /** Locks the FireBase query thread until the map is fully initializated; */
+    private var threadLocker = ReentrantLock()
+    private var threadLockerCond = threadLocker.newCondition()
+    /** GPS Manager; */
     private lateinit var locationManager: FusedLocationProviderClient
+    /** User Interface objects; */
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var topSheetBehavior: TopSheetBehavior<View>
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var drawerLayout: DrawerLayout
+    /** ArrayList containing all the anomalies reported by the users; */
     private lateinit var anomalies: ArrayList<Anomaly>
+    /** ArrayList containing all the anomalies not reported by the voice assistant; */
     private lateinit var notEncounteredAnomalies: ArrayList<Anomaly>
+    /** Voice assistant; */
     private lateinit var TTS: TTS
-    private var areMarkerShown = true
-    private var userLocation: Location? = null
-    private var anomalyMarker: Marker? = null
-    private var lastUserLocMarker: Marker? = null
-    private var lastUserLocCircle: Circle? = null
-    private var threadLocker = ReentrantLock()
-    private var threadLockerCond = threadLocker.newCondition()
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,10 +104,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun setupTTS(){
-        TTS = TTS(this)
-        { TTS.speak("Text to Speech inizializzato correttamente!") }
-
-        TTS.language = Locale.ITALY
+        TTS = TTS(this){}
     }
 
     private fun fetchUserData() {
@@ -135,8 +147,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
      * Sets the content of the activity;
      */
     override fun setContentView(){
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        mapBinding = ActivityMapsBinding.inflate(layoutInflater)
+        setContentView(mapBinding.root)
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -429,7 +441,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         this.googleMap?.map?.setOnMarkerClickListener {
             when (it) {
                 anomalyMarker -> this.removeAnomalyMarker()
-                lastUserLocMarker -> this.zoomMapToUser()
+                userLocMarker -> this.zoomMapToUser()
             }
 
             return@setOnMarkerClickListener false
@@ -474,12 +486,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         if(userLocation == null)
             return
 
-        val zoomValue = 14f
-
         googleMap?.map?.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation!!.latitude, userLocation!!.longitude),
-                zoomValue
+                MAP_DEFAULT_ZOOM
             )
         )
     }
@@ -490,13 +500,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun refreshLocationCircle(){
-        val minCircleZoom = 16
-        lastUserLocCircle?.isVisible = getMapZoom() > minCircleZoom
+        userLocCircle?.isVisible = getMapZoom() >= MAP_DEFAULT_ZOOM
     }
 
     @JvmName("onLocationChanged1")
     fun onLocationChanged(newLocation: Location?){
+        val updateDistance = 100
         val currentCityTW = this.findViewById<TextView>(R.id.dialog_city_tw)
+
         if(newLocation == null){
             currentCityTW.text = getString(R.string.citynotfound)
             return
@@ -515,22 +526,23 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val circleOptions = CircleOptions()
             .center(markerOptions.position)
-            .radius(100.0)
+            .radius(WARN_RADIUS)
             .strokeColor(0xf1E90FF)
             .fillColor(0x301E90FF)
             .strokeWidth(10f)
 
-        // TODO: This condition is always false
-        if(userLocation != null)
-            if(newLocation.distanceTo(userLocation) > 100)
+        if(userLocation != null){
+            if(intervalUserLocation == null || userLocation!!.distanceTo(intervalUserLocation) >= updateDistance){
+                intervalUserLocation = userLocation
                 checkNearbyAnomalies()
+            }
+        }
 
         userLocation = newLocation
-
-        lastUserLocCircle?.remove()
-        lastUserLocMarker?.remove()
-        lastUserLocMarker = googleMap?.map?.addMarker(markerOptions)
-        lastUserLocCircle = googleMap?.map?.addCircle(circleOptions)
+        userLocCircle?.remove()
+        userLocMarker?.remove()
+        userLocMarker = googleMap?.map?.addMarker(markerOptions)
+        userLocCircle = googleMap?.map?.addCircle(circleOptions)
 
         refreshLocationCircle()
 
@@ -538,12 +550,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun checkNearbyAnomalies(){
-        val radiusAnomaly = 200
         val nearestAnomaly = getNearestNotWarnedAnomaly() ?: return
 
-        if(nearestAnomaly.location.distanceTo(userLocation) < radiusAnomaly){
+        if(nearestAnomaly.location.distanceTo(userLocation) < WARN_RADIUS)
             warnAnomaly(nearestAnomaly)
-        }
     }
 
     private fun getNearestNotWarnedAnomaly(): Anomaly? {
@@ -554,8 +564,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     private fun warnAnomaly(anomaly: Anomaly){
         notEncounteredAnomalies.remove(anomaly)
-        val distanceInKm = getDistanceInKm(anomaly.location.distanceTo(userLocation).toInt())
-        Utility.showToast(this, "Anomalia nelle vicinanze: $distanceInKm")
+        val distanceInMeters = anomaly.location.distanceTo(userLocation).toInt()
+        val distanceInMetersApprox = ((distanceInMeters/10.0f).toInt())*10
+        val messageToSay = getString(R.string.anomalia_in_range).replace("{meters}", distanceInMetersApprox.toString())
+        TTS.speak(messageToSay)
+        Utility.showToast(this, messageToSay)
     }
 
     private fun setAnomaliesListener() {
@@ -833,6 +846,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     companion object {
+        private const val MAP_DEFAULT_ZOOM = 15f
+        private const val WARN_RADIUS = 200.0
         private const val GEOLOCATION_PERMISSION_CODE = 1
 
         fun getCity(location: Location?, activity: AppCompatActivity): String? {

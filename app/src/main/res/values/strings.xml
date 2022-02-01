@@ -63,6 +63,7 @@
     <string name="mapstyle">Stile mappa</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
+    <string name="anomalia_in_range">Attenzione, anomalia nel raggio di {meters} metri.</string>
     <string name="logout_success">Disconnesso con successo!</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>

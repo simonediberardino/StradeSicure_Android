@@ -14,6 +14,7 @@ class SettingsActivity : SSActivity() {
     override fun initializeLayout() {
         setContentView(R.layout.activity_settings)
         this.setupMapThemeSpinner()
+        this.setupUpdateAnomaliesSpinner()
         this.setupLogoutBtn()
         this.setupLoginButton()
     }
@@ -38,6 +39,24 @@ class SettingsActivity : SSActivity() {
 
         spinner.apply()
         spinner.selectItem(themeObjs.map { it.themeId }.indexOf(ApplicationData.getSavedMapStyle()))
+    }
+
+    private fun setupUpdateAnomaliesSpinner(){
+        val mainLayout = findViewById<ViewGroup>(R.id.settings_viewgroup_1)
+        val spinner = CSpinner(this, mainLayout)
+
+        val options = resources.getStringArray(R.array.yesno)
+
+        spinner.title = getString(R.string.realtimeupdate)
+        spinner.options = options
+        spinner.setOnChangeListener(object : RunnablePar {
+            override fun run(p: Any?) {
+                ApplicationData.isRealtimeUpdated((p as Int) == 0)
+            }
+        })
+
+        spinner.apply()
+        spinner.selectItem(if(!ApplicationData.isRealtimeUpdated()) 1 else 0)
     }
 
     private fun setupLogoutBtn(){

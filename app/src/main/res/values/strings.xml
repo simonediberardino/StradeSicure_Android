@@ -12,6 +12,10 @@
         <item>Satellite</item>
     </string-array>
 
+    <string-array name="yesno">
+        <item>Sì</item>
+        <item>No</item>
+    </string-array>
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strada Sicura</string>
     <string name="title_activity_maps">Strade Sicure</string>
@@ -61,6 +65,7 @@
     <string name="progress">Avanzamento: {progress}</string>
     <string name="recensioni">Recensioni</string>
     <string name="mapstyle">Stile mappa</string>
+    <string name="realtimeupdate">Aggiornamento anomalie in tempo reale</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
     <string name="anomalia_in_range">Attenzione, anomalia nel raggio di {meters} metri.</string>
@@ -83,6 +88,7 @@
     <string name="nessunaanomaliacitta">Impossibile trovare anomalie nella tua città.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="noimagewarn">Non hai impostato una foto profilo, vuoi continuare lo stesso?</string>
+    <string name="dialog_conferma_eliminazione">Sei sicuro di voler rimuovere questa segnalazione? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

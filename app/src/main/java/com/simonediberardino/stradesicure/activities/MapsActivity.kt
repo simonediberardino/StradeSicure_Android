@@ -73,6 +73,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     /** Locks the FireBase query thread until the map is fully initializated; */
     private var threadLocker = ReentrantLock()
     private var threadLockerCond = threadLocker.newCondition()
+    private var hasListedAnomalies = false
     /** GPS Manager; */
     private lateinit var locationManager: FusedLocationProviderClient
     /** User Interface objects; */
@@ -172,22 +173,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             R.id.menu_profilo -> {
                 Utility.navigateTo(this,
                 if(LoginHandler.isLoggedIn())
-                    MyAccountActivity::class.java
+                        MyAccountActivity::class.java
                     else
                         LoginActivity::class.java)
             }
 
-            R.id.menu_mie_segnalazioni -> {
-
-            }
-
-            R.id.menu_tutte_segnalazioni -> {
-
-            }
-
-            R.id.menu_contatti -> {
-
-            }
+            R.id.menu_mie_segnalazioni -> {}
+            R.id.menu_tutte_segnalazioni -> {}
+            R.id.menu_contatti -> {}
 
             R.id.menu_impostazioni -> {
                 Utility.navigateTo(this, SettingsActivity::class.java)
@@ -410,6 +403,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         anomalyMarker?.remove()
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     private fun setupUserLocation(){
         val locationRequest = LocationRequest.create()
@@ -442,9 +436,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             when (it) {
                 anomalyMarker -> this.removeAnomalyMarker()
                 userLocMarker -> this.zoomMapToUser()
+                /* Else it must be an anomaly */
+                else -> {
+                    val findAnomalyByMarker = getAnomalyByMarker(it)
+                    if (findAnomalyByMarker != null) {
+                        setupMoreAnomalyDialog(findAnomalyByMarker)
+                    }
+                }
             }
 
-            return@setOnMarkerClickListener false
+            return@setOnMarkerClickListener true
         }
 
         this.googleMap?.map?.setOnMapLongClickListener {
@@ -467,13 +468,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         fetchAnomalies(object : RunnablePar {
             override fun run(p: Any?) {
-                showAnomaly(p as Anomaly)
-                storeAnomaly(p)
+                storeAnomaly(p as Anomaly)
+                showAnomaly(p)
             }
         }) {
             threadLocker.withLock {
                 threadLockerCond.signalAll()
-                listAnomalies()
+                this.firstAnomalyList()
             }
         }
     }
@@ -503,8 +504,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         userLocCircle?.isVisible = getMapZoom() >= MAP_DEFAULT_ZOOM
     }
 
-    @JvmName("onLocationChanged1")
+    @RequiresApi(Build.VERSION_CODES.N)
     fun onLocationChanged(newLocation: Location?){
+        this.firstAnomalyList()
+
         val updateDistance = 100
         val currentCityTW = this.findViewById<TextView>(R.id.dialog_city_tw)
 
@@ -582,6 +585,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 var index = 0
                 FirebaseClass.anomaliesRef.addChildEventListener(
                     object : ChildEventListener {
+                        @RequiresApi(Build.VERSION_CODES.N)
                         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                             index++
                             if(index <= anomalies.size)
@@ -591,6 +595,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
                             showAnomaly(anomalyAdded!!)
                             storeAnomaly(anomalyAdded)
+                            if(isInSameCity(anomalyAdded.location))
+                                listAnomaliesIfRealtimeUpdated()
                         }
 
                         @RequiresApi(Build.VERSION_CODES.N)
@@ -621,11 +627,17 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun removeAnomaly(anomaly: Anomaly){
+    private fun removeAnomaly(anomaly: Anomaly?){
+        if(anomaly?.location == null)
+            return
+
         val predicate = Predicate<Anomaly>{ it.location == anomaly.location }
         anomalies.removeIf(predicate)
         notEncounteredAnomalies.removeIf(predicate)
         googleMap?.removeMarker(anomaly.location)
+
+        if(isInSameCity(anomaly.location))
+            listAnomaliesIfRealtimeUpdated()
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -647,6 +659,12 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
         notEncounteredAnomalies.add(anomaly)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun listAnomaliesIfRealtimeUpdated(){
+        if(ApplicationData.isRealtimeUpdated())
+            listAnomalies()
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -673,6 +691,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val anomaliesInCity = getAnomaliesInCity(userLocation).size
         nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.toString())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun firstAnomalyList(){
+        if(!hasListedAnomalies && userLocation != null) {
+            this.hasListedAnomalies = true
+            this.listAnomalies()
+        }
     }
 
     private fun listAnomaly(anomaly: Anomaly) {
@@ -724,6 +750,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         addressET.setText(foundAddress)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun setupMoreAnomalyDialog(anomaly: Anomaly){
         val moreDialog = CBottomSheetDialog(this)
         moreDialog.setContentView(R.layout.anomaly_more_dialog)
@@ -741,10 +768,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             if(notEncounteredAnomalies.contains(anomaly)){
                 Utility.oneLineDialog(this, getString(R.string.anomalia_non_visitata), null)
             }else{
+                Utility.oneLineDialog(this, getString(R.string.dialog_conferma_eliminazione)) {
+                    FirebaseClass.deleteAnomalyFirebase(anomaly)
+                }
             }
-            FirebaseClass.deleteAnomalyFirebase(anomaly)
-
+            moreDialog.dismiss()
         }
+
         moreDialog.show()
     }
 
@@ -801,6 +831,15 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             else -> {
                 false
             }
+        }
+    }
+
+    private fun getAnomalyByMarker(marker: Marker): Anomaly? {
+        return try{
+            val markerLocation = latLngToLocation(marker.position)
+            this.anomalies.first { it.location == markerLocation }
+        }catch(exception: NoSuchElementException){
+            null
         }
     }
 

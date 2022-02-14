@@ -1,5 +1,6 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.content.Intent
 import android.os.Build
 import android.view.View
 import android.widget.EditText
@@ -12,6 +13,7 @@ import com.facebook.login.widget.LoginButton
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
+import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
@@ -49,18 +51,16 @@ class LoginActivity : SSActivity() {
             if(matchedUser == null || matchedUser.password != encryptedPassword){
                 Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate), null)
             }else{
-                LoginHandler.doLogin(matchedUser)
-                Utility.showToast(this, this.getString(R.string.login_success))
-                Utility.goToMainMenu(this)
+                loginSuccess(matchedUser)
             }
         }
     }
 
     // TODO: Update data;
     fun handleLoginFB(){
-        val loginButton = findViewById<LoginButton>(R.id.login_facebook_button)
-
         callbackManager = CallbackManager.Factory.create()
+
+        val loginButton = findViewById<LoginButton>(R.id.login_facebook_button)
 
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -70,23 +70,51 @@ class LoginActivity : SSActivity() {
 
                 FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar{
                     override fun run(p: Any?) {
-                        var loggedUser = p as FbUser?
+                        Thread{
+                            val loggedUser = p as FbUser?
 
-                        if(loggedUser == null){
-                            loggedUser = RegisterActivity.registerFbUser(userId)
-                        }
+                            val doLogin = {
+                                loginSuccess(loggedUser)
+                            }
 
-                        LoginHandler.doLogin(loggedUser)
+                            if(loggedUser != null){
+                                doLogin()
+                            }else{
+                                RegisterActivity.registerFbUser(userId){
+                                    doLogin()
+                                }
+                            }
+                        }.start()
+
                     }
 
                 })
             }
 
             override fun onCancel() {
+                loginError()
             }
 
             override fun onError(e: FacebookException) {
+                loginError()
             }
         })
     }
+
+    fun loginSuccess(loggedUser: User?){
+        LoginHandler.doLogin(loggedUser)
+        Utility.showToast(this, this.getString(R.string.login_success))
+        Utility.goToMainMenu(this)
+    }
+
+    fun loginError(){
+        Utility.showToast(this, this.getString(R.string.login_error))
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+    }
+
+
 }

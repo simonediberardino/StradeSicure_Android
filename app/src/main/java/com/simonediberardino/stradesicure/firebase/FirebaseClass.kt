@@ -15,6 +15,9 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import java.net.URL
 
 
+
+
+
 object FirebaseClass {
     private var DB_REF = "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app"
     private var STOR_REF = "gs://strade-sicure.appspot.com"
@@ -155,7 +158,16 @@ object FirebaseClass {
             getUserSnapshotById<FbUser>(user.uniqueId, callback)
     }
 
+    fun getFBProfileImage(user: FbUser, callback: RunnablePar){
+        getImageFromUrl("https://graph.facebook.com/${user.uniqueId}/picture?type=large", callback)
+    }
+
     fun getProfileImage(user: User, callback: RunnablePar){
+        if(user is FbUser){
+            getFBProfileImage(user, callback)
+            return
+        }
+
         getUserSnapshotId<User>(
             user.uniqueId,
             object : RunnablePar{

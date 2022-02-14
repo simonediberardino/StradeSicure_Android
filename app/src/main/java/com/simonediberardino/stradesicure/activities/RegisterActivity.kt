@@ -145,13 +145,17 @@ class RegisterActivity : SSActivity() {
     }
 
     companion object{
-        fun registerFbUser(userId: String): FbUser {
-            val createdUser = Profile.getCurrentProfile()
-            val firstName = createdUser.firstName
-            val lastName = createdUser.lastName
-            val loggedUser = FbUser(firstName, lastName, userId)
-            FirebaseClass.addFbUserToFirebase(loggedUser)
-            return loggedUser
+        fun registerFbUser(userId: String, callback: Runnable) {
+            LoginHandler.waittilFBProfileIsReady(object : RunnablePar{
+                override fun run(p: Any?) {
+                    val createdUser = Profile.getCurrentProfile()
+                    val firstName = createdUser.firstName
+                    val lastName = createdUser.lastName
+                    val loggedUser = FbUser(firstName, lastName, userId)
+                    FirebaseClass.addFbUserToFirebase(loggedUser)
+                    callback.run()
+                }
+            })
         }
     }
 }

@@ -52,6 +52,8 @@
     <string name="anomalia_non_visitata">Devi visitare questa anomalia almeno una volta durante questa sessione per poter eliminarla.</string>
     <string name="ok">OK</string>
     <string name="email">Email</string>
+    <string name="email_id">Email / ID Utente</string>
+    <string name="login_error">Impossibile effettuare l\'accesso.</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="register">Registrati</string>

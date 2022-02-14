@@ -5,7 +5,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ProgressDialog
-import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
@@ -96,7 +96,7 @@ class MyAccountActivity : SSActivity() {
     }
 
     private fun setUserId() {
-        FirebaseClass.getUserSnapshotId<EmailUser>(
+        FirebaseClass.getUserSnapshotId<User>(
             LoginHandler.deviceUser!!.uniqueId,
             object : RunnablePar {
                 override fun run(p: Any?) {
@@ -118,5 +118,6 @@ class MyAccountActivity : SSActivity() {
                 }
             }
         )
+
     }
 }

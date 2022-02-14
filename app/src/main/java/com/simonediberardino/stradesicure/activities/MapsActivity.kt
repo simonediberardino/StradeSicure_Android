@@ -113,15 +113,21 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             return
 
         if(LoginHandler.isFacebookLoggedIn()){
-            val userId = Profile.getCurrentProfile().id
-            FirebaseClass.getUserObjectById<FbUser>(
-                userId,
-                object : RunnablePar {
-                    override fun run(p: Any?) {
-                        val fbUser = p as FbUser?
-                        if(fbUser != null)
-                            LoginHandler.doLogin(fbUser)
-                    }
+            LoginHandler.waittilFBProfileIsReady(object : RunnablePar{
+                override fun run(p: Any?) {
+                    val userId = (p as Profile).id
+                    FirebaseClass.getUserObjectById<FbUser>(
+                        userId,
+                        object : RunnablePar {
+                            override fun run(p: Any?) {
+                                val fbUser = p as FbUser?
+                                if(fbUser != null)
+                                    LoginHandler.doLogin(fbUser)
+                            }
+                        }
+                    )
+                }
+
             })
         }else{
             val storedAccount = ApplicationData.getSavedAccount<EmailUser>() ?: return

@@ -1,5 +1,5 @@
 <resources>
-    <string name="facebook_app_id">473625777492322</string> <string name="fb_login_protocol_scheme">fb473625777492322</string>
+    <string name="facebook_app_id">308870061304393</string> <string name="fb_login_protocol_scheme">fb473625777492322</string>
     <string-array name="stato">
         <item>Lieve</item>
         <item>Medio</item>

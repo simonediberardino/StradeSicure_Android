@@ -1,8 +1,13 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
+import android.view.View
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.TextView
+import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.User
@@ -26,6 +31,8 @@ class MyAccountActivity : SSActivity() {
     private lateinit var userIDTW: TextView
     private lateinit var profileImageIV: CircleImageView
     private lateinit var logoutBtn: RadioButton
+    private lateinit var editIDBtn: ImageView
+    private lateinit var editImageBtn: ImageView
 
     override fun initializeLayout() {
         this.setContentView(R.layout.activity_account)
@@ -43,11 +50,13 @@ class MyAccountActivity : SSActivity() {
         progressDialog = ProgressDialog(currentContext!!)
 
         nameTW = findViewById(R.id.account_name)
-        emailTW = findViewById(R.id.account_email_text)
+        emailTW = findViewById(R.id.account_emailid_text)
         reportsTW = findViewById(R.id.account_segnalazioni_number)
         reviewsTW = findViewById(R.id.account_recensioni_number)
         userIDTW = findViewById(R.id.account_id_text)
         profileImageIV = findViewById(R.id.account_icon)
+        editIDBtn = findViewById(R.id.account_emailid_edit)
+        editImageBtn = findViewById(R.id.account_camera)
     }
 
     private fun setupListeners(){
@@ -69,6 +78,7 @@ class MyAccountActivity : SSActivity() {
 
     private fun setProfileEmail() {
         emailTW.text = LoginHandler.deviceUser!!.uniqueId
+        //editIDBtn.visibility = if(LoginHandler.isFacebookLoggedIn()) View.INVISIBLE else View.VISIBLE
     }
 
     private fun setAnomaliesNumber() {
@@ -100,7 +110,9 @@ class MyAccountActivity : SSActivity() {
             LoginHandler.deviceUser!!.uniqueId,
             object : RunnablePar {
                 override fun run(p: Any?) {
-                    val userId = p as String?
+                    if(p == null) return
+
+                    val userId = p as String
                     userIDTW.text = userId
                     progressDialog.progress = progressDialog.progress + singleStepValue
                 }
@@ -114,10 +126,41 @@ class MyAccountActivity : SSActivity() {
                 override fun run(p: Any?) {
                     if(p != null)
                         profileImageIV.setImageBitmap(p as Bitmap)
+
                     progressDialog.progress = progressDialog.progress + singleStepValue
                 }
             }
         )
 
+        editImageBtn.visibility = if(LoginHandler.isFacebookLoggedIn()) View.INVISIBLE else View.VISIBLE
+        editImageBtn.setOnClickListener {
+            super.startGalleryActivity()
+        }
+    }
+
+    private fun updateProfileImage(uploadedImage: Uri){
+        FirebaseClass.getSnapshotFromUser(LoginHandler.deviceUser!!, object : RunnablePar{
+            override fun run(p: Any?) {
+                val dataSnapshot = p as DataSnapshot?
+                if(dataSnapshot != null){
+                    RegisterActivity.uploadProfilePicToFirebase(
+                        this@MyAccountActivity,
+                        uploadedImage,
+                        dataSnapshot
+                    ){
+                        setProfileImage()
+                    }
+                }
+
+            }
+        })
+    }
+
+    override fun onActivityResult(reqCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(reqCode, resultCode, data)
+        if (resultCode == RESULT_OK && reqCode == 100) {
+            uploadedImage = data?.data
+            updateProfileImage(uploadedImage!!)
+        }
     }
 }

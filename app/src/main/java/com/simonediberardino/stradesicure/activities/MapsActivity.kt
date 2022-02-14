@@ -707,6 +707,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun listAnomaly(anomaly: Anomaly) {
         if(!isInSameCity(anomaly.location))
             return
@@ -726,14 +727,18 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
 
         addressTW.text = getCity(anomaly.location, this)
-        distanceTW.text = distanceTW.text.toString().replace("{distance}", getDistanceString(userLocation, anomaly.location))
+
+        val distanceTemplate = getString(R.string.distance)
+        distanceTW.text = distanceTemplate.replace("{distance}", getDistanceString(userLocation, anomaly.location))
 
         FirebaseClass.getUserObjectById<User>(
             anomaly.spotterId,
             object : RunnablePar {
                 override fun run(p: Any?) {
                     val user = p as User?
-                    reporterTW.text = reporterTW.text.toString().replace("{username}", LoginHandler.getFullName(user))
+                    if(p == null) return
+                    val reporterTemplate = getString(R.string.segnalata_da)
+                    reporterTW.text = reporterTemplate.replace("{username}", LoginHandler.getFullName(user))
                 }
             })
 

@@ -6,12 +6,14 @@ import com.facebook.login.LoginManager
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.activities.SSActivity
 import com.simonediberardino.stradesicure.entity.EmailUser
+import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
 
 object LoginHandler {
     var deviceUser: User? = null
+    var accessToken: AccessToken? = null
 
     fun isFacebookLoggedIn(): Boolean {
         val accessToken = AccessToken.getCurrentAccessToken()
@@ -45,6 +47,9 @@ object LoginHandler {
     }
 
     inline fun <reified T> doLogin(loggedUser: T?){
+        if(loggedUser is FbUser)
+            accessToken =  AccessToken.getCurrentAccessToken()
+
         deviceUser = loggedUser as User?
         ApplicationData.setSavedAccount<T>(loggedUser)
     }

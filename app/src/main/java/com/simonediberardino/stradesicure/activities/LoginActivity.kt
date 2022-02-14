@@ -56,7 +56,6 @@ class LoginActivity : SSActivity() {
         }
     }
 
-    // TODO: Update data;
     fun handleLoginFB(){
         callbackManager = CallbackManager.Factory.create()
 
@@ -85,9 +84,7 @@ class LoginActivity : SSActivity() {
                                 }
                             }
                         }.start()
-
                     }
-
                 })
             }
 
@@ -102,19 +99,21 @@ class LoginActivity : SSActivity() {
     }
 
     fun loginSuccess(loggedUser: User?){
-        LoginHandler.doLogin(loggedUser)
-        Utility.showToast(this, this.getString(R.string.login_success))
-        Utility.goToMainMenu(this)
+        runOnUiThread {
+            LoginHandler.doLogin(loggedUser)
+            Utility.showToast(this, this.getString(R.string.login_success))
+            Utility.goToMainMenu(this)
+        }
     }
 
     fun loginError(){
-        Utility.showToast(this, this.getString(R.string.login_error))
+        runOnUiThread {
+            Utility.showToast(this, this.getString(R.string.login_error))
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
-
-
 }

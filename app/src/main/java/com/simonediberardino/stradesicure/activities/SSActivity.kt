@@ -1,9 +1,12 @@
 package com.simonediberardino.stradesicure.activities
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
@@ -13,6 +16,8 @@ import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
 abstract class SSActivity : AppCompatActivity() {
+    var uploadedImage: Uri? = null
+
     companion object {
         var currentContext: SSActivity? = null
     }
@@ -49,4 +54,10 @@ abstract class SSActivity : AppCompatActivity() {
 
     abstract fun initializeLayout()
     open fun setContentView(){}
+
+    fun startGalleryActivity(){
+        val PICK_IMAGE = 100
+        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        startActivityForResult(gallery, PICK_IMAGE)
+    }
 }

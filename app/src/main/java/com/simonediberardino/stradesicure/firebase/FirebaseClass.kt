@@ -11,6 +11,7 @@ import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import java.net.URL
 
@@ -159,7 +160,7 @@ object FirebaseClass {
     }
 
     fun getFBProfileImage(user: FbUser, callback: RunnablePar){
-        getImageFromUrl("https://graph.facebook.com/${user.uniqueId}/picture?type=large", callback)
+        getImageFromUrl("https://graph.facebook.com/${user.uniqueId}/picture?access_token=${LoginHandler.accessToken?.token}", callback)
     }
 
     fun getProfileImage(user: User, callback: RunnablePar){

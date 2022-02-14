@@ -2,12 +2,12 @@ package com.simonediberardino.stradesicure.activities
 
 import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import com.facebook.Profile
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.storage.FirebaseStorage
@@ -23,8 +23,6 @@ import com.simonediberardino.stradesicure.utils.Utility
 
 
 class RegisterActivity : SSActivity() {
-    private var uploadedImage: Uri? = null
-    
     override fun initializeLayout() {
         setContentView(R.layout.activity_register)
 
@@ -85,7 +83,7 @@ class RegisterActivity : SSActivity() {
                     object : RunnablePar {
                         override fun run(p: Any?) {
                             val dataSnapshot = p as DataSnapshot?
-                            uploadProfilePicToFirebase(dataSnapshot!!) {
+                            uploadProfilePicToFirebase(this@RegisterActivity, uploadedImage, dataSnapshot!!) {
                                 LoginHandler.doLogin(emailUser)
                                 Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
                                 Utility.goToMainMenu(this@RegisterActivity)
@@ -100,39 +98,6 @@ class RegisterActivity : SSActivity() {
                 }
             else finalCallback.run()
         }
-    }
-
-    private fun startGalleryActivity(){
-        val PICK_IMAGE = 100
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        startActivityForResult(gallery, PICK_IMAGE)
-    }
-
-    private fun uploadProfilePicToFirebase(dataSnapshot: DataSnapshot, callback: Runnable){
-        val storageReference = FirebaseStorage.getInstance().reference
-
-        if(uploadedImage == null){
-            callback.run()
-            return
-        }
-
-        val progressDialog = ProgressDialog(this)
-        val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
-
-        reference.putFile(uploadedImage!!)
-            .addOnSuccessListener {
-                println("FINISHHHH!")
-                progressDialog.dismiss()
-                callback.run()
-            }
-            .addOnFailureListener { e ->
-                progressDialog.dismiss()
-                Utility.showToast(this, e.message.toString())
-            }
-            .addOnProgressListener { taskSnapshot ->
-                val progress: Double = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
-                progressDialog.progress = progress.toInt()
-            }
     }
 
     override fun onActivityResult(reqCode: Int, resultCode: Int, data: Intent?) {
@@ -156,6 +121,32 @@ class RegisterActivity : SSActivity() {
                     callback.run()
                 }
             })
+        }
+
+        fun uploadProfilePicToFirebase(context: AppCompatActivity, uploadedImage: Uri?, dataSnapshot: DataSnapshot, callback: Runnable){
+            val storageReference = FirebaseStorage.getInstance().reference
+
+            if(uploadedImage == null){
+                callback.run()
+                return
+            }
+
+            val progressDialog = ProgressDialog(context)
+            val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
+
+            reference.putFile(uploadedImage)
+                .addOnSuccessListener {
+                    progressDialog.dismiss()
+                    callback.run()
+                }
+                .addOnFailureListener { e ->
+                    progressDialog.dismiss()
+                    Utility.showToast(context, e.message.toString())
+                }
+                .addOnProgressListener { taskSnapshot ->
+                    val progress: Double = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
+                    progressDialog.progress = progress.toInt()
+                }
         }
     }
 }

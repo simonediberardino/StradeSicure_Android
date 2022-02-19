@@ -90,6 +90,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
+        mapsActivity = this
         super.onCreate(savedInstanceState)
         this.setupTTS()
         this.fetchUserData()
@@ -184,7 +185,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         LoginActivity::class.java)
             }
 
-            R.id.menu_mie_segnalazioni -> {}
             R.id.menu_tutte_segnalazioni -> {}
             R.id.menu_contatti -> {}
 
@@ -446,7 +446,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 else -> {
                     val findAnomalyByMarker = getAnomalyByMarker(it)
                     if (findAnomalyByMarker != null) {
-                        setupMoreAnomalyDialog(findAnomalyByMarker)
+                        setupMoreAnomalyDialog(this, findAnomalyByMarker)
                     }
                 }
             }
@@ -688,10 +688,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         anomalies.sortBy{ it.location.distanceTo(userLocation) }
 
+        val parentLayoutId = R.id.dialog_anomaly_layout
+        val parentViewId = R.id.parent
+        val layoutToAddId = R.layout.single_anomaly
+
         var i = 0
         val toShow = 5
         while(i < toShow && i < anomalies.size) {
-            listAnomaly(anomalies[i])
+            listAnomaly(this, parentLayoutId, parentViewId, layoutToAddId, anomalies[i])
             i++
         }
 
@@ -707,49 +711,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun listAnomaly(anomaly: Anomaly) {
-        if(!isInSameCity(anomaly.location))
-            return
-
-        val parentLayoutId = R.id.dialog_anomaly_layout
-        val parentViewId = R.id.parent
-        val layoutToAddId = R.layout.single_anomaly
-
-        val inflater = LayoutInflater.from(this)
-        val gallery: LinearLayout = findViewById(parentLayoutId)
-        val view = inflater.inflate(layoutToAddId, gallery, false)
-        val parentView = view.findViewById<ViewGroup>(parentViewId)
-
-        val addressTW = view.findViewById<TextView>(R.id.single_anomaly_title)
-        val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
-        val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
-        val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
-
-        addressTW.text = getCity(anomaly.location, this)
-
-        val distanceTemplate = getString(R.string.distance)
-        distanceTW.text = distanceTemplate.replace("{distance}", getDistanceString(userLocation, anomaly.location))
-
-        FirebaseClass.getUserObjectById<User>(
-            anomaly.spotterId,
-            object : RunnablePar {
-                override fun run(p: Any?) {
-                    val user = p as User?
-                    if(p == null) return
-                    val reporterTemplate = getString(R.string.segnalata_da)
-                    reporterTW.text = reporterTemplate.replace("{username}", LoginHandler.getFullName(user))
-                }
-            })
-
-        moreBTN.setOnClickListener {
-            setupMoreAnomalyDialog(anomaly)
-        }
-
-        Utility.ridimensionamento(this, parentView)
-        gallery.addView(view)
-    }
-
     private fun addAnomalyMarker(latLng: LatLng){
         anomalyMarker?.remove()
         anomalyMarker = this.googleMap?.map?.addMarker(MarkerOptions().position(latLng))
@@ -759,34 +720,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val foundAddress = getAddress(anomalyMarker!!.position, this)
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
         addressET.setText(foundAddress)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun setupMoreAnomalyDialog(anomaly: Anomaly){
-        val moreDialog = CBottomSheetDialog(this)
-        moreDialog.setContentView(R.layout.anomaly_more_dialog)
-
-        val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
-        streetBtn?.setOnClickListener {
-            val streetViewURI = Uri.parse("google.streetview:cbll=${anomaly.location.latitude},${anomaly.location.longitude}")
-            val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
-            streetViewIntent.setPackage ("com.google.android.apps.maps")
-            startActivity (streetViewIntent)
-        }
-        
-        val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
-        removeBtn?.setOnClickListener {
-            if(notEncounteredAnomalies.contains(anomaly)){
-                Utility.oneLineDialog(this, getString(R.string.anomalia_non_visitata), null)
-            }else{
-                Utility.oneLineDialog(this, getString(R.string.dialog_conferma_eliminazione)) {
-                    FirebaseClass.deleteAnomalyFirebase(anomaly)
-                }
-            }
-            moreDialog.dismiss()
-        }
-
-        moreDialog.show()
     }
 
     private fun setSideMenuVisibility(flag: Boolean) {
@@ -867,38 +800,81 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         return getCity(userLocation, this) == getCity(location, this)
     }
 
-    private fun getDistanceString(location1: Location?, location2: Location?): String {
-        if(location1 == null || location2 == null)
-            return getString(R.string.posizionenontrovata)
-
-        val distanceInMeters = location1.distanceTo(location2)
-        val distanceInKm = getDistanceInKm(distanceInMeters.toInt())
-
-        return if(distanceInMeters.toInt() == distanceInKm.toInt())
-            "${distanceInMeters.toInt()} m"
-        else "$distanceInKm km"
-    }
-
-    /**
-     * @return the distance in km if it's greater than 1000m, else the distance in meters;
-     */
-    private fun getDistanceInKm(distanceValue: Int): Float {
-        return if(distanceValue >= 1000){
-            ((distanceValue/100).toFloat()/10)
-        }else{
-            distanceValue.toFloat()
-        }
-    }
-
     override fun onBackPressed() {
         if(!closeMenus())
             super.onBackPressed()
     }
 
     companion object {
+        var mapsActivity: MapsActivity? = null
         private const val MAP_DEFAULT_ZOOM = 15f
         private const val WARN_RADIUS = 200.0
         private const val GEOLOCATION_PERMISSION_CODE = 1
+
+        @RequiresApi(Build.VERSION_CODES.N)
+        private fun listAnomaly(activity: AppCompatActivity, parentLayoudId: Int, parentViewId: Int, layoutToAddId: Int, anomaly: Anomaly) {
+            val inflater = LayoutInflater.from(activity)
+            val gallery: LinearLayout = activity.findViewById(parentLayoudId)
+            val view = inflater.inflate(layoutToAddId, gallery, false)
+            val parentView = view.findViewById<ViewGroup>(parentViewId)
+
+            val addressTW = view.findViewById<TextView>(R.id.single_anomaly_title)
+            val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
+            val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
+            val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
+
+            addressTW.text = getCity(anomaly.location, activity)
+
+            val distanceTemplate = activity.getString(R.string.distance)
+            distanceTW.text = distanceTemplate.replace("{distance}", getDistanceString(activity,
+                mapsActivity?.userLocation, anomaly.location))
+
+            FirebaseClass.getUserObjectById<User>(
+                anomaly.spotterId,
+                object : RunnablePar {
+                    override fun run(p: Any?) {
+                        val user = p as User?
+                        if(p == null) return
+                        val reporterTemplate = activity.getString(R.string.segnalata_da)
+                        reporterTW.text = reporterTemplate.replace("{username}", LoginHandler.getFullName(user))
+                    }
+                })
+
+            moreBTN.setOnClickListener {
+                setupMoreAnomalyDialog(activity, anomaly)
+            }
+
+            Utility.ridimensionamento(activity, parentView)
+            gallery.addView(view)
+        }
+
+        @RequiresApi(Build.VERSION_CODES.N)
+        private fun setupMoreAnomalyDialog(activity: AppCompatActivity, anomaly: Anomaly){
+            val moreDialog = CBottomSheetDialog(activity)
+            moreDialog.setContentView(R.layout.anomaly_more_dialog)
+
+            val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
+            streetBtn?.setOnClickListener {
+                val streetViewURI = Uri.parse("google.streetview:cbll=${anomaly.location.latitude},${anomaly.location.longitude}")
+                val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
+                streetViewIntent.setPackage ("com.google.android.apps.maps")
+                activity.startActivity(streetViewIntent)
+            }
+
+            val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
+            removeBtn?.setOnClickListener {
+                if(mapsActivity?.notEncounteredAnomalies.contains(anomaly)){
+                    Utility.oneLineDialog(activity, activity.getString(R.string.anomalia_non_visitata), null)
+                }else{
+                    Utility.oneLineDialog(activity, activity.getString(R.string.dialog_conferma_eliminazione)) {
+                        FirebaseClass.deleteAnomalyFirebase(anomaly)
+                    }
+                }
+                moreDialog.dismiss()
+            }
+
+            moreDialog.show()
+        }
 
         fun getCity(location: Location?, activity: AppCompatActivity): String? {
             if(location == null)
@@ -938,6 +914,29 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             locationExtended.latitude = location.latitude
             locationExtended.longitude = location.longitude
             return locationExtended
+        }
+
+        private fun getDistanceString(activity: AppCompatActivity, location1: Location?, location2: Location?): String {
+            if(location1 == null || location2 == null)
+                return activity.getString(R.string.posizionenontrovata)
+
+            val distanceInMeters = location1.distanceTo(location2)
+            val distanceInKm = getDistanceInKm(distanceInMeters.toInt())
+
+            return if(distanceInMeters.toInt() == distanceInKm.toInt())
+                "${distanceInMeters.toInt()} m"
+            else "$distanceInKm km"
+        }
+
+        /**
+         * @return the distance in km if it's greater than 1000m, else the distance in meters;
+         */
+        private fun getDistanceInKm(distanceValue: Int): Float {
+            return if(distanceValue >= 1000){
+                ((distanceValue/100).toFloat()/10)
+            }else{
+                distanceValue.toFloat()
+            }
         }
     }
 }

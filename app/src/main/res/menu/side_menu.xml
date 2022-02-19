@@ -12,20 +12,11 @@
                 android:id="@+id/menu_profilo"
                 android:icon="@drawable/ic_baseline_account_circle_24"
                 android:title="@string/menu_account" />
-        </menu>
-    </item>
-
-    <item android:title="@string/segnalazioni">
-        <menu>
-            <item
-                android:id="@+id/menu_mie_segnalazioni"
-                android:icon="@drawable/ic_baseline_assignment_24"
-                android:title="@string/mie_segnalazioni"/>
 
             <item
                 android:id="@+id/menu_tutte_segnalazioni"
                 android:icon="@drawable/ic_baseline_list_alt_24"
-                android:title="@string/tutte_segnalazioni" />
+                android:title="@string/segnalazioni" />
         </menu>
     </item>
 

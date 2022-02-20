@@ -68,6 +68,7 @@
     <string name="recensioni">Recensioni</string>
     <string name="mapstyle">Stile mappa</string>
     <string name="realtimeupdate">Aggiornamento anomalie in tempo reale</string>
+    <string name="anomalies_filter">Solo anomalie nella tua città</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
     <string name="anomalia_in_range">Attenzione, anomalia nel raggio di {meters} metri.</string>
@@ -87,7 +88,7 @@
     <string name="emailgiaregistrata">Questa email è già stata registrata.</string>
     <string name="posizionenontrovata">Posizione non trovata</string>
     <string name="nameinvalidlength">Il tuo nome deve essere lungo almeno {length} caratteri.</string>
-    <string name="nessunaanomaliacitta">Impossibile trovare anomalie nella tua città.</string>
+    <string name="nessunaanomalia">Impossibile trovare anomalie.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="noimagewarn">Non hai impostato una foto profilo, vuoi continuare lo stesso?</string>
     <string name="dialog_conferma_eliminazione">Sei sicuro di voler rimuovere questa segnalazione? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>

@@ -47,7 +47,7 @@ abstract class SSActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    protected fun onPageLoaded(){
+    open fun onPageLoaded(){
         this.setupTopbar()
         Utility.ridimensionamento(this, findViewById(R.id.parent))
     }

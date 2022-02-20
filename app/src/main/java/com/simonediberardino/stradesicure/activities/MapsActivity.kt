@@ -55,38 +55,38 @@ import kotlin.concurrent.withLock
 
 class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
     /** Google map object provided by Google; */
-    private var googleMap: GoogleMapExtended? = null
-    private lateinit var mapBinding: ActivityMapsBinding
+    internal var googleMap: GoogleMapExtended? = null
+    internal lateinit var mapBinding: ActivityMapsBinding
 
     /** Wheter markers are shown or not; */
-    private var areMarkerShown = true
+    internal var areMarkerShown = true
     /** Exact user location; */
-    private var userLocation: Location? = null
+    internal var userLocation: Location? = null
     /** User location updated every 100 meters; */
-    private var intervalUserLocation: Location? = null
+    internal var intervalUserLocation: Location? = null
     /** Anomaly marker placed by the user; */
-    private var anomalyMarker: Marker? = null
+    internal var anomalyMarker: Marker? = null
     /** Location icon placed on the user location updated every time the user location changes; */
-    private var userLocMarker: Marker? = null
+    internal var userLocMarker: Marker? = null
     /** Circle placed on the user location updated every time the user location changes; */
-    private var userLocCircle: Circle? = null
+    internal var userLocCircle: Circle? = null
     /** Locks the FireBase query thread until the map is fully initializated; */
-    private var threadLocker = ReentrantLock()
-    private var threadLockerCond = threadLocker.newCondition()
-    private var hasListedAnomalies = false
+    internal var threadLocker = ReentrantLock()
+    internal var threadLockerCond = threadLocker.newCondition()
+    internal var hasListedAnomalies = false
     /** GPS Manager; */
-    private lateinit var locationManager: FusedLocationProviderClient
+    internal lateinit var locationManager: FusedLocationProviderClient
     /** User Interface objects; */
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var topSheetBehavior: TopSheetBehavior<View>
-    private lateinit var refreshLayout: SwipeRefreshLayout
-    private lateinit var drawerLayout: DrawerLayout
+    internal lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    internal lateinit var topSheetBehavior: TopSheetBehavior<View>
+    internal lateinit var refreshLayout: SwipeRefreshLayout
+    internal lateinit var drawerLayout: DrawerLayout
     /** ArrayList containing all the anomalies reported by the users; */
-    private lateinit var anomalies: ArrayList<Anomaly>
+    internal lateinit var anomalies: ArrayList<Anomaly>
     /** ArrayList containing all the anomalies not reported by the voice assistant; */
-    private lateinit var notEncounteredAnomalies: ArrayList<Anomaly>
+    internal lateinit var notEncounteredAnomalies: ArrayList<Anomaly>
     /** Voice assistant; */
-    private lateinit var TTS: TTS
+    internal lateinit var TTS: TTS
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,7 +185,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         LoginActivity::class.java)
             }
 
-            R.id.menu_tutte_segnalazioni -> {}
+            R.id.menu_segnalazioni -> {
+                Utility.navigateTo(this, AnomaliesActivity::class.java)
+            }
+
             R.id.menu_contatti -> {}
 
             R.id.menu_impostazioni -> {
@@ -673,34 +676,46 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             listAnomalies()
     }
 
+    fun sortByDistance(array: Array<Anomaly>){
+        array.sortBy { it.location.distanceTo(userLocation) }
+    }
+
+    fun sortByDistance(arrayList: ArrayList<Anomaly>){
+        sortByDistance(arrayList.toTypedArray())
+    }
+
+    fun sortAnomalies(){
+        sortByDistance(anomalies)
+    }
+
     @RequiresApi(Build.VERSION_CODES.N)
     private fun listAnomalies() {
-        val anomaliesContainer = findViewById<LinearLayout>(R.id.dialog_anomaly_layout)
+        val parentLayoutId = R.id.dialog_anomaly_layout
+
+        val anomaliesContainer = findViewById<LinearLayout>(parentLayoutId)
         anomaliesContainer.removeAllViews()
 
         val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
-        val hasAnomalyInCity: Boolean = anomalies.stream().anyMatch { isInSameCity(it.location) }
+        val anomaliesInCity = getAnomaliesInCity(userLocation)
 
-        if(!hasAnomalyInCity){
-            nAnomaliesTW.text = getString(R.string.nessunaanomaliacitta)
+        sortAnomalies()
+
+        if(anomaliesInCity.isEmpty()){
+            nAnomaliesTW.text = getString(R.string.nessunaanomalia)
             return
         }
 
-        anomalies.sortBy{ it.location.distanceTo(userLocation) }
-
-        val parentLayoutId = R.id.dialog_anomaly_layout
         val parentViewId = R.id.parent
         val layoutToAddId = R.layout.single_anomaly
 
         var i = 0
         val toShow = 5
-        while(i < toShow && i < anomalies.size) {
-            listAnomaly(this, parentLayoutId, parentViewId, layoutToAddId, anomalies[i])
+        while(i < toShow && i < anomaliesInCity.size) {
+            listAnomaly(this, parentLayoutId, parentViewId, layoutToAddId, anomaliesInCity[i])
             i++
         }
 
-        val anomaliesInCity = getAnomaliesInCity(userLocation).size
-        nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.toString())
+        nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.size.toString())
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -787,16 +802,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
     }
 
-    private fun getAnomaliesInCity(location: Location?) : Array<Anomaly> {
+    internal fun getAnomaliesInCity(location: Location?) : Array<Anomaly> {
         if(location == null)
             return emptyArray()
 
         return anomalies.filter {
-            getCity(it.location, this) == getCity(location, this)
+            isInSameCity(it.location)
         }.toTypedArray()
     }
 
-    private fun isInSameCity(location : Location) : Boolean{
+    internal fun isInSameCity(location : Location) : Boolean{
         return getCity(userLocation, this) == getCity(location, this)
     }
 
@@ -806,13 +821,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     companion object {
-        var mapsActivity: MapsActivity? = null
+        lateinit var mapsActivity: MapsActivity
         private const val MAP_DEFAULT_ZOOM = 15f
         private const val WARN_RADIUS = 200.0
         private const val GEOLOCATION_PERMISSION_CODE = 1
 
         @RequiresApi(Build.VERSION_CODES.N)
-        private fun listAnomaly(activity: AppCompatActivity, parentLayoudId: Int, parentViewId: Int, layoutToAddId: Int, anomaly: Anomaly) {
+        internal fun listAnomaly(activity: AppCompatActivity, parentLayoudId: Int, parentViewId: Int, layoutToAddId: Int, anomaly: Anomaly) {
             val inflater = LayoutInflater.from(activity)
             val gallery: LinearLayout = activity.findViewById(parentLayoudId)
             val view = inflater.inflate(layoutToAddId, gallery, false)
@@ -827,7 +842,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
             val distanceTemplate = activity.getString(R.string.distance)
             distanceTW.text = distanceTemplate.replace("{distance}", getDistanceString(activity,
-                mapsActivity?.userLocation, anomaly.location))
+                mapsActivity.userLocation, anomaly.location))
 
             FirebaseClass.getUserObjectById<User>(
                 anomaly.spotterId,
@@ -863,7 +878,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
             val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
             removeBtn?.setOnClickListener {
-                if(mapsActivity?.notEncounteredAnomalies.contains(anomaly)){
+                if(mapsActivity.notEncounteredAnomalies.contains(anomaly)){
                     Utility.oneLineDialog(activity, activity.getString(R.string.anomalia_non_visitata), null)
                 }else{
                     Utility.oneLineDialog(activity, activity.getString(R.string.dialog_conferma_eliminazione)) {
@@ -880,11 +895,15 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             if(location == null)
                 return activity.getString(R.string.citynotfound)
 
-            return Geocoder(activity, Locale.getDefault()).getFromLocation(
+            val city = Geocoder(activity, Locale.getDefault()).getFromLocation(
                 location.latitude,
                 location.longitude,
                 1
             )[0].locality
+
+            return if(city == null || city.trim().isEmpty())
+                return activity.getString(R.string.citynotfound)
+            else city
         }
 
         fun getAddress(latLng: LatLng, activity: AppCompatActivity) : String{

@@ -13,7 +13,9 @@ object ApplicationData {
     private const val MAP_STYLE_DEFAULT = GoogleMap.MAP_TYPE_NORMAL.toString()
     private const val MAP_UPDATE_ID = "MAP_UPDATE"
     private const val MAP_UPDATE_DEFAULT = "true"
-
+    private const val ANOMALIE_CITTA_ID = "MAP_UPDATE"
+    private const val ANOMALIE_CITTA_DEFAULT = "false"
+    
     val ACCOUNT_DEFAULT = null
 
     fun getApplicationData(): SharedPreferences {
@@ -32,6 +34,19 @@ object ApplicationData {
         dataEditor.apply()
     }
 
+    fun anomaliesInCity(): Boolean {
+        val savedJson: String? = getApplicationData().getString(ANOMALIE_CITTA_ID, ANOMALIE_CITTA_DEFAULT)
+        return Gson().fromJson(savedJson, String::class.java).toBoolean()
+    }
+
+    fun anomaliesInCity(flag: Boolean) {
+        val json = Gson().toJson(flag)
+        val dataEditor = getApplicationData().edit()
+        dataEditor.putString(ANOMALIE_CITTA_ID, json)
+        dataEditor.apply()
+    }
+
+    
     inline fun <reified T> getSavedAccount(): T? {
         val savedJson: String? = getApplicationData().getString(ACCOUNT_ID, ACCOUNT_DEFAULT)
         return Gson().fromJson(savedJson, T::class.java)

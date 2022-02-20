@@ -25,7 +25,7 @@
         android:layout_marginStart="24dp"
         android:text="@string/caricamento"
         android:textColor="@color/darkgrey"
-        android:textSize="40px"
+        android:textSize="37px"
         app:layout_constraintBottom_toBottomOf="@+id/single_anomaly_circle"
         app:layout_constraintStart_toEndOf="@+id/single_anomaly_circle"
         app:layout_constraintTop_toTopOf="@+id/single_anomaly_circle" />

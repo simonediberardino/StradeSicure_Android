@@ -382,15 +382,18 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         Utility.showToast(this, getString(R.string.aggiungi_marker_tut))
     }
 
+    private fun getStatusDescByValue(value: Int): String {
+        val statusArray = resources.getStringArray(R.array.stato)
+        val maxIndex = statusArray.size - 1
+        val index = (maxIndex * value) / 100
+        return statusArray[index]
+    }
     /**
      * Updates the textview attached to the anomaly status seekbar
      */
     private fun updateStatusDescription(value: Int){
         val statusValueTT = findViewById<TextView>(R.id.report_stato_value)
-        val statusArray = resources.getStringArray(R.array.stato)
-        val maxIndex = statusArray.size - 1
-        val index = (maxIndex * value) / 100
-        statusValueTT.text = statusArray[index]
+        statusValueTT.text = getStatusDescByValue(value)
     }
 
     private fun insufficientPermissions(){
@@ -578,7 +581,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         notEncounteredAnomalies.remove(anomaly)
         val distanceInMeters = anomaly.location.distanceTo(userLocation).toInt()
         val distanceInMetersApprox = ((distanceInMeters/10.0f).toInt())*10
-        val messageToSay = getString(R.string.anomalia_in_range).replace("{meters}", distanceInMetersApprox.toString())
+        val messageToSay = getString(R.string.anomalia_in_range)
+            .replace("{meters}", distanceInMetersApprox.toString())
+                .replace("{value}", getStatusDescByValue(anomaly.stato).lowercase())
+
         TTS.speak(messageToSay)
         Utility.showToast(this, messageToSay)
     }

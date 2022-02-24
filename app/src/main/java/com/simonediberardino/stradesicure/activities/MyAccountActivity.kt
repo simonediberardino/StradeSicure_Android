@@ -148,7 +148,7 @@ class MyAccountActivity : SSActivity() {
                         uploadedImage,
                         dataSnapshot
                     ){
-                        setProfileImage()
+                        profileImageIV.setImageURI(uploadedImage)
                     }
                 }
 

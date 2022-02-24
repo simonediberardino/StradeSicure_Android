@@ -67,7 +67,16 @@
     <string name="progress">Avanzamento: {progress}</string>
     <string name="recensioni">Recensioni</string>
     <string name="mapstyle">Stile mappa</string>
+    <string name="introActivity_defaultBackButtonText" override="true">INDIETRO</string>
+    <string name="introActivity_defaultNextButtonText">SALTA</string>
+    <string name="introActivity_defaultFinalButtonText">FATTO</string>
     <string name="realtimeupdate">Aggiornamento anomalie in tempo reale</string>
+    <string name="intro_1_title">Benvenuto a Strada Sicura!</string>
+    <string name="intro_1_desc">Strada Sicura è un\'applicazione, gestita dalla community, che permette la segnalazione di anomalie stradali in tempo reale.\nCosa significa? Significa che ogni utente può segnalare i problemi stradali della propria città in ogni momento, più segnalazioni verranno effettuate, più l\'applicazione sarà affidabile e più verrà garantita un\'esperienza positiva a tutti gli utenti. Contribuisci anche tu!</string>
+    <string name="intro_2_title">Sfrutta al massimo l\'applicazione!</string>
+    <string name="intro_2_desc">Per sfruttare al massimo le potenzialità di questa applicazione è necessario che abiliti la geolocalizzazione e che ti registri con un account: potrai farlo nel menu principale successivamente.</string>
+    <string name="intro_3_title">Un\'ultima cosa…</string>
+    <string name="intro_3_desc">Questa applicazione è stata sviluppata da Simone Di Berardino, studente di Latina. Trovi una sezione dedicata ai contatti nel menu a sinistra successivamente.</string>
     <string name="anomalies_filter">Solo anomalie nella tua città</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>

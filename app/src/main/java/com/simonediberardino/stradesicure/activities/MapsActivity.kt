@@ -95,6 +95,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         super.onCreate(savedInstanceState)
         this.setupTTS()
         this.fetchUserData()
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -334,8 +335,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         this.googleMap = GoogleMapExtended(googleMap)
         this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
 
-        this.setupGPS()
-        this.setAnomaliesListener()
+        try{
+            this.setupGPS()
+            this.setAnomaliesListener()
+        }catch(e: Exception){
+            return
+        }
+
     }
 
     override fun onResume() {
@@ -639,9 +645,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }.start()
     }
 
-
     private fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
         FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
+            if(!Utility.isInternetAvailable()) return@addOnCompleteListener
+
             for(it : DataSnapshot in task.result.children){
                 val anomaly = it.getValue(Anomaly::class.java)
                 callback.run(anomaly!!)
@@ -974,4 +981,5 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             }
         }
     }
+
 }

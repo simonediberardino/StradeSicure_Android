@@ -1,7 +1,9 @@
 package com.simonediberardino.stradesicure.utils
 
 import android.R
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import com.simonediberardino.stradesicure.UI.CDialog
 import com.simonediberardino.stradesicure.activities.MapsActivity
+import com.simonediberardino.stradesicure.activities.SSActivity
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -66,6 +69,16 @@ object Utility {
         catch (e: NoSuchAlgorithmException) {
             throw RuntimeException(e)
         }
+    }
+
+    fun isInternetAvailable(): Boolean {
+        return isInternetAvailable(SSActivity.currentContext!!)
+    }
+
+    fun isInternetAvailable(appCompatActivity: AppCompatActivity): Boolean {
+        val cm = appCompatActivity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val nInfo = cm.activeNetworkInfo
+        return nInfo != null && nInfo.isAvailable && nInfo.isConnected
     }
 
     fun showToast(c: AppCompatActivity, message: String){

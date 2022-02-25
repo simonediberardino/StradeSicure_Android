@@ -13,6 +13,7 @@ import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
+import com.simonediberardino.stradesicure.utils.Utility
 import java.net.URL
 
 
@@ -53,6 +54,8 @@ object FirebaseClass {
     }
 
     fun addAnomalyToFirebase(anomaly: Anomaly){
+        if(!Utility.isInternetAvailable()) return
+
         anomaliesRef.push().setValue(anomaly)
     }
 
@@ -61,6 +64,8 @@ object FirebaseClass {
     }
 
     fun addEmailUserToFirebase(utente: EmailUser, callback: RunnablePar?){
+        if(!Utility.isInternetAvailable()) return
+
         emailUsersRef.push().setValue(utente).addOnCompleteListener {
             getSnapshotFromUser(
                 utente,
@@ -73,10 +78,14 @@ object FirebaseClass {
     }
 
     fun addFbUserToFirebase(utente: FbUser){
+        if(!Utility.isInternetAvailable()) return
+
         addFbUserToFirebase(utente, null)
     }
 
     fun addFbUserToFirebase(utente: FbUser, callback: RunnablePar?){
+        if(!Utility.isInternetAvailable()) return
+
         fbUsersRef.push().setValue(utente).addOnCompleteListener { callback?.run(it) }
     }
 
@@ -89,6 +98,8 @@ object FirebaseClass {
     }
 
     fun getAnomaliesByUser(user: User, callback: RunnablePar) {
+        if(!Utility.isInternetAvailable()) return
+
         anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
             val count = dataSnapshot.result.children.count {
                 it.child("spotterId").value.toString().equals(user.uniqueId, ignoreCase = true)
@@ -99,6 +110,8 @@ object FirebaseClass {
     }
 
     fun getReportsByUser(user: User, callback: RunnablePar) {
+        if(!Utility.isInternetAvailable()) return
+
         anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
             val count = dataSnapshot.result.children.count {
                 it.child("authorId").value.toString().equals(user.uniqueId, ignoreCase = true)
@@ -108,11 +121,15 @@ object FirebaseClass {
     }
 
     fun getGenericUserSnapshotById(userId: String, callback: RunnablePar){
+        if(!Utility.isInternetAvailable()) return
+
         getUserSnapshotById<EmailUser>(userId, callback)
         getUserSnapshotById<FbUser>(userId, callback)
     }
 
     inline fun <reified T: User> getUserSnapshotId(userId: String, callback: RunnablePar){
+        if(!Utility.isInternetAvailable()) return
+
         getUserSnapshotById<T>(userId, object : RunnablePar{
             override fun run(p: Any?) {
                 callback.run((p as DataSnapshot?)?.ref?.key)
@@ -121,6 +138,8 @@ object FirebaseClass {
     }
 
     inline fun <reified T: User> getUserSnapshotById(userId: String, callback: RunnablePar) {
+        if(!Utility.isInternetAvailable()) return
+
         if(T::class.java == User::class.java) {
             getGenericUserSnapshotById(userId, callback)
             return
@@ -130,12 +149,13 @@ object FirebaseClass {
             val userFound = dataSnapshot.result.children.find {
                 it.child("uniqueId").value.toString().equals(userId, ignoreCase = true)
             }
-
             callback.run(userFound)
         }
     }
 
     fun getAnomalySnapshot(anomaly: Anomaly, callback: RunnablePar){
+        if(!Utility.isInternetAvailable()) return
+
         anomaliesRef.get().addOnCompleteListener { dataSnapshot ->
             callback.run(dataSnapshot.result.children.find{
                 it.getValue(Anomaly::class.java)!!.location == anomaly.location
@@ -144,6 +164,8 @@ object FirebaseClass {
     }
 
     inline fun <reified T: User> getUserObjectById(userId: String, callback: RunnablePar) {
+        if(!Utility.isInternetAvailable()) return
+
         getUserSnapshotById<T>(userId, object : RunnablePar {
             override fun run(p: Any?) {
                 val snapshot = p as DataSnapshot?
@@ -164,6 +186,8 @@ object FirebaseClass {
     }
 
     fun getProfileImage(user: User, callback: RunnablePar){
+        if(!Utility.isInternetAvailable()) return
+
         if(user is FbUser){
             getFBProfileImage(user, callback)
             return
@@ -191,6 +215,8 @@ object FirebaseClass {
     }
 
     fun getImageFromUrl(imageUrl: String, callback: RunnablePar){
+        if(!Utility.isInternetAvailable()) return
+
         Thread{
             val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
             SSActivity.currentContext?.runOnUiThread {
@@ -200,11 +226,15 @@ object FirebaseClass {
     }
 
     fun <T> editFieldFirebase(referString: String, field: String, child: String, value: T) {
+        if(!Utility.isInternetAvailable()) return
+
         val update = getSpecificField(referString, field)
         update.child(child).setValue(value)
     }
 
     fun deleteAnomalyFirebase(anomaly: Anomaly){
+        if(!Utility.isInternetAvailable()) return
+
         getAnomalySnapshot(anomaly, object : RunnablePar{
             override fun run(p: Any?) {
                 deleteFieldFirebase(anomaliesRef, (p as DataSnapshot?)?.ref?.key)

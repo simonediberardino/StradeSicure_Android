@@ -1,5 +1,7 @@
 <resources>
     <string name="facebook_app_id">308870061304393</string> <string name="fb_login_protocol_scheme">fb473625777492322</string>
+    <string name="contact_email">simonediberardino7@gmail.com</string>
+    <string name="credits">© Copyright 2022, Simone Di Berardino</string>
     <string-array name="stato">
         <item>Lieve</item>
         <item>Medio</item>
@@ -87,6 +89,7 @@
     <string name="googlestreet">Google Street</string>
     <string name="recensione">Recensione</string>
     <string name="rimuovi">Rimuovi</string>
+    <string name="no_email_app">Hai bisogno di un client per email per utilizzare questa funzione.</string>
     <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>
     <string name="citynotfound">Città sconosciuta</string>
     <string name="login_success">Login effettuato correttamente!</string>

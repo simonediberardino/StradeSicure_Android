@@ -9,13 +9,15 @@ import com.simonediberardino.stradesicure.activities.SSActivity
 object ApplicationData {
     const val DATA_ID = "data"
     const val ACCOUNT_ID = "ACCOUNT_ID"
-    private const val MAP_STYLE_ID = "MAP_STYLE_ID"
-    private const val MAP_STYLE_DEFAULT = GoogleMap.MAP_TYPE_NORMAL.toString()
-    private const val MAP_UPDATE_ID = "MAP_UPDATE"
-    private const val MAP_UPDATE_DEFAULT = "true"
-    private const val ANOMALIE_CITTA_ID = "MAP_UPDATE"
-    private const val ANOMALIE_CITTA_DEFAULT = "false"
-    
+    const val MAP_STYLE_ID = "MAP_STYLE_ID"
+    const val MAP_STYLE_DEFAULT = GoogleMap.MAP_TYPE_NORMAL.toString()
+    const val MAP_UPDATE_ID = "MAP_UPDATE"
+    const val MAP_UPDATE_DEFAULT = "true"
+    const val ANOMALIE_CITTA_ID = "MAP_UPDATE"
+    const val ANOMALIE_CITTA_DEFAULT = "false"
+    const val FIRST_LAUNCH_ID = "FIRST_LAUNCH"
+    const val FIRST_LAUNCH_DEFAULT = "true"
+
     val ACCOUNT_DEFAULT = null
 
     fun getApplicationData(): SharedPreferences {
@@ -31,6 +33,18 @@ object ApplicationData {
         val json = Gson().toJson(flag)
         val dataEditor = getApplicationData().edit()
         dataEditor.putString(MAP_UPDATE_ID, json)
+        dataEditor.apply()
+    }
+
+    fun isFirstLaunch(): Boolean {
+        val savedJson: String? = getApplicationData().getString(FIRST_LAUNCH_ID, FIRST_LAUNCH_DEFAULT)
+        return Gson().fromJson(savedJson, String::class.java).toBoolean()
+    }
+
+    fun isFirstLaunch(flag: Boolean) {
+        val json = Gson().toJson(flag)
+        val dataEditor = getApplicationData().edit()
+        dataEditor.putString(FIRST_LAUNCH_ID, json)
         dataEditor.apply()
     }
 

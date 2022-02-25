@@ -8,18 +8,23 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.matthewtamlin.sliding_intro_screen_library.buttons.IntroButton
+import com.matthewtamlin.sliding_intro_screen_library.core.IntroActivity
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
-abstract class SSActivity : AppCompatActivity() {
+abstract class SSActivity : IntroActivity() {
     var uploadedImage: Uri? = null
 
     companion object {
-        var currentContext: SSActivity? = null
+        @SuppressLint("StaticFieldLeak")
+        var currentContext: AppCompatActivity? = null
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -48,8 +53,11 @@ abstract class SSActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     open fun onPageLoaded(){
-        this.setupTopbar()
-        Utility.ridimensionamento(this, findViewById(R.id.parent))
+        val parent = findViewById<ViewGroup>(R.id.parent)
+        if(parent != null) {
+            this.setupTopbar()
+            Utility.ridimensionamento(this, parent)
+        }
     }
 
     abstract fun initializeLayout()
@@ -59,5 +67,20 @@ abstract class SSActivity : AppCompatActivity() {
         val PICK_IMAGE = 100
         val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         startActivityForResult(gallery, PICK_IMAGE)
+    }
+
+    override fun generatePages(savedInstanceState: Bundle?): Collection<Fragment> {
+        return pages
+    }
+
+    override fun generateFinalButtonBehaviour(): IntroButton.Behaviour? {
+        return object : IntroButton.Behaviour{
+            override fun run() {}
+            override fun setActivity(activity: IntroActivity?) {}
+
+            override fun getActivity(): IntroActivity {
+                return this@SSActivity
+            }
+        }
     }
 }

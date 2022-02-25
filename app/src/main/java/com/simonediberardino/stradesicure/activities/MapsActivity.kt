@@ -2,6 +2,7 @@ package com.simonediberardino.stradesicure.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.*
@@ -189,7 +190,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 Utility.navigateTo(this, AnomaliesActivity::class.java)
             }
 
-            R.id.menu_contatti -> {}
+            R.id.menu_contatti -> {
+                try {
+                    val intent = Intent(Intent.ACTION_SENDTO)
+                    intent.data = Uri.parse("mailto:")
+                    intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.contact_email)))
+                    startActivity(intent)
+                } catch (ex: ActivityNotFoundException) {
+                    Utility.showToast(this, getString(R.string.no_email_app))
+                }
+            }
 
             R.id.menu_impostazioni -> {
                 Utility.navigateTo(this, SettingsActivity::class.java)

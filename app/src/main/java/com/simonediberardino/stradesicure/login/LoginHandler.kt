@@ -42,7 +42,7 @@ object LoginHandler {
 
     fun getFullName(user: User?): String{
         return if(user == null)
-            SSActivity.currentContext?.getString(R.string.account_eliminato)!!
+            SSActivity.currentContext.getString(R.string.account_eliminato)!!
         else "${user.nome} ${user.cognome}"
     }
 

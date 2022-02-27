@@ -6,9 +6,8 @@ class LocationExtended : Location(String()){
         val startLat = this.latitude
         val startLong = this.longitude
         val endLat = (other as Location).latitude
-        val endLong = (other as Location).longitude
+        val endLong = other.longitude
 
         return startLat == endLat && startLong == endLong
     }
-
 }

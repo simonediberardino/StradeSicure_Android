@@ -72,7 +72,7 @@ object Utility {
     }
 
     fun isInternetAvailable(): Boolean {
-        return isInternetAvailable(SSActivity.currentContext!!)
+        return isInternetAvailable(SSActivity.currentContext)
     }
 
     fun isInternetAvailable(appCompatActivity: AppCompatActivity): Boolean {

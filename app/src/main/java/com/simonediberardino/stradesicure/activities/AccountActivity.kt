@@ -5,11 +5,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
-import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
@@ -17,13 +17,8 @@ import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import de.hdodenhof.circleimageview.CircleImageView
 
-class MyAccountActivity : SSActivity() {
-    companion object {
-        private const val totalSteps = 4
-        private const val singleStepValue = 100/totalSteps
-    }
-
-    private lateinit var progressDialog: ProgressDialog
+class AccountActivity : SSActivity() {
+    private lateinit var userToShow: User
     private lateinit var nameTW: TextView
     private lateinit var emailTW: TextView
     private lateinit var reportsTW: TextView
@@ -33,22 +28,29 @@ class MyAccountActivity : SSActivity() {
     private lateinit var logoutBtn: RadioButton
     private lateinit var editIDBtn: ImageView
     private lateinit var editImageBtn: ImageView
+    private lateinit var progressBar: ProgressBar
 
     override fun initializeLayout() {
         this.setContentView(R.layout.activity_account)
-        this.setupListeners()
         this.setupDialog()
-        this.setProfileName()
-        this.setProfileEmail()
-        this.setAnomaliesNumber()
-        this.setReportsNumber()
-        this.setUserId()
-        this.setProfileImage()
+
+        FirebaseClass.getUserObjectById<User>(
+            intent.extras!!.getString("userToShow")!!,
+            object : RunnablePar{
+                override fun run(p: Any?) {
+                    userToShow = p as User? ?: return
+                    setProfileName()
+                    setProfileEmail()
+                    setAnomaliesNumber()
+                    setReportsNumber()
+                    setUserId()
+                    setProfileImage()
+                    setupListeners()
+                }
+            })
     }
 
     private fun setupDialog(){
-        progressDialog = ProgressDialog(currentContext!!)
-
         nameTW = findViewById(R.id.account_name)
         emailTW = findViewById(R.id.account_emailid_text)
         reportsTW = findViewById(R.id.account_segnalazioni_number)
@@ -57,12 +59,17 @@ class MyAccountActivity : SSActivity() {
         profileImageIV = findViewById(R.id.account_icon)
         editIDBtn = findViewById(R.id.account_emailid_edit)
         editImageBtn = findViewById(R.id.account_camera)
+        progressBar = findViewById(R.id.account_progressBar)
     }
 
     private fun setupListeners(){
         logoutBtn = findViewById(R.id.account_logout_btn)
-        logoutBtn.setOnClickListener{
-            Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
+        if(userToShow != LoginHandler.deviceUser){
+            logoutBtn.visibility = View.INVISIBLE
+        }else{
+            logoutBtn.setOnClickListener{
+                Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
+            }
         }
     }
 
@@ -73,21 +80,23 @@ class MyAccountActivity : SSActivity() {
     }
 
     private fun setProfileName() {
-        nameTW.text = LoginHandler.getFullName(LoginHandler.deviceUser!!)
+        nameTW.text = LoginHandler.getFullName(userToShow)
     }
 
     private fun setProfileEmail() {
-        emailTW.text = LoginHandler.deviceUser!!.uniqueId
-        //editIDBtn.visibility = if(LoginHandler.isFacebookLoggedIn()) View.INVISIBLE else View.VISIBLE
+        emailTW.text =
+            if(LoginHandler.deviceUser!! == userToShow)
+                userToShow.uniqueId
+            else
+                getString(R.string.sconosciuto)
     }
 
     private fun setAnomaliesNumber() {
         FirebaseClass.getAnomaliesByUser(
-            LoginHandler.deviceUser!!,
-            object : RunnablePar {
+            userToShow,
+            object : RunnablePar{
                 override fun run(p: Any?) {
                     reportsTW.text = (p as Int).toString()
-                    progressDialog.progress = progressDialog.progress + singleStepValue
                 }
             }
         )
@@ -95,11 +104,10 @@ class MyAccountActivity : SSActivity() {
 
     private fun setReportsNumber() {
         FirebaseClass.getReportsByUser(
-            LoginHandler.deviceUser!!,
-            object : RunnablePar {
+            userToShow,
+            object : RunnablePar{
                 override fun run(p: Any?) {
                     reviewsTW.text = (p as Int).toString()
-                    progressDialog.progress = progressDialog.progress + singleStepValue
                 }
             }
         )
@@ -107,27 +115,25 @@ class MyAccountActivity : SSActivity() {
 
     private fun setUserId() {
         FirebaseClass.getUserSnapshotId<User>(
-            LoginHandler.deviceUser!!.uniqueId,
-            object : RunnablePar {
+            userToShow.uniqueId,
+            object : RunnablePar{
                 override fun run(p: Any?) {
                     if(p == null) return
 
                     val userId = p as String
                     userIDTW.text = userId
-                    progressDialog.progress = progressDialog.progress + singleStepValue
                 }
             })
     }
 
     private fun setProfileImage() {
         FirebaseClass.getProfileImage(
-            LoginHandler.deviceUser!!,
-            object : RunnablePar {
+            userToShow,
+            object : RunnablePar{
                 override fun run(p: Any?) {
                     if(p != null)
                         profileImageIV.setImageBitmap(p as Bitmap)
-
-                    progressDialog.progress = progressDialog.progress + singleStepValue
+                    progressBar.visibility = View.INVISIBLE
                 }
             }
         )
@@ -139,12 +145,12 @@ class MyAccountActivity : SSActivity() {
     }
 
     private fun updateProfileImage(uploadedImage: Uri){
-        FirebaseClass.getSnapshotFromUser(LoginHandler.deviceUser!!, object : RunnablePar{
+        FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar{
             override fun run(p: Any?) {
                 val dataSnapshot = p as DataSnapshot?
                 if(dataSnapshot != null){
                     RegisterActivity.uploadProfilePicToFirebase(
-                        this@MyAccountActivity,
+                        this@AccountActivity,
                         uploadedImage,
                         dataSnapshot
                     ){

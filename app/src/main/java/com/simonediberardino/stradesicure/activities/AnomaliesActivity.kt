@@ -43,7 +43,7 @@ class AnomaliesActivity : SSActivity() {
         val anomaliesToShow = if(ApplicationData.anomaliesInCity()){
                 mapsActivity.getAnomaliesInCity(mapsActivity.userLocation)
             }else{
-                mapsActivity.anomalies.toTypedArray()
+            mapsActivity.anomalies!!.toTypedArray()
           }
 
         if(anomaliesToShow.isEmpty()) {

@@ -109,7 +109,7 @@
 
 
         <activity
-            android:name=".activities.MyAccountActivity"
+            android:name=".activities.AccountActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

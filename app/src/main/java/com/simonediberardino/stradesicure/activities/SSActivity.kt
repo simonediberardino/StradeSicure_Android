@@ -24,7 +24,7 @@ abstract class SSActivity : IntroActivity() {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        var currentContext: AppCompatActivity? = null
+        lateinit var currentContext: AppCompatActivity
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")

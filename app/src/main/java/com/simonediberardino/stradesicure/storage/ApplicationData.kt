@@ -21,7 +21,7 @@ object ApplicationData {
     val ACCOUNT_DEFAULT = null
 
     fun getApplicationData(): SharedPreferences {
-        return SSActivity.currentContext?.getSharedPreferences(DATA_ID, Context.MODE_PRIVATE)!!
+        return SSActivity.currentContext.getSharedPreferences(DATA_ID, Context.MODE_PRIVATE)!!
     }
 
     fun isRealtimeUpdated(): Boolean {

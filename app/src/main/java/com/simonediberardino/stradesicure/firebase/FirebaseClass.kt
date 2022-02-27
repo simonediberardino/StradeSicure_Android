@@ -149,7 +149,8 @@ object FirebaseClass {
             val userFound = dataSnapshot.result.children.find {
                 it.child("uniqueId").value.toString().equals(userId, ignoreCase = true)
             }
-            callback.run(userFound)
+            if(userFound != null)
+                callback.run(userFound)
         }
     }
 
@@ -181,7 +182,7 @@ object FirebaseClass {
             getUserSnapshotById<FbUser>(user.uniqueId, callback)
     }
 
-    fun getFBProfileImage(user: FbUser, callback: RunnablePar){
+    fun getFBProfileImage(user: User, callback: RunnablePar){
         getImageFromUrl("https://graph.facebook.com/${user.uniqueId}/picture?access_token=${LoginHandler.accessToken?.token}", callback)
     }
 
@@ -205,7 +206,7 @@ object FirebaseClass {
                             .addOnSuccessListener {
                                 getImageFromUrl(it.toString(), callback)
                             }.addOnFailureListener {
-                                callback.run(null)
+                                getFBProfileImage(user, callback)
                             }
                     }
                 }
@@ -218,10 +219,17 @@ object FirebaseClass {
         if(!Utility.isInternetAvailable()) return
 
         Thread{
-            val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
-            SSActivity.currentContext?.runOnUiThread {
-                callback.run(bitmap)
+            try{
+                val bitmap = BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
+                SSActivity.currentContext.runOnUiThread {
+                    callback.run(bitmap)
+                }
+            }catch (exception: Exception){
+                SSActivity.currentContext.runOnUiThread {
+                    callback.run(null)
+                }
             }
+
         }.start()
     }
 

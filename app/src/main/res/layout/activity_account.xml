@@ -43,6 +43,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <ProgressBar
+                    android:id="@+id/account_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="100px"
+                    android:layout_height="100px"
+                    app:layout_constraintBottom_toBottomOf="@+id/account_icon"
+                    app:layout_constraintEnd_toEndOf="@+id/account_icon"
+                    app:layout_constraintHorizontal_bias="0.49"
+                    app:layout_constraintStart_toStartOf="@+id/account_icon"
+                    app:layout_constraintTop_toTopOf="@+id/account_icon" />
+
                 <TextView
                     android:id="@+id/account_name"
                     android:layout_width="wrap_content"

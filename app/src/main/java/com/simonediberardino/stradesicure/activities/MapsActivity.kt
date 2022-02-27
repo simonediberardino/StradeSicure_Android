@@ -74,6 +74,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     /** Locks the FireBase query thread until the map is fully initializated; */
     internal var threadLocker = ReentrantLock()
     internal var threadLockerCond = threadLocker.newCondition()
+
+    /** Whether it has listed the anomalies since the GPS is on atleast once or not */
     internal var hasListedAnomalies = false
     /** GPS Manager; */
     internal lateinit var locationManager: FusedLocationProviderClient
@@ -82,24 +84,23 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     internal lateinit var topSheetBehavior: TopSheetBehavior<View>
     internal lateinit var refreshLayout: SwipeRefreshLayout
     internal lateinit var drawerLayout: DrawerLayout
-    /** ArrayList containing all the anomalies reported by the users; */
-    internal lateinit var anomalies: ArrayList<Anomaly>
-    /** ArrayList containing all the anomalies not reported by the voice assistant; */
-    internal lateinit var notEncounteredAnomalies: ArrayList<Anomaly>
     /** Voice assistant; */
     internal lateinit var TTS: TTS
+    /** ArrayList containing all the anomalies reported by the users; */
+    internal lateinit var anomalies: ArrayList<Anomaly>
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
-        mapsActivity = this
         super.onCreate(savedInstanceState)
+
+        mapsActivity = this
+
         this.setupTTS()
         this.fetchUserData()
-
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    override fun initializeLayout(){
+    override fun initializeLayout() {
         this.setContentView()
         this.setupSideMenu()
         this.setupBottomSheet()
@@ -180,11 +181,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             }
 
             R.id.menu_profilo -> {
-                Utility.navigateTo(this,
-                if(LoginHandler.isLoggedIn())
-                        MyAccountActivity::class.java
-                    else
-                        LoginActivity::class.java)
+                if(LoginHandler.isLoggedIn()){
+                    val intent = Intent(this, AccountActivity::class.java)
+                    intent.putExtra("userToShow", LoginHandler.deviceUser!!.uniqueId)
+                    startActivity(intent)
+                }else{
+                    Utility.navigateTo(this, LoginActivity::class.java)
+                }
             }
 
             R.id.menu_segnalazioni -> {
@@ -330,8 +333,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
      */
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onMapReady(googleMap: GoogleMap) {
-        this.anomalies = ArrayList()
-        this.notEncounteredAnomalies = ArrayList()
+        anomalies = ArrayList()
+
+        if(encounteredAnomalies == null) {
+            println("NEWENCOUNTERED")
+            encounteredAnomalies = ArrayList()
+        }
+
         this.googleMap = GoogleMapExtended(googleMap)
         this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
 
@@ -502,7 +510,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }) {
             threadLocker.withLock {
                 threadLockerCond.signalAll()
-                this.firstAnomalyList()
+                this.listAnomalies()
             }
         }
     }
@@ -534,8 +542,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onLocationChanged(newLocation: Location?){
-        this.firstAnomalyList()
-
         val updateDistance = 100
         val currentCityTW = this.findViewById<TextView>(R.id.dialog_city_tw)
 
@@ -577,6 +583,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         refreshLocationCircle()
 
+        if(!hasListedAnomalies){
+            hasListedAnomalies = true
+            listAnomalies()
+        }
+
         currentCityTW.text = getCity(userLocation, this)
     }
 
@@ -588,13 +599,19 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun getNearestNotWarnedAnomaly(): Anomaly? {
-        return if(notEncounteredAnomalies.size > 0)
+        val notEncounteredAnomalies = getNotEncounteredAnomalies()
+        return if(notEncounteredAnomalies.isNotEmpty())
             notEncounteredAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
         else null
     }
 
+    private fun getNotEncounteredAnomalies(): List<Anomaly> {
+        return anomalies.filterNot { encounteredAnomalies!!.contains(it) }
+    }
+
     private fun warnAnomaly(anomaly: Anomaly){
-        notEncounteredAnomalies.remove(anomaly)
+        encounteredAnomalies!!.add(anomaly)
+
         val distanceInMeters = anomaly.location.distanceTo(userLocation).toInt()
         val distanceInMetersApprox = ((distanceInMeters/10.0f).toInt())*10
         val messageToSay = getString(R.string.anomalia_in_range)
@@ -619,7 +636,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         @RequiresApi(Build.VERSION_CODES.N)
                         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                             index++
-                            if(index <= anomalies.size)
+                            if(index <= anomalies.size!!)
                                 return
 
                             val anomalyAdded = snapshot.getValue(Anomaly::class.java)
@@ -665,7 +682,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val predicate = Predicate<Anomaly>{ it.location == anomaly.location }
         anomalies.removeIf(predicate)
-        notEncounteredAnomalies.removeIf(predicate)
+        encounteredAnomalies!!.removeIf(predicate)
         googleMap?.removeMarker(anomaly.location)
 
         if(isInSameCity(anomaly.location))
@@ -690,7 +707,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     private fun storeAnomaly(anomaly: Anomaly) {
         anomalies.add(anomaly)
-        notEncounteredAnomalies.add(anomaly)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -700,7 +716,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     fun sortByDistance(array: Array<Anomaly>){
-        array.sortBy { it.location.distanceTo(userLocation) }
+        if(userLocation != null)
+            array.sortBy { it.location.distanceTo(userLocation) }
     }
 
     fun sortByDistance(arrayList: ArrayList<Anomaly>){
@@ -739,14 +756,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
 
         nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.size.toString())
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun firstAnomalyList(){
-        if(!hasListedAnomalies && userLocation != null) {
-            this.hasListedAnomalies = true
-            this.listAnomalies()
-        }
     }
 
     private fun addAnomalyMarker(latLng: LatLng){
@@ -819,19 +828,19 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     private fun getAnomalyByMarker(marker: Marker): Anomaly? {
         return try{
             val markerLocation = latLngToLocation(marker.position)
-            this.anomalies.first { it.location == markerLocation }
+            anomalies.first { it.location == markerLocation }
         }catch(exception: NoSuchElementException){
             null
         }
     }
 
     internal fun getAnomaliesInCity(location: Location?) : Array<Anomaly> {
-        if(location == null)
+        if(location == null || userLocation == null)
             return emptyArray()
 
         return anomalies.filter {
             isInSameCity(it.location)
-        }.toTypedArray()
+        }!!.toTypedArray()
     }
 
     internal fun isInSameCity(location : Location) : Boolean{
@@ -845,6 +854,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     companion object {
         lateinit var mapsActivity: MapsActivity
+        /** ArrayList containing all the anomalies reported by the voice assistant; */
+        private var encounteredAnomalies: ArrayList<Anomaly>? = null
         private const val MAP_DEFAULT_ZOOM = 15f
         private const val WARN_RADIUS = 200.0
         private const val GEOLOCATION_PERMISSION_CODE = 1
@@ -860,6 +871,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
             val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
             val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
+            val visitAccountBTN = view.findViewById<View>(R.id.single_anomaly_info)
 
             addressTW.text = getCity(anomaly.location, activity)
 
@@ -882,6 +894,12 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 setupMoreAnomalyDialog(activity, anomaly)
             }
 
+            visitAccountBTN.setOnClickListener {
+                val intent = Intent(currentContext, AccountActivity::class.java)
+                intent.putExtra("userToShow", anomaly.spotterId)
+                currentContext.startActivity(intent)
+            }
+
             Utility.ridimensionamento(activity, parentView)
             gallery.addView(view)
         }
@@ -901,7 +919,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
             val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
             removeBtn?.setOnClickListener {
-                if(mapsActivity.notEncounteredAnomalies.contains(anomaly)){
+                if(!encounteredAnomalies!!.contains(anomaly)){
                     Utility.oneLineDialog(activity, activity.getString(R.string.anomalia_non_visitata), null)
                 }else{
                     Utility.oneLineDialog(activity, activity.getString(R.string.dialog_conferma_eliminazione)) {

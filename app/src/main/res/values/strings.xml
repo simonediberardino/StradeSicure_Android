@@ -21,9 +21,13 @@
     <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
     <string name="app_name">Strada Sicura</string>
     <string name="title_activity_maps">Strade Sicure</string>
-    <string name="anomalie_citta">Anomalie stradali nella tua città: {number}</string>
+    <string name="anomalie_trovate">Anomalie stradali trovate: {number}</string>
+    <string name="anomalie_vicine">Anomalie stradali nelle vicinanze</string>
+    <string name="ruolo">Ruolo</string>
+    <string name="mostra_di_più"><u>Mostra di più</u></string>
     <string name="segnala_anomalia">Segnala anomalia</string>
     <string name="indirizzo">Indirizzo</string>
+    <string name="indirizzo_dot">• Indirizzo: {indirizzo}</string>
     <string name="segnalata_da">• Segnalazione di: {username}</string>
     <string name="indicazioni">• Indicazioni: {indicazioni}</string>
     <string name="distance">• Distanza: {distance}</string>
@@ -92,7 +96,7 @@
     <string name="recensione">Recensione</string>
     <string name="rimuovi">Rimuovi</string>
     <string name="no_email_app">Hai bisogno di un client per email per utilizzare questa funzione.</string>
-    <string name="erroreprofilo">Impossibile recuperare il profilo salvato.</string>
+    <string name="erroreprofilocredenziali">Sei stato disconnesso: le credenziali del tuo profilo non sono più valide.</string>
     <string name="citynotfound">Città sconosciuta</string>
     <string name="login_success">Login effettuato correttamente!</string>
     <string name="login_description">Effettua il login e sblocca tutte le funzionalità dell\'app</string>

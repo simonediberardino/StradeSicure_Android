@@ -1,5 +1,6 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -10,6 +11,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.entity.Roles
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
@@ -24,6 +26,8 @@ class AccountActivity : SSActivity() {
     private lateinit var reportsTW: TextView
     private lateinit var reviewsTW: TextView
     private lateinit var userIDTW: TextView
+    private lateinit var roleTW: TextView
+    private lateinit var roleEditBtn: View
     private lateinit var profileImageIV: CircleImageView
     private lateinit var logoutBtn: RadioButton
     private lateinit var editIDBtn: ImageView
@@ -41,6 +45,7 @@ class AccountActivity : SSActivity() {
                     userToShow = p as User? ?: return
                     setProfileName()
                     setProfileEmail()
+                    showRole()
                     setAnomaliesNumber()
                     setReportsNumber()
                     setUserId()
@@ -56,6 +61,8 @@ class AccountActivity : SSActivity() {
         reportsTW = findViewById(R.id.account_segnalazioni_number)
         reviewsTW = findViewById(R.id.account_recensioni_number)
         userIDTW = findViewById(R.id.account_id_text)
+        roleTW = findViewById(R.id.account_role_text)
+        roleEditBtn = findViewById(R.id.account_role_edit)
         profileImageIV = findViewById(R.id.account_icon)
         editIDBtn = findViewById(R.id.account_emailid_edit)
         editImageBtn = findViewById(R.id.account_camera)
@@ -71,6 +78,26 @@ class AccountActivity : SSActivity() {
                 Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
             }
         }
+
+        if(LoginHandler.deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true && LoginHandler.deviceUser != userToShow){
+            roleEditBtn.visibility = View.VISIBLE
+            roleEditBtn.setOnClickListener {
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                builder.setTitle(title)
+
+                val availableRoles: Array<Roles> = Roles.values()
+
+                builder.setItems(availableRoles.map { Utility.capitalizeFirstLetter(it.toString()) }.toTypedArray()) { _, which ->
+                    FirebaseClass.updateUserRole(userToShow, Roles.values()[which]){
+                        userToShow.role = Roles.values()[which]
+                        showRole()
+                    }
+                }
+
+                builder.create().show()
+            }
+        }
+
     }
 
     private fun doLogout(){
@@ -85,10 +112,14 @@ class AccountActivity : SSActivity() {
 
     private fun setProfileEmail() {
         emailTW.text =
-            if(LoginHandler.deviceUser!! == userToShow)
+            if(LoginHandler.deviceUser!! == userToShow || LoginHandler.deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true)
                 userToShow.uniqueId
             else
                 getString(R.string.sconosciuto)
+    }
+
+    private fun showRole(){
+        roleTW.text = Utility.capitalizeFirstLetter(userToShow.role.toString())
     }
 
     private fun setAnomaliesNumber() {

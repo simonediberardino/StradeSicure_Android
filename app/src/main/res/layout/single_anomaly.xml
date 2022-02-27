@@ -20,13 +20,17 @@
 
     <TextView
         android:id="@+id/single_anomaly_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
         android:text="@string/caricamento"
         android:textColor="@color/darkgrey"
         android:textSize="37px"
         app:layout_constraintBottom_toBottomOf="@+id/single_anomaly_circle"
+        app:layout_constraintEnd_toStartOf="@+id/single_anomaly_more"
         app:layout_constraintStart_toEndOf="@+id/single_anomaly_circle"
         app:layout_constraintTop_toTopOf="@+id/single_anomaly_circle" />
 
@@ -41,17 +45,35 @@
         android:textColor="@color/lightgrey"
         android:textSize="35px"
         app:layout_constraintEnd_toStartOf="@+id/single_anomaly_info"
-        app:layout_constraintStart_toStartOf="@+id/single_anomaly_title"
+        app:layout_constraintStart_toStartOf="@+id/single_anomaly_distance"
         app:layout_constraintTop_toBottomOf="@+id/single_anomaly_distance" />
 
     <TextView
         android:id="@+id/single_anomaly_distance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
         android:text="@string/caricamento"
         android:textColor="@color/lightgrey"
         android:textSize="35px"
+        app:layout_constraintEnd_toStartOf="@+id/single_anomaly_info"
+        app:layout_constraintStart_toStartOf="@+id/single_anomaly_address"
+        app:layout_constraintTop_toBottomOf="@+id/single_anomaly_address" />
+
+    <TextView
+        android:id="@+id/single_anomaly_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="@string/caricamento"
+        android:textColor="@color/lightgrey"
+        android:textSize="35px"
+        app:layout_constraintEnd_toStartOf="@+id/single_anomaly_info"
         app:layout_constraintStart_toStartOf="@+id/single_anomaly_title"
         app:layout_constraintTop_toBottomOf="@+id/single_anomaly_title" />
 
@@ -73,7 +95,7 @@
         app:srcCompat="@drawable/ic_baseline_info_24" />
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/single_anomaly_seperator"
         android:layout_width="1dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"

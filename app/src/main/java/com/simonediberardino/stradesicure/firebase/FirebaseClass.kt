@@ -1,23 +1,15 @@
 package com.simonediberardino.stradesicure.firebase
 
 import android.graphics.BitmapFactory
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.simonediberardino.stradesicure.activities.SSActivity
-import com.simonediberardino.stradesicure.entity.Anomaly
-import com.simonediberardino.stradesicure.entity.EmailUser
-import com.simonediberardino.stradesicure.entity.FbUser
-import com.simonediberardino.stradesicure.entity.User
+import com.simonediberardino.stradesicure.entity.*
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import java.net.URL
-
-
-
 
 
 object FirebaseClass {
@@ -95,6 +87,43 @@ object FirebaseClass {
 
     inline fun <reified T: User> getReferenceByUser(): DatabaseReference {
         return if(T::class.java == EmailUser::class.java) emailUsersRef else fbUsersRef
+    }
+
+    inline fun <reified T: User> updateUserRole(user: T, role: Roles, callback: Runnable?){
+        if(!Utility.isInternetAvailable()) return
+
+        getUserSnapshotId<T>(user.uniqueId, object : RunnablePar{
+            override fun run(p: Any?) {
+                val key = p as String
+
+                val updateRole = object : RunnablePar{
+                    override fun run(p: Any?) {
+                        val databaseReference = p as DatabaseReference
+                        databaseReference.child(key)
+                            .child("role")
+                            .setValue(role)
+                            .addOnCompleteListener {
+                                callback?.run()
+                            }
+                    }
+                }
+
+                executeIfIsChild(emailUsersRef, key, updateRole)
+                executeIfIsChild(fbUsersRef, key, updateRole)
+            }
+        })
+
+    }
+
+    fun executeIfIsChild(databaseReference: DatabaseReference, child: String, callback: RunnablePar){
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.hasChild(child))
+                    callback.run(databaseReference)
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     fun getAnomaliesByUser(user: User, callback: RunnablePar) {
@@ -176,10 +205,11 @@ object FirebaseClass {
     }
 
     fun getSnapshotFromUser(user: User, callback: RunnablePar) {
-        if(user is EmailUser)
-            getUserSnapshotById<EmailUser>(user.uniqueId, callback)
-        else
-            getUserSnapshotById<FbUser>(user.uniqueId, callback)
+        when (user) {
+            is EmailUser -> getUserSnapshotById<EmailUser>(user.uniqueId, callback)
+            is FbUser -> getUserSnapshotById<FbUser>(user.uniqueId, callback)
+            else -> getUserSnapshotById<User>(user.uniqueId, callback)
+        }
     }
 
     fun getFBProfileImage(user: User, callback: RunnablePar){

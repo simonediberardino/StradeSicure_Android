@@ -48,15 +48,29 @@
 
     <TextView
         android:id="@+id/dialog_anomaly_tw"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/caricamento"
         android:textColor="@color/grey"
+        android:textSize="35px"
+        app:layout_constraintEnd_toStartOf="@+id/dialog_anomaly_more"
         app:layout_constraintStart_toStartOf="@+id/dialog_city_icon"
         app:layout_constraintTop_toBottomOf="@+id/dialog_city_tw" />
 
+
+    <TextView
+        android:id="@+id/dialog_anomaly_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/mostra_di_più"
+        android:textColor="@color/darkblue"
+        android:textSize="35px"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_report_btn"
+        app:layout_constraintTop_toTopOf="@+id/dialog_anomaly_tw" />
 
     <RadioButton
         android:id="@+id/dialog_report_btn"
@@ -112,7 +126,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:background="@color/darksilver"
         app:layout_constraintEnd_toEndOf="parent"

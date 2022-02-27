@@ -10,6 +10,7 @@ import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
+import com.simonediberardino.stradesicure.utils.Utility
 
 object LoginHandler {
     var deviceUser: User? = null
@@ -60,5 +61,10 @@ object LoginHandler {
 
         deviceUser = null
         ApplicationData.setSavedAccount<User>(null)
+    }
+
+    fun logoutByError(){
+        Utility.showToast(SSActivity.currentContext, SSActivity.currentContext.getString(R.string.erroreprofilocredenziali))
+        doLogout()
     }
 }

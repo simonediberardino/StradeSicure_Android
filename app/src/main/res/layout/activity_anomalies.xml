@@ -11,7 +11,7 @@
         android:id="@+id/anomalies_cardview_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         app:cardBackgroundColor="@color/white"
         app:cardElevation="4dp">
 
@@ -59,4 +59,13 @@
 
     </androidx.cardview.widget.CardView>
 
+    <TextView
+        android:id="@+id/anomalies_n"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center|top"
+        android:text="@string/caricamento">
+
+    </TextView>
 </LinearLayout>

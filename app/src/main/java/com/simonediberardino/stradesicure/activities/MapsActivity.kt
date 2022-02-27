@@ -125,8 +125,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         object : RunnablePar {
                             override fun run(p: Any?) {
                                 val fbUser = p as FbUser?
-                                if(fbUser != null)
+                                if(fbUser != null) {
                                     LoginHandler.doLogin(fbUser)
+                                    setAccountDataListener()
+                                }
                             }
                         }
                     )
@@ -145,9 +147,9 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
                         if(passwordOnDatabase == passwordOnDevice){
                             LoginHandler.doLogin(retrievedUser)
+                            setAccountDataListener()
                         }else{
-                            Utility.showToast(this@MapsActivity, getString(R.string.erroreprofilo))
-                            LoginHandler.doLogout()
+                            LoginHandler.logoutByError()
                         }
                     }
             })
@@ -299,6 +301,32 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 removeAnomalyMarker()
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun setupMoreMarkerDialog(activity: AppCompatActivity){
+        val moreDialog = CBottomSheetDialog(activity)
+        moreDialog.setContentView(R.layout.marker_more_dialog)
+
+        val streetBtn = moreDialog.findViewById<View>(R.id.marker_more_map_btn)
+        streetBtn?.setOnClickListener {
+            startGoogleMapsByLocation(latLngToLocation(anomalyMarker!!.position))
+        }
+
+        val removeBtn = moreDialog.findViewById<View>(R.id.marker_more_remove_btn)
+        removeBtn?.setOnClickListener {
+            this.removeAnomalyMarker()
+            moreDialog.dismiss()
+        }
+
+        moreDialog.show()
+    }
+
+    private fun startGoogleMapsByLocation(location: Location){
+        val streetViewURI = Uri.parse("google.streetview:cbll=${location.latitude},${location.longitude}")
+        val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
+        streetViewIntent.setPackage ("com.google.android.apps.maps")
+        startActivity(streetViewIntent)
     }
 
     /**
@@ -470,7 +498,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     private fun setupMap() {
         this.googleMap?.map?.setOnMarkerClickListener {
             when (it) {
-                anomalyMarker -> this.removeAnomalyMarker()
+                anomalyMarker -> this.setupMoreMarkerDialog(this)
                 userLocMarker -> this.zoomMapToUser()
                 /* Else it must be an anomaly */
                 else -> {
@@ -662,6 +690,36 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }.start()
     }
 
+    private fun setAccountDataListener(){
+        val childEventListener = object : ChildEventListener {
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                if(!LoginHandler.isLoggedIn())
+                    return
+
+                val user = snapshot.getValue(EmailUser::class.java)
+
+                try{
+                    if(user == LoginHandler.deviceUser){
+                        if(LoginHandler.deviceUser is EmailUser){
+                            if((LoginHandler.deviceUser as EmailUser).password != user!!.password) {
+                                LoginHandler.logoutByError()
+                                return
+                            }
+                        }
+                        LoginHandler.deviceUser = user
+                    }
+                }catch (exception: Exception){}
+            }
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot){}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?){}
+            override fun onCancelled(error: DatabaseError){}
+        }
+
+        FirebaseClass.fbUsersRef.addChildEventListener(childEventListener)
+        FirebaseClass.emailUsersRef.addChildEventListener(childEventListener)
+    }
+
     private fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
         FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
             if(!Utility.isInternetAvailable()) return@addOnCompleteListener
@@ -735,15 +793,20 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val anomaliesContainer = findViewById<LinearLayout>(parentLayoutId)
         anomaliesContainer.removeAllViews()
 
-        val nAnomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
+        val anomaliesTW = findViewById<TextView>(R.id.dialog_anomaly_tw)
         val anomaliesInCity = getAnomaliesInCity(userLocation)
+        val anomaliesMoreBTN = findViewById<View>(R.id.dialog_anomaly_more)
 
-        sortAnomalies()
+        anomaliesMoreBTN.setOnClickListener {
+            Utility.navigateTo(this, AnomaliesActivity::class.java)
+        }
 
         if(anomaliesInCity.isEmpty()){
-            nAnomaliesTW.text = getString(R.string.nessunaanomalia)
+            anomaliesTW.text = getString(R.string.nessunaanomalia)
             return
         }
+
+        sortByDistance(anomaliesInCity)
 
         val parentViewId = R.id.parent
         val layoutToAddId = R.layout.single_anomaly
@@ -755,7 +818,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             i++
         }
 
-        nAnomaliesTW.text = getString(R.string.anomalie_citta).replace("{number}", anomaliesInCity.size.toString())
+        anomaliesTW.text = getString(R.string.anomalie_vicine)
     }
 
     private fun addAnomalyMarker(latLng: LatLng){
@@ -764,7 +827,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun updateAnomalyLocation(){
-        val foundAddress = getAddress(anomalyMarker!!.position, this)
+        val foundAddress = getAddress(latLngToLocation(anomalyMarker!!.position), this)
         val addressET = findViewById<TextInputEditText>(R.id.report_address)
         addressET.setText(foundAddress)
     }
@@ -867,13 +930,17 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             val view = inflater.inflate(layoutToAddId, gallery, false)
             val parentView = view.findViewById<ViewGroup>(parentViewId)
 
-            val addressTW = view.findViewById<TextView>(R.id.single_anomaly_title)
+            val cityTW = view.findViewById<TextView>(R.id.single_anomaly_title)
             val reporterTW = view.findViewById<TextView>(R.id.single_anomaly_reporter)
             val distanceTW = view.findViewById<TextView>(R.id.single_anomaly_distance)
+            val addressTW = view.findViewById<TextView>(R.id.single_anomaly_address)
             val moreBTN = view.findViewById<View>(R.id.single_anomaly_more)
             val visitAccountBTN = view.findViewById<View>(R.id.single_anomaly_info)
 
-            addressTW.text = getCity(anomaly.location, activity)
+            cityTW.text = getCity(anomaly.location, activity)
+
+            val addressTemplate = activity.getString(R.string.indirizzo_dot)
+            addressTW.text = addressTemplate.replace("{indirizzo}", getSimpleAddress(anomaly.location, mapsActivity))
 
             val distanceTemplate = activity.getString(R.string.distance)
             distanceTW.text = distanceTemplate.replace("{distance}", getDistanceString(activity,
@@ -907,21 +974,24 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         @RequiresApi(Build.VERSION_CODES.N)
         private fun setupMoreAnomalyDialog(activity: AppCompatActivity, anomaly: Anomaly){
             val moreDialog = CBottomSheetDialog(activity)
-            moreDialog.setContentView(R.layout.anomaly_more_dialog)
+            moreDialog.setContentView(R.layout.marker_more_dialog)
 
-            val streetBtn = moreDialog.findViewById<View>(R.id.anomaly_more_map_btn)
+            val streetBtn = moreDialog.findViewById<View>(R.id.marker_more_map_btn)
             streetBtn?.setOnClickListener {
-                val streetViewURI = Uri.parse("google.streetview:cbll=${anomaly.location.latitude},${anomaly.location.longitude}")
-                val streetViewIntent = Intent (Intent.ACTION_VIEW, streetViewURI)
-                streetViewIntent.setPackage ("com.google.android.apps.maps")
-                activity.startActivity(streetViewIntent)
+                mapsActivity.startGoogleMapsByLocation(anomaly.location)
             }
 
-            val removeBtn = moreDialog.findViewById<View>(R.id.anomaly_more_remove_btn)
+            val removeBtn = moreDialog.findViewById<View>(R.id.marker_more_remove_btn)
             removeBtn?.setOnClickListener {
-                if(!encounteredAnomalies!!.contains(anomaly)){
+                if(!LoginHandler.isLoggedIn()){
+                    Utility.oneLineDialog(activity, activity.getString(R.string.nonloggato), null)
+                }
+
+                else if(!encounteredAnomalies!!.contains(anomaly) && LoginHandler.deviceUser!!.role.isLowerOr(Roles.UTENTE)){
                     Utility.oneLineDialog(activity, activity.getString(R.string.anomalia_non_visitata), null)
-                }else{
+                }
+
+                else{
                     Utility.oneLineDialog(activity, activity.getString(R.string.dialog_conferma_eliminazione)) {
                         FirebaseClass.deleteAnomalyFirebase(anomaly)
                     }
@@ -947,19 +1017,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             else city
         }
 
-        fun getAddress(latLng: LatLng, activity: AppCompatActivity) : String{
-            val location = Location(String())
-            location.latitude = latLng.latitude
-            location.longitude = latLng.longitude
-            return getAddress(location, activity)
-        }
-
         fun getAddress(location: Location, activity: AppCompatActivity) : String{
             return Geocoder(activity, Locale.getDefault()).getFromLocation(
                 location.latitude,
                 location.longitude,
                 1
             )[0].getAddressLine(0)
+        }
+
+        fun getSimpleAddress(location: Location, activity: AppCompatActivity): String {
+            return getAddress(location, activity).split(",")[0]
         }
 
         fun latLngToLocation(latLng: LatLng): LocationExtended {

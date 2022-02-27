@@ -4,6 +4,7 @@ open class User{
     lateinit var nome: String
     lateinit var cognome: String
     lateinit var uniqueId: String
+    var role = Roles.UTENTE
 
     constructor()
 
@@ -14,7 +15,6 @@ open class User{
     }
 
     override fun equals(other: Any?): Boolean {
-        println("ISTRUE ${this.uniqueId} ${(other as User).uniqueId}")
         return this.uniqueId == (other as User).uniqueId
     }
 }

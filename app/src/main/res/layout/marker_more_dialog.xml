@@ -13,7 +13,7 @@
     app:layout_constraintCircleRadius="10dp">
 
     <ImageView
-        android:id="@+id/anomaly_more_swiper"
+        android:id="@+id/marker_more_swiper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,7 +21,7 @@
         app:srcCompat="@drawable/swiper" />
 
     <ImageButton
-        android:id="@+id/anomaly_more_remove_btn"
+        android:id="@+id/marker_more_remove_btn"
         android:layout_width="140px"
         android:layout_height="140px"
 
@@ -29,67 +29,52 @@
         android:elevation="28dp"
         android:src="@drawable/ic_baseline_remove_circle_outline_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/anomaly_more_review_btn"
-        app:layout_constraintTop_toTopOf="@+id/anomaly_more_review_btn" />
+        app:layout_constraintStart_toEndOf="@+id/view4"
+        app:layout_constraintTop_toTopOf="@+id/marker_more_map_btn" />
 
-    <ImageButton
-        android:id="@+id/anomaly_more_map_btn"
-        android:layout_width="140px"
-        android:layout_height="140px"
-
-        android:background="@drawable/white_circle"
-        android:elevation="28dp"
-        android:src="@drawable/ic_baseline_map_24"
-        app:layout_constraintEnd_toStartOf="@+id/anomaly_more_review_btn"
+    <View
+        android:id="@+id/view4"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/anomaly_more_review_btn" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/anomaly_more_review_btn"
+        android:id="@+id/marker_more_map_btn"
         android:layout_width="140px"
         android:layout_height="140px"
 
         android:layout_marginTop="24dp"
         android:background="@drawable/white_circle"
         android:elevation="28dp"
-        android:src="@drawable/ic_baseline_comment_24"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_baseline_map_24"
+        app:layout_constraintEnd_toStartOf="@+id/view4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/anomaly_more_swiper" />
+        app:layout_constraintTop_toBottomOf="@+id/marker_more_swiper" />
 
     <TextView
-        android:id="@+id/anomaly_more_map_tv"
+        android:id="@+id/marker_more_map_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/googlestreet"
         android:textColor="@color/white"
         android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="@+id/anomaly_more_map_btn"
-        app:layout_constraintStart_toStartOf="@+id/anomaly_more_map_btn"
-        app:layout_constraintTop_toBottomOf="@+id/anomaly_more_map_btn" />
+        app:layout_constraintEnd_toEndOf="@+id/marker_more_map_btn"
+        app:layout_constraintStart_toStartOf="@+id/marker_more_map_btn"
+        app:layout_constraintTop_toBottomOf="@+id/marker_more_map_btn" />
 
     <TextView
-        android:id="@+id/anomaly_more_review_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/recensione"
-        android:textColor="@color/white"
-        android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="@+id/anomaly_more_review_btn"
-        app:layout_constraintStart_toStartOf="@+id/anomaly_more_review_btn"
-        app:layout_constraintTop_toBottomOf="@+id/anomaly_more_review_btn" />
-
-    <TextView
-        android:id="@+id/anomaly_more_remove_tv"
+        android:id="@+id/marker_more_remove_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/rimuovi"
         android:textColor="@color/red"
         android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="@+id/anomaly_more_remove_btn"
-        app:layout_constraintStart_toStartOf="@+id/anomaly_more_remove_btn"
-        app:layout_constraintTop_toBottomOf="@+id/anomaly_more_remove_btn" />
+        app:layout_constraintEnd_toEndOf="@+id/marker_more_remove_btn"
+        app:layout_constraintStart_toStartOf="@+id/marker_more_remove_btn"
+        app:layout_constraintTop_toBottomOf="@+id/marker_more_remove_btn" />
 </androidx.constraintlayout.widget.ConstraintLayout>

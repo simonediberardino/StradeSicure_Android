@@ -3,6 +3,7 @@ package com.simonediberardino.stradesicure.activities
 import android.os.Build
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simonediberardino.stradesicure.R
@@ -43,8 +44,11 @@ class AnomaliesActivity : SSActivity() {
         val anomaliesToShow = if(ApplicationData.anomaliesInCity()){
                 mapsActivity.getAnomaliesInCity(mapsActivity.userLocation)
             }else{
-            mapsActivity.anomalies!!.toTypedArray()
+            mapsActivity.anomalies.toTypedArray()
           }
+
+        val nAnomaliesTW = findViewById<TextView>(R.id.anomalies_n)
+        nAnomaliesTW.text = getString(R.string.anomalie_trovate).replace("{number}", anomaliesToShow.size.toString())
 
         if(anomaliesToShow.isEmpty()) {
             Utility.showToast(this, getString(R.string.nessunaanomalia))

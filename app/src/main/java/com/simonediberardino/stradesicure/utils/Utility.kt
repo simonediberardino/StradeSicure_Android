@@ -19,9 +19,6 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-
-
-
 object Utility {
     fun navigateTo(c: AppCompatActivity, cl: Class<*>?) {
         val intent = Intent(c, cl)
@@ -79,6 +76,15 @@ object Utility {
         val cm = appCompatActivity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nInfo = cm.activeNetworkInfo
         return nInfo != null && nInfo.isAvailable && nInfo.isConnected
+    }
+
+    fun capitalizeFirstLetter(string: String): String {
+        if(string.isEmpty())
+            return string
+
+        val firstChar = string[0]
+        val restOfString = if(string.length > 1) string.drop(1) else String()
+        return "${firstChar.uppercase()}${restOfString.lowercase()}"
     }
 
     fun showToast(c: AppCompatActivity, message: String){

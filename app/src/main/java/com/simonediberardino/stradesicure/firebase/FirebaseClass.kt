@@ -1,6 +1,7 @@
 package com.simonediberardino.stradesicure.firebase
 
 import android.graphics.BitmapFactory
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -283,5 +284,15 @@ object FirebaseClass {
     fun deleteFieldFirebase(reference: DatabaseReference, child: String?) {
         if(child != null)
             reference.child(child).removeValue()
+    }
+
+    fun deleteImageFromFirebase(context: AppCompatActivity, dataSnapshot: DataSnapshot, callback: Runnable){
+        val storageReference = FirebaseStorage.getInstance().reference
+        val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
+
+        reference.delete()
+            .addOnCompleteListener {
+                callback.run()
+            }
     }
 }

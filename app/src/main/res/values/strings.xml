@@ -9,6 +9,10 @@
         <item>Estremamente grave</item>
     </string-array>
 
+    <string-array name="camera_options">
+        <item>Carica una nuova immagine</item>
+        <item>Ripristina immagine</item>
+    </string-array>
     <string-array name="maptheme">
         <item>Classico</item>
         <item>Satellite</item>
@@ -41,6 +45,10 @@
     <string name="descrizione">Breve descrizione</string>
     <string name="stato">Stato</string>
     <string name="mappa">Mappa</string>
+    <string name="ripristina_immagine_conferma">Sei sicuro di voler ripristinare l\'immagine?</string>
+    <string name="azione_non_reversibile">L\'azione non è reversibile.</string>
+    <string name="modifica_immagine">Modifica immagine</string>
+    <string name="errore">Errore</string>
     <string name="mie_segnalazioni">Le mie segnalazioni</string>
     <string name="tutte_segnalazioni">Tutte le segnalazioni</string>
     <string name="segnalazioni">Segnalazioni</string>
@@ -109,7 +117,8 @@
     <string name="nessunaanomalia">Impossibile trovare anomalie.</string>
     <string name="surnameinvalidlength">Il tuo cognome deve essere lungo almeno {length} caratteri.</string>
     <string name="noimagewarn">Non hai impostato una foto profilo, vuoi continuare lo stesso?</string>
-    <string name="dialog_conferma_eliminazione">Sei sicuro di voler rimuovere questa segnalazione? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
-    <string name="dialog_conferma_anomalia">Sei sicuro di voler segnalare questa anomalia? Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
+    <string name="dialog_conferma_eliminazione_title">Sei sicuro di voler rimuovere questa segnalazione?</string>
+    <string name="ban_warning">Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
+    <string name="dialog_conferma_anomalia_title">Sei sicuro di voler segnalare questa anomalia?</string>
     <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
 </resources>

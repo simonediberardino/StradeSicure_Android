@@ -1,6 +1,5 @@
 package com.simonediberardino.stradesicure.utils
 
-import android.R
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -11,12 +10,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CDialog
 import com.simonediberardino.stradesicure.activities.MapsActivity
 import com.simonediberardino.stradesicure.activities.SSActivity
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import android.R as R1
 
 
 object Utility {
@@ -24,30 +25,32 @@ object Utility {
         val intent = Intent(c, cl)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-        val bundle = ActivityOptionsCompat.makeCustomAnimation(c, R.anim.fade_in, R.anim.fade_out).toBundle()
+        val bundle = ActivityOptionsCompat.makeCustomAnimation(c, R1.anim.fade_in, R1.anim.fade_out).toBundle()
         c.startActivity(intent, bundle)
     }
 
     fun goToMainMenu(c: AppCompatActivity){
-        Utility.navigateTo(c, MapsActivity::class.java)
+        navigateTo(c, MapsActivity::class.java)
     }
 
-    fun oneLineDialog(c: AppCompatActivity?, title: String?, callback: Runnable?) {
-        CDialog(c!!, title, callback).show()
+    fun oneLineDialog(c: AppCompatActivity, title: String){
+        CDialog(c, title, null).show()
     }
 
-    fun oneLineDialog(
-        c: AppCompatActivity?,
-        title: String?,
-        option1: String?,
-        option2: String?,
-        firstCallback: Runnable?,
-        secondCallback: Runnable?,
-        dismissCallback: Runnable?,
-    ) {
-        CDialog(
-            c!!, title, option1!!, option2!!, firstCallback, secondCallback, dismissCallback
-        ).show()
+    fun oneLineDialog(c: AppCompatActivity, title: String, callback: Runnable){
+        CDialog(c, title, callback).show()
+    }
+
+    fun oneLineDialog(c: AppCompatActivity, title: String, description: String?, callbackConfirm: Runnable?) {
+        CDialog(c, title, description, c.resources.getStringArray(R.array.yesno)[0], c.resources.getStringArray(R.array.yesno)[1], callbackConfirm, null, null).show()
+    }
+
+    fun oneLineDialog(c: AppCompatActivity, title: String, description: String?, options: Array<String>, callbackConfirm: Runnable, callbackDeny: Runnable?) {
+        CDialog(c, title, description, options[0], options[1], callbackConfirm, callbackDeny, null).show()
+    }
+
+    fun oneLineDialog(c: AppCompatActivity, title: String, description: String?, options: Array<String>, callbackConfirm: Runnable, callbackDeny: Runnable, callbackDismiss: Runnable) {
+        CDialog(c, title, description, options[0], options[1], callbackConfirm, callbackDeny, callbackDismiss).show()
     }
 
     fun getMD5(input: String): String? {

@@ -1,5 +1,6 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,10 +12,12 @@ import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.Roles
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
+import com.simonediberardino.stradesicure.login.LoginHandler.deviceUser
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import de.hdodenhof.circleimageview.CircleImageView
@@ -50,7 +53,9 @@ class AccountActivity : SSActivity() {
                     setReportsNumber()
                     setUserId()
                     setProfileImage()
-                    setupListeners()
+                    setupLogout()
+                    setupRoles()
+                    setupCamera()
                 }
             })
     }
@@ -69,17 +74,8 @@ class AccountActivity : SSActivity() {
         progressBar = findViewById(R.id.account_progressBar)
     }
 
-    private fun setupListeners(){
-        logoutBtn = findViewById(R.id.account_logout_btn)
-        if(userToShow != LoginHandler.deviceUser){
-            logoutBtn.visibility = View.INVISIBLE
-        }else{
-            logoutBtn.setOnClickListener{
-                Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
-            }
-        }
-
-        if(LoginHandler.deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true && LoginHandler.deviceUser != userToShow){
+    private fun setupRoles(){
+        if(deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true && deviceUser != userToShow){
             roleEditBtn.visibility = View.VISIBLE
             roleEditBtn.setOnClickListener {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -97,7 +93,61 @@ class AccountActivity : SSActivity() {
                 builder.create().show()
             }
         }
+    }
 
+    private fun setupLogout(){
+        logoutBtn = findViewById(R.id.account_logout_btn)
+        if(userToShow != deviceUser){
+            logoutBtn.visibility = View.INVISIBLE
+        }else{
+            logoutBtn.setOnClickListener{
+                Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
+            }
+        }
+    }
+
+    private fun setupCamera(){
+        editImageBtn.visibility =
+            if(userToShow is FbUser) {
+                View.INVISIBLE
+            }else{
+                if(userToShow != deviceUser && deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == false || deviceUser?.role?.isGreaterOr(userToShow.role) == false)
+                    View.INVISIBLE
+                else
+                    View.VISIBLE
+            }
+
+        editImageBtn.setOnClickListener {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setTitle(title)
+
+            val options = resources.getStringArray(R.array.camera_options)
+
+            builder.setTitle(getString(R.string.modifica_immagine))
+            builder.setItems(options) { _, which ->
+                when(which){
+                    0 -> super.startGalleryActivity()
+                    1 -> {
+                        Utility.oneLineDialog(this,
+                            getString(R.string.ripristina_immagine_conferma),
+                            getString(R.string.azione_non_reversibile)
+                        ){
+                            FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar {
+                                @SuppressLint("UseCompatLoadingForDrawables")
+                                override fun run(p: Any?) {
+                                    val dataSnapshot = p!! as DataSnapshot
+                                    FirebaseClass.deleteImageFromFirebase(this@AccountActivity, dataSnapshot){
+                                        profileImageIV.setImageDrawable(getDrawable(R.drawable.com_facebook_profile_picture_blank_square))
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+
+            builder.create().show()
+        }
     }
 
     private fun doLogout(){
@@ -112,7 +162,7 @@ class AccountActivity : SSActivity() {
 
     private fun setProfileEmail() {
         emailTW.text =
-            if(LoginHandler.deviceUser!! == userToShow || LoginHandler.deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true)
+            if(deviceUser!! == userToShow || deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true)
                 userToShow.uniqueId
             else
                 getString(R.string.sconosciuto)
@@ -168,11 +218,6 @@ class AccountActivity : SSActivity() {
                 }
             }
         )
-
-        editImageBtn.visibility = if(LoginHandler.isFacebookLoggedIn()) View.INVISIBLE else View.VISIBLE
-        editImageBtn.setOnClickListener {
-            super.startGalleryActivity()
-        }
     }
 
     private fun updateProfileImage(uploadedImage: Uri){

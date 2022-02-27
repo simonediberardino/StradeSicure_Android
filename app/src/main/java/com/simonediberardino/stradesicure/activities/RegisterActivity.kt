@@ -45,20 +45,20 @@ class RegisterActivity : SSActivity() {
         val isValidEmail = !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
         if (!isValidEmail) {
             val message = this.getString(R.string.emailnotvalid)
-            Utility.oneLineDialog(this, message, null)
+            Utility.oneLineDialog(this, message)
             return
         }
 
         val minLength = 3
         if(firstName.isEmpty()){
             val message = this.getString(R.string.nameinvalidlength).replace("{length}", minLength.toString())
-            Utility.oneLineDialog(this, message, null)
+            Utility.oneLineDialog(this, message)
             return
         }
 
         if(lastName.isEmpty()){
             val message = this.getString(R.string.surnameinvalidlength).replace("{length}", minLength.toString())
-            Utility.oneLineDialog(this, message, null)
+            Utility.oneLineDialog(this, message)
             return
         }
 
@@ -71,7 +71,7 @@ class RegisterActivity : SSActivity() {
 
             if(isEmailRegistered) {
                 val message = this.getString(R.string.emailgiaregistrata)
-                Utility.oneLineDialog(this, message, null)
+                Utility.oneLineDialog(this, message)
                 return@addOnCompleteListener
             }
 

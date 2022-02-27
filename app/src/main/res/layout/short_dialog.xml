@@ -2,110 +2,106 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dialog_parent"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource"
+    android:id="@+id/parent">
 
-    android:background="#FFFFFF"
-    android:orientation="vertical">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="700px"
+    <androidx.cardview.widget.CardView
+        android:layout_width="340dp"
         android:layout_height="wrap_content"
-
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginRight="1dp"
-        android:layout_marginBottom="1dp"
-        android:background="#3E80B4"
-        android:paddingBottom="8dp"
+        app:cardCornerRadius="11dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/dialog_close"
-            android:layout_width="50px"
-            android:layout_height="50px"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dialog_title"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_close_24" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp">
 
-        <TextView
-            android:id="@+id/dialog_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
-            android:fontFamily="@font/carter_one"
-            android:gravity="center"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:text="Title"
-            android:textColor="@android:color/white"
-            android:textSize="40px"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/short_dialog_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="32dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Titolo"
+                android:textColor="@color/black"
+                android:textSize="44px"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/dialog_view12"
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="MissingConstraints" />
+            <TextView
+                android:id="@+id/short_dialog_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:maxLines="4"
+                android:text="Sottotitolo"
+                android:textColor="@color/black"
+                android:textSize="40px"
+                app:layout_constraintEnd_toEndOf="@+id/short_dialog_title"
+                app:layout_constraintStart_toStartOf="@+id/short_dialog_title"
+                app:layout_constraintTop_toBottomOf="@+id/short_dialog_title" />
 
-        <RadioButton
-            android:id="@+id/dialog_btn2"
-            android:layout_width="0dp"
-            android:layout_height="80px"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/short_dialog_button_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/white_button"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/short_dialog_description">
 
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="8dp"
-            android:background="@android:color/white"
-            android:button="@android:color/transparent"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="@string/annulla"
-            android:textAllCaps="true"
-            android:textColor="#5DBCD2"
-            android:textSize="40px"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dialog_view12"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
+                <TextView
+                    android:id="@+id/short_dialog_text_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="TextView"
+                    android:textColor="@color/black"
+                    android:textSize="40px"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <RadioButton
-            android:id="@+id/dialog_btn1"
-            android:layout_width="0dp"
-            android:layout_height="80px"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="2dp"
-            android:background="@android:color/white"
-            android:button="@android:color/transparent"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:text="@string/ok"
-            android:textAllCaps="true"
-            android:textColor="#5DBCD2"
-            android:textSize="40px"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/dialog_view12"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/short_dialog_button_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/white_button"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/short_dialog_button_1">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/short_dialog_text_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="TextView"
+                    android:textColor="@color/black"
+                    android:textSize="40px"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

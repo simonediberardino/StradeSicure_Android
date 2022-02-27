@@ -266,7 +266,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val confirmBtn = findViewById<View>(R.id.report_confirm)
         confirmBtn.setOnClickListener {
             if(LoginHandler.deviceUser == null){
-                Utility.oneLineDialog(this, this.getString(R.string.nonloggato), null)
+                Utility.oneLineDialog(this,
+                    this.getString(R.string.errore),
+                    this.getString(R.string.nonloggato),
+                null)
+
                 return@setOnClickListener
             }
 
@@ -287,7 +291,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             setTopMenuVisibility(false)
 
             Utility.oneLineDialog(this as AppCompatActivity,
-                this.getString(R.string.dialog_conferma_anomalia)
+                this.getString(R.string.dialog_conferma_anomalia_title),
+                this.getString(R.string.ban_warning)
             ) {
                 FirebaseClass.addAnomalyToFirebase(
                     Anomaly(
@@ -984,15 +989,24 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             val removeBtn = moreDialog.findViewById<View>(R.id.marker_more_remove_btn)
             removeBtn?.setOnClickListener {
                 if(!LoginHandler.isLoggedIn()){
-                    Utility.oneLineDialog(activity, activity.getString(R.string.nonloggato), null)
+                    Utility.oneLineDialog(activity,
+                        activity.getString(R.string.errore),
+                        activity.getString(R.string.nonloggato),
+                    null)
                 }
 
                 else if(!encounteredAnomalies!!.contains(anomaly) && LoginHandler.deviceUser!!.role.isLowerOr(Roles.UTENTE)){
-                    Utility.oneLineDialog(activity, activity.getString(R.string.anomalia_non_visitata), null)
+                    Utility.oneLineDialog(activity,
+                        activity.getString(R.string.errore),
+                        activity.getString(R.string.anomalia_non_visitata),
+                    null)
                 }
 
                 else{
-                    Utility.oneLineDialog(activity, activity.getString(R.string.dialog_conferma_eliminazione)) {
+                    Utility.oneLineDialog(activity,
+                        activity.getString(R.string.dialog_conferma_eliminazione_title),
+                        activity.getString(R.string.ban_warning)
+                    ) {
                         FirebaseClass.deleteAnomalyFirebase(anomaly)
                     }
                 }

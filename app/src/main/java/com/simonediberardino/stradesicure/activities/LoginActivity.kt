@@ -49,7 +49,7 @@ class LoginActivity : SSActivity() {
             }?.getValue(EmailUser::class.java)
 
             if(matchedUser == null || matchedUser.password != encryptedPassword){
-                Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate), null)
+                Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate))
             }else{
                 loginSuccess(matchedUser)
             }

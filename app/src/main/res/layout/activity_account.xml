@@ -99,6 +99,7 @@
                     app:rowCount="1">
 
                     <LinearLayout
+                        android:id="@+id/account_segnalazioni_btn"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:orientation="vertical"

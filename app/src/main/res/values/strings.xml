@@ -4,7 +4,7 @@
     <string name="credits">© Copyright 2022, Simone Di Berardino</string>
     <string-array name="stato">
         <item>Lieve</item>
-        <item>Medio</item>
+        <item>Media</item>
         <item>Grave</item>
         <item>Estremamente grave</item>
     </string-array>
@@ -31,7 +31,7 @@
     <string name="mostra_di_più"><u>Mostra di più</u></string>
     <string name="segnala_anomalia">Segnala anomalia</string>
     <string name="indirizzo">Indirizzo</string>
-    <string name="indirizzo_dot">• Indirizzo: {indirizzo}</string>
+    <string name="indirizzo_dot">• Luogo: {indirizzo}</string>
     <string name="segnalata_da">• Segnalazione di: {username}</string>
     <string name="indicazioni">• Indicazioni: {indicazioni}</string>
     <string name="distance">• Distanza: {distance}</string>
@@ -44,6 +44,7 @@
     <string name="tua_posizione">La tua posizione attuale</string>
     <string name="descrizione">Breve descrizione</string>
     <string name="stato">Stato</string>
+    <string name="gravita">Gravità</string>
     <string name="mappa">Mappa</string>
     <string name="ripristina_immagine_conferma">Sei sicuro di voler ripristinare l\'immagine?</string>
     <string name="azione_non_reversibile">L\'azione non è reversibile.</string>
@@ -81,6 +82,7 @@
     <string name="nonhaiaccount">Non hai un account?</string>
     <string name="emailnotvalid">Email non valida</string>
     <string name="caricamento">Caricamento…</string>
+    <string name="caricamento_immagine">Caricamento immagine</string>
     <string name="progress">Avanzamento: {progress}</string>
     <string name="recensioni">Recensioni</string>
     <string name="mapstyle">Stile mappa</string>
@@ -97,7 +99,7 @@
     <string name="anomalies_filter">Solo anomalie nella tua città</string>
     <string name="accountid">ID Account</string>
     <string name="logout">Logout</string>
-    <string name="anomalia_in_range">Attenzione, anomalia con stato di gravità {value} nel raggio di {meters} metri.</string>
+    <string name="anomalia_in_range">Attenzione! Anomalia di gravità {value} in {via} nel raggio di {meters} metri.</string>
     <string name="logout_success">Disconnesso con successo!</string>
     <string name="register_success">Registrato correttamente!</string>
     <string name="indietro">Indietro</string>

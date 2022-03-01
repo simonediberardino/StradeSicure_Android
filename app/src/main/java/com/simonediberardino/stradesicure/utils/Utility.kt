@@ -90,6 +90,9 @@ object Utility {
         return "${firstChar.uppercase()}${restOfString.lowercase()}"
     }
 
+    fun String.capitalizeWords(): String =
+        lowercase().split(" ").joinToString(" ") { it.capitalize() }
+
     fun showToast(c: AppCompatActivity, message: String){
         Toast.makeText(c, message, Toast.LENGTH_LONG).show()
     }

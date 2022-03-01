@@ -31,7 +31,7 @@ class SearchActivity : SSActivity() {
         searchButton = findViewById(R.id.search_button)
 
         searchButton.setOnClickListener {
-            val enteredText = editText.text.toString()
+            val enteredText = editText.text.toString().lowercase()
             results.removeAllViews()
 
             for(userReference: DatabaseReference in FirebaseClass.userReferences){

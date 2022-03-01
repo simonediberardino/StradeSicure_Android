@@ -16,7 +16,6 @@ class Anomaly{
     }
 
     override fun equals(other: Any?): Boolean {
-        println(" EQUALSS ${this.location == (other as Anomaly).location}")
         return this.location == (other as Anomaly).location
     }
 }

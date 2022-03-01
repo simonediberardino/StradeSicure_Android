@@ -47,16 +47,11 @@
                 android:id="@+id/load_dialog_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="20dp"
-                android:fontFamily="@font/carter_one"
-                android:shadowColor="#000"
-                android:shadowDx="2"
-                android:shadowDy="5"
-                android:shadowRadius="1.5"
                 android:text="@string/caricamento"
-                android:textColor="@color/blue"
+                android:textColor="@color/black"
                 android:textSize="55px"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

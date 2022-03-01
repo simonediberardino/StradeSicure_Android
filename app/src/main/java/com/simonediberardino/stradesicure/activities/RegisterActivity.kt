@@ -1,7 +1,10 @@
 package com.simonediberardino.stradesicure.activities
 
+import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
@@ -12,14 +15,15 @@ import com.facebook.Profile
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.simonediberardino.stradesicure.R
-import com.simonediberardino.stradesicure.UI.ProgressDialog
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
+import java.io.ByteArrayOutputStream
 
 
 class RegisterActivity : SSActivity() {
@@ -124,29 +128,45 @@ class RegisterActivity : SSActivity() {
         }
 
         fun uploadProfilePicToFirebase(context: AppCompatActivity, uploadedImage: Uri?, dataSnapshot: DataSnapshot, callback: Runnable){
+            val progressDialog = ProgressDialog(context)
+            progressDialog.max = 100
+            progressDialog.setTitle(context.getString(R.string.caricamento_immagine))
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+            progressDialog.show()
+            progressDialog.setCancelable(false)
+
             val storageReference = FirebaseStorage.getInstance().reference
+            val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
 
             if(uploadedImage == null){
                 callback.run()
                 return
             }
 
-            val progressDialog = ProgressDialog(context)
-            val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
+            val byteArrayOutputStream = ByteArrayOutputStream()
 
-            reference.putFile(uploadedImage)
-                .addOnSuccessListener {
-                    progressDialog.dismiss()
-                    callback.run()
-                }
-                .addOnFailureListener { e ->
-                    progressDialog.dismiss()
-                    Utility.showToast(context, e.message.toString())
-                }
-                .addOnProgressListener { taskSnapshot ->
-                    val progress: Double = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
-                    progressDialog.progress = progress.toInt()
-                }
+            MediaStore.Images.Media.getBitmap(
+                context.contentResolver,
+                uploadedImage)
+                .compress(
+                    Bitmap.CompressFormat.JPEG,
+                    25,
+                    byteArrayOutputStream
+                )
+
+            val dataToByteArray = byteArrayOutputStream.toByteArray()
+            val uploadTask: UploadTask = reference.putBytes(dataToByteArray)
+
+            uploadTask.addOnSuccessListener {
+                callback.run()
+            }.addOnFailureListener{ e ->
+                Utility.showToast(context, e.message.toString())
+            }.addOnProgressListener { taskSnapshot ->
+               val progress: Double = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
+                progressDialog.progress = progress.toInt()
+            }.addOnCompleteListener{
+                progressDialog.dismiss()
+            }
         }
     }
 }

@@ -28,6 +28,8 @@ import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -45,6 +47,7 @@ import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.GoogleMapExtended
 import com.simonediberardino.stradesicure.misc.LocationExtended
+import com.simonediberardino.stradesicure.misc.MapInteractions
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
@@ -54,7 +57,8 @@ import java.util.function.Predicate
 import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
-class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
+class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener,
+    MapInteractions {
     /** Google map object provided by Google; */
     internal var googleMap: GoogleMapExtended? = null
     internal lateinit var mapBinding: ActivityMapsBinding
@@ -74,6 +78,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     /** Locks the FireBase query thread until the map is fully initializated; */
     internal var threadLocker = ReentrantLock()
     internal var threadLockerCond = threadLocker.newCondition()
+    internal var mapFollowsUser = true
 
     /** Whether it has listed the anomalies since the GPS is on atleast once or not */
     internal var hasListedAnomalies = false
@@ -366,8 +371,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
-            if(!isTopMenuShown())
+            if(!isTopMenuShown()) {
+                mapFollowsUser = true
                 this.zoomMapToUser()
+            }
         }
 
         val showSideMenuBTN = findViewById<View>(R.id.main_toggle_menu)
@@ -563,6 +570,94 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 this.listAnomalies()
             }
         }
+
+        setMapInteractionTrackingListeners()
+    }
+
+    private fun setMapInteractionTrackingListeners() {
+        var cameraPositionBeforeCameraMoveStarted = googleMap!!.map.cameraPosition
+        var cameraChangeReason = REASON_DEVELOPER_ANIMATION
+        var isZoomInStarted = false
+        var isZoomOutStarted = false
+
+        googleMap!!.map.setOnCameraMoveStartedListener { reason ->
+            cameraChangeReason = reason
+            if (reason == REASON_GESTURE) {
+                cameraPositionBeforeCameraMoveStarted = googleMap!!.map.cameraPosition
+                this.onMapPanListener().invoke()
+            }
+        }
+
+        googleMap!!.map.setOnCameraMoveListener {
+            // track when the user starts zooming in
+            if (googleMap!!.map.cameraPosition.zoom > cameraPositionBeforeCameraMoveStarted.zoom && !isZoomInStarted) {
+                isZoomInStarted = true
+                this.onMapZoomInStartListener().invoke(googleMap!!.map.cameraPosition.zoom.toDouble())
+            } else if (googleMap!!.map.cameraPosition.zoom < cameraPositionBeforeCameraMoveStarted.zoom && !isZoomOutStarted) {
+                // track when the user starts zooming out
+                isZoomOutStarted = true
+                this.onMapZoomOutStartListener().invoke(googleMap!!.map.cameraPosition.zoom.toDouble())
+            }
+        }
+
+        googleMap!!.map.setOnCameraIdleListener {
+            // track the camera change only if it is moved by the user
+            if (cameraChangeReason == REASON_GESTURE) {
+                // tracking when the user rotates the map view
+                if (googleMap!!.map.cameraPosition.bearing != cameraPositionBeforeCameraMoveStarted.bearing) {
+                    this.onMapRotateListener().invoke()
+                }
+
+                val isZoomInOrOutStarted = isZoomInStarted || isZoomOutStarted
+
+                // tracking when the user pans the map view and if the panning is not happening during the zoom
+                if (googleMap!!.map.cameraPosition.bearing == cameraPositionBeforeCameraMoveStarted.bearing
+                    && googleMap!!.map.cameraPosition.target != cameraPositionBeforeCameraMoveStarted.target
+                    && !isZoomInOrOutStarted
+                ) {
+                    this.onMapPanListener().invoke()
+                }
+
+                // track when the user ends the zoom in
+                if (googleMap!!.map.cameraPosition.zoom > cameraPositionBeforeCameraMoveStarted.zoom && isZoomInStarted) {
+                    this.onMapZoomInEndListener().invoke(googleMap!!.map.cameraPosition.zoom.toDouble())
+                    isZoomInStarted = false
+                }
+
+                // track when the user ends the zoom out
+                if (googleMap!!.map.cameraPosition.zoom < cameraPositionBeforeCameraMoveStarted.zoom && isZoomOutStarted) {
+                    this.onMapZoomOutEndListener().invoke(googleMap!!.map.cameraPosition.zoom.toDouble())
+                    isZoomOutStarted = false
+                }
+
+                cameraPositionBeforeCameraMoveStarted = googleMap!!.map.cameraPosition
+                cameraChangeReason = REASON_DEVELOPER_ANIMATION
+            }
+        }
+    }
+
+    override fun onMapZoomInStartListener(): (Double) -> Unit = {
+        mapFollowsUser = false
+    }
+
+    override fun onMapZoomInEndListener(): (zoomLevel: Double) -> Unit = {
+        mapFollowsUser = false
+    }
+
+    override fun onMapZoomOutStartListener(): (zoomLevel: Double) -> Unit = {
+        mapFollowsUser = false
+    }
+
+    override fun onMapZoomOutEndListener(): (zoomLevel: Double) -> Unit = {
+        mapFollowsUser = false
+    }
+
+    override fun onMapPanListener(): () -> Unit = {
+        mapFollowsUser = false
+    }
+
+    override fun onMapRotateListener(): () -> Unit = {
+        mapFollowsUser = false
     }
 
     private fun getMapZoom(): Float {
@@ -625,6 +720,9 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             }
         }
 
+        if(mapFollowsUser)
+            zoomMapToUser()
+
         userLocation = newLocation
         userLocCircle?.remove()
         userLocMarker?.remove()
@@ -664,12 +762,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val distanceInMeters = anomaly.location.distanceTo(userLocation).toInt()
         val distanceInMetersApprox = ((distanceInMeters/10.0f).toInt())*10
-        val messageToSay = getString(R.string.anomalia_in_range)
+        var messageToSay = getString(R.string.anomalia_in_range)
             .replace("{meters}", distanceInMetersApprox.toString())
                 .replace("{value}", getStatusDescByValue(anomaly.stato).lowercase())
+                    .replace("{via}", getSimpleAddress(anomaly.location, this))
 
-        TTS.speak(messageToSay)
         Utility.showToast(this, messageToSay)
+        messageToSay = messageToSay.replace(",","")
+        TTS.speak(messageToSay)
     }
 
     private fun setAnomaliesListener() {
@@ -941,7 +1041,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         lateinit var mapsActivity: MapsActivity
         /** ArrayList containing all the anomalies reported by the voice assistant; */
         private var encounteredAnomalies: ArrayList<Anomaly>? = null
-        private const val MAP_DEFAULT_ZOOM = 15f
+        private const val MAP_DEFAULT_ZOOM = 17f
         private const val WARN_RADIUS = 200.0
         private const val GEOLOCATION_PERMISSION_CODE = 1
 
@@ -1010,8 +1110,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 if(!LoginHandler.isLoggedIn()){
                     Utility.oneLineDialog(activity,
                         activity.getString(R.string.errore),
-                        activity.getString(R.string.nonloggato),
-                    null)
+                        activity.getString(R.string.nonloggato)
+                    ) {
+                        Utility.navigateTo(activity, AccountActivity::class.java)
+                    }
                 }
 
                 else if(!encounteredAnomalies!!.contains(anomaly) && LoginHandler.deviceUser!!.role.isLowerOr(Roles.UTENTE)){
@@ -1059,7 +1161,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
 
         fun getSimpleAddress(location: Location, activity: AppCompatActivity): String {
-            return getAddress(location, activity).split(",")[0]
+            val tokens = getAddress(location, activity).split(",")
+            return if(tokens.size > 1)
+                "${tokens[0]},${tokens[1]}"
+            else tokens[0]
         }
 
         fun latLngToLocation(latLng: LatLng): LocationExtended {
@@ -1099,5 +1204,4 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             }
         }
     }
-
 }

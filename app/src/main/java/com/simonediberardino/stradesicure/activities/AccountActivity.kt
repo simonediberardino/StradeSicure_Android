@@ -36,6 +36,7 @@ class AccountActivity : SSActivity() {
     private lateinit var editIDBtn: ImageView
     private lateinit var editImageBtn: ImageView
     private lateinit var progressBar: ProgressBar
+    private lateinit var segnalazioniBtn: View
 
     override fun initializeLayout() {
         this.setContentView(R.layout.activity_account)
@@ -51,6 +52,7 @@ class AccountActivity : SSActivity() {
                     showRole()
                     setAnomaliesNumber()
                     setReportsNumber()
+                    setupReportsBtn()
                     setUserId()
                     setProfileImage()
                     setupLogout()
@@ -72,6 +74,7 @@ class AccountActivity : SSActivity() {
         editIDBtn = findViewById(R.id.account_emailid_edit)
         editImageBtn = findViewById(R.id.account_camera)
         progressBar = findViewById(R.id.account_progressBar)
+        segnalazioniBtn = findViewById(R.id.account_segnalazioni_btn)
     }
 
     private fun setupRoles(){
@@ -192,6 +195,14 @@ class AccountActivity : SSActivity() {
                 }
             }
         )
+    }
+
+    private fun setupReportsBtn(){
+        segnalazioniBtn.setOnClickListener {
+            val intent = Intent(this, AnomaliesActivity::class.java)
+            intent.putExtra("reporterId", userToShow.uniqueId)
+            startActivity(intent)
+        }
     }
 
     private fun setUserId() {

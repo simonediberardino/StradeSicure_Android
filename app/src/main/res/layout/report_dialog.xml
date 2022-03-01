@@ -190,7 +190,7 @@
             android:layout_marginTop="24dp"
             android:background="@drawable/blue_btn_icon"
             android:gravity="center"
-            android:text="@string/stato"
+            android:text="@string/gravita"
             android:textColor="@color/darkblue"
             app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
@@ -200,7 +200,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:text="TextView"
+            android:text="@string/caricamento"
             android:textColor="@color/lightgrey"
             android:textSize="30px"
             app:layout_constraintBottom_toTopOf="@+id/report_stato_bar"

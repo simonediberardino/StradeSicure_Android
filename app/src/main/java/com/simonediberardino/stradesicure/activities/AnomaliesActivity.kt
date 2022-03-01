@@ -16,15 +16,20 @@ import com.simonediberardino.stradesicure.utils.Utility
 
 class AnomaliesActivity : SSActivity() {
     lateinit var refreshLayout: SwipeRefreshLayout
+    var reporterId: String? = null
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun initializeLayout() {
         setContentView(R.layout.activity_anomalies)
+
+        reporterId = intent.extras?.getString("reporterId")
+
         refreshLayout = findViewById(R.id.anomalies_refresh_layout)
         refreshLayout.setOnRefreshListener {
             this.listAnomalies()
             refreshLayout.isRefreshing = false
         }
+
         setupFilterSpinner()
     }
 
@@ -35,20 +40,24 @@ class AnomaliesActivity : SSActivity() {
     }
     
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun listAnomalies(){
+    private fun listAnomalies() {
         val parentLayoutId = R.id.anomalies_anomaly_layout
 
         val anomaliesContainer = findViewById<LinearLayout>(parentLayoutId)
         anomaliesContainer.removeAllViews()
 
-        val anomaliesToShow = if(ApplicationData.anomaliesInCity()){
+        var anomaliesToShow = if(ApplicationData.anomaliesInCity()){
                 mapsActivity.getAnomaliesInCity(mapsActivity.userLocation)
             }else{
-            mapsActivity.anomalies.toTypedArray()
-          }
+                mapsActivity.anomalies.toTypedArray()
+            }
+
+        if(reporterId != null)
+            anomaliesToShow = anomaliesToShow.filter { it.spotterId == reporterId }.toTypedArray()
 
         val nAnomaliesTW = findViewById<TextView>(R.id.anomalies_n)
-        nAnomaliesTW.text = getString(R.string.anomalie_trovate).replace("{number}", anomaliesToShow.size.toString())
+        nAnomaliesTW.text = getString(R.string.anomalie_trovate)
+            .replace("{number}", anomaliesToShow.size.toString())
 
         if(anomaliesToShow.isEmpty()) {
             Utility.showToast(this, getString(R.string.nessunaanomalia))

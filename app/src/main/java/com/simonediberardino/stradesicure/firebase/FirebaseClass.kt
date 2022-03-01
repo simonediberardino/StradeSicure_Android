@@ -17,6 +17,11 @@ object FirebaseClass {
     private var DB_REF = "https://strade-sicure-default-rtdb.europe-west1.firebasedatabase.app"
     private var STOR_REF = "gs://strade-sicure.appspot.com"
 
+    val userReferences: Array<DatabaseReference>
+        get() {
+            return arrayOf(emailUsersRef, fbUsersRef)
+        }
+
     val storageRef: StorageReference
         get() {
             return FirebaseStorage.getInstance(STOR_REF).reference

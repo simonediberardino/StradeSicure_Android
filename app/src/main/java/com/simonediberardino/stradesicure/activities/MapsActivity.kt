@@ -178,8 +178,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_mappa -> {
-                setSideMenuVisibility(false)
+            R.id.menu_cerca -> {
+                Utility.navigateTo(this, SearchActivity::class.java)
             }
 
             R.id.menu_profilo -> {
@@ -958,7 +958,9 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         val user = p as User?
                         if(p == null) return
                         val reporterTemplate = activity.getString(R.string.segnalata_da)
-                        reporterTW.text = reporterTemplate.replace("{username}", LoginHandler.getFullName(user))
+                        reporterTW.text = reporterTemplate
+                            .replace("{username}",
+                                user?.fullName ?: activity.getString(R.string.account_eliminato))
                     }
                 })
 

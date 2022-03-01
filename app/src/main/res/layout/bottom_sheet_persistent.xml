@@ -55,7 +55,7 @@
         android:layout_marginEnd="16dp"
         android:text="@string/caricamento"
         android:textColor="@color/grey"
-        android:textSize="35px"
+        android:textSize="38px"
         app:layout_constraintEnd_toStartOf="@+id/dialog_anomaly_more"
         app:layout_constraintStart_toStartOf="@+id/dialog_city_icon"
         app:layout_constraintTop_toBottomOf="@+id/dialog_city_tw" />
@@ -68,7 +68,7 @@
         android:layout_marginEnd="8dp"
         android:text="@string/mostra_di_più"
         android:textColor="@color/darkblue"
-        android:textSize="35px"
+        android:textSize="38px"
         app:layout_constraintEnd_toEndOf="@+id/dialog_report_btn"
         app:layout_constraintTop_toTopOf="@+id/dialog_anomaly_tw" />
 

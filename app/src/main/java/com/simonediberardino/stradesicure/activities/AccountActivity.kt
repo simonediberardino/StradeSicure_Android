@@ -157,7 +157,7 @@ class AccountActivity : SSActivity() {
     }
 
     private fun setProfileName() {
-        nameTW.text = LoginHandler.getFullName(userToShow)
+        nameTW.text = userToShow.fullName
     }
 
     private fun setProfileEmail() {

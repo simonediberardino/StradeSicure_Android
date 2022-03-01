@@ -1,16 +1,14 @@
 package com.simonediberardino.stradesicure.entity
 
 open class User{
-    lateinit var nome: String
-    lateinit var cognome: String
+    lateinit var fullName: String
     lateinit var uniqueId: String
     var role = Roles.UTENTE
 
     constructor()
 
-    constructor(nome: String, cognome: String, uniqueId: String) {
-        this.nome = nome.trim()
-        this.cognome = cognome.trim()
+    constructor(fullName: String, uniqueId: String) {
+        this.fullName = fullName.trim()
         this.uniqueId = uniqueId.trim()
     }
 

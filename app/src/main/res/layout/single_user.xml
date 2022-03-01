@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/white_button"
+    android:padding="16dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/single_user_icon"
+        android:layout_width="125px"
+        android:layout_height="125px"
+        android:src="@drawable/com_facebook_profile_picture_blank_square"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/single_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/caricamento"
+        android:textColor="@color/black"
+        android:textSize="35px"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintStart_toEndOf="@+id/single_user_icon" />
+
+    <TextView
+        android:id="@+id/single_user_role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/caricamento"
+        android:textColor="@color/grey"
+        android:textSize="30px"
+        app:layout_constraintStart_toStartOf="@+id/single_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+    <ProgressBar
+        android:id="@+id/single_user_progressbar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="50px"
+        android:layout_height="50px"
+        app:layout_constraintBottom_toBottomOf="@+id/single_user_icon"
+        app:layout_constraintEnd_toEndOf="@+id/single_user_icon"
+        app:layout_constraintStart_toStartOf="@+id/single_user_icon"
+        app:layout_constraintTop_toTopOf="@+id/single_user_icon" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/single_user_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/single_user_icon" />
+</androidx.constraintlayout.widget.ConstraintLayout>

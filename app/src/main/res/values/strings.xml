@@ -56,6 +56,7 @@
     <string name="chiudi_nav">Chiudi menu</string>
     <string name="menu_home">Home</string>
     <string name="menu_mappa">Mappa</string>
+    <string name="menu_cerca">Cerca</string>
     <string name="menu_account">Mio profilo</string>
     <string name="menu_credits">Crediti</string>
     <string name="menu_contattaci">Contattaci</string>

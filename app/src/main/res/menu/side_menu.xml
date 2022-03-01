@@ -4,9 +4,9 @@
     <item android:title="@string/menu_home">
         <menu>
             <item
-                android:id="@+id/menu_mappa"
-                android:icon="@drawable/ic_baseline_map_24"
-                android:title="@string/menu_mappa"/>
+                android:id="@+id/menu_cerca"
+                android:icon="@drawable/ic_baseline_search_24"
+                android:title="@string/menu_cerca"/>
 
             <item
                 android:id="@+id/menu_profilo"

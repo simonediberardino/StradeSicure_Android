@@ -39,6 +39,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_perm_identity_24.xml" value="0.2875" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_photo_camera_24.xml" value="0.21770833333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_qr_code_24.xml" value="0.2875" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.2203125" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_baseline_timer_24.xml" value="0.20833333333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_launcher_background.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.20462962962962963" />
@@ -54,6 +55,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_border_black.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_bottom.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_button.xml" value="0.20462962962962963" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_edit_text.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_top.xml" value="0.20833333333333334" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/round_white_button_shadow.xml" value="0.36203703703703705" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/seek_bar_progress.xml" value="0.20462962962962963" />
@@ -81,6 +83,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_login.xml" value="0.22" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_maps.xml" value="0.25" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_register.xml" value="0.33" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_search.xml" value="0.33" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_settings.xml" value="0.19322916666666667" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/activity_street.xml" value="0.17916666666666667" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/anomaly_more_dialog.xml" value="0.33" />
@@ -93,6 +96,7 @@
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/report_dialog.xml" value="0.33" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/short_dialog.xml" value="0.5" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/single_anomaly.xml" value="0.67" />
+        <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/layout/single_user.xml" value="0.5" />
         <entry key="..\:/Users/Utente/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/menu/side_menu.xml" value="0.22" />
         <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_background_gradient.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/simon/AndroidStudioProjects/StradeSicure_Android/app/src/main/res/drawable/blue_background_static.xml" value="0.26614583333333336" />

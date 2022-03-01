@@ -41,12 +41,6 @@ object LoginHandler {
         return deviceUser != null
     }
 
-    fun getFullName(user: User?): String{
-        return if(user == null)
-            SSActivity.currentContext.getString(R.string.account_eliminato)!!
-        else "${user.nome} ${user.cognome}"
-    }
-
     inline fun <reified T> doLogin(loggedUser: T?){
         if(loggedUser is FbUser)
             accessToken =  AccessToken.getCurrentAccessToken()

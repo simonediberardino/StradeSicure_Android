@@ -75,7 +75,7 @@ class RegisterActivity : SSActivity() {
                 return@addOnCompleteListener
             }
 
-            val emailUser = EmailUser(firstName, lastName, email, passwordEncrypted!!)
+            val emailUser = EmailUser("$firstName $lastName", email, passwordEncrypted!!)
 
             val finalCallback = Runnable {
                 FirebaseClass.addEmailUserToFirebase(
@@ -116,7 +116,7 @@ class RegisterActivity : SSActivity() {
                     val createdUser = Profile.getCurrentProfile()
                     val firstName = createdUser.firstName
                     val lastName = createdUser.lastName
-                    val loggedUser = FbUser(firstName, lastName, userId)
+                    val loggedUser = FbUser("$firstName $lastName", userId)
                     FirebaseClass.addFbUserToFirebase(loggedUser)
                     callback.run()
                 }

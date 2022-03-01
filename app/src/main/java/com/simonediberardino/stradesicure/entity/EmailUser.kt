@@ -6,11 +6,10 @@ class EmailUser : User {
     constructor() {}
 
     constructor(
-        nome: String,
-        cognome: String,
+        fullName: String,
         uniqueId: String,
         password: String,
-    ) : super(nome, cognome, uniqueId) {
+    ) : super(fullName, uniqueId) {
         this.password = password
     }
 }

@@ -123,7 +123,7 @@
                 android:layout_height="125px"
                 android:background="@drawable/blue_btn_icon"
                 android:gravity="top|left"
-
+                android:textCursorDrawable="@null"
                 android:hint="@string/descrizione"
                 android:singleLine="true"
                 android:textColor="@color/lightgrey"

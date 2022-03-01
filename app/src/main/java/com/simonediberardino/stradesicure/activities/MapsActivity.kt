@@ -223,6 +223,15 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
         bottomSheetBehavior.peekHeight = 400
         bottomSheetBehavior.isHideable = false
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(isTopMenuShown() && isBottomMenuShown())
+                    setTopMenuVisibility(false)
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float){}
+        })
 
         refreshLayout = findViewById(R.id.dialog_refresh_layout)
         refreshLayout.setOnRefreshListener {
@@ -240,6 +249,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         topSheetBehavior = TopSheetBehavior.from(topSheet)
         topSheetBehavior.peekHeight = 90
         topSheetBehavior.isHideable = false
+        topSheetBehavior.setTopSheetCallback(object : TopSheetBehavior.TopSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(isBottomMenuShown() && isTopMenuShown())
+                    setBottomMenuVisibility(false)
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
 
         setTopMenuVisibility(false)
 

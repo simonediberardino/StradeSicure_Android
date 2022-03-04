@@ -45,8 +45,8 @@
                 android:layout_marginTop="12dp"
                 android:maxLines="4"
                 android:text="Sottotitolo"
-                android:textColor="@color/darkgrey"
-                android:textSize="40px"
+                android:textColor="@color/grey"
+                android:textSize="37px"
                 app:layout_constraintEnd_toEndOf="@+id/short_dialog_title"
                 app:layout_constraintStart_toStartOf="@+id/short_dialog_title"
                 app:layout_constraintTop_toBottomOf="@+id/short_dialog_title" />
@@ -72,7 +72,7 @@
                     android:layout_marginStart="16dp"
                     android:text="TextView"
                     android:textColor="@color/black"
-                    android:textSize="40px"
+                    android:textSize="37px"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -97,7 +97,7 @@
                     android:layout_marginStart="16dp"
                     android:text="TextView"
                     android:textColor="@color/black"
-                    android:textSize="40px"
+                    android:textSize="37px"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>

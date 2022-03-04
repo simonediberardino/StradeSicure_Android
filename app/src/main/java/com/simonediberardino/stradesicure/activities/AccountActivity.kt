@@ -104,7 +104,10 @@ class AccountActivity : SSActivity() {
             logoutBtn.visibility = View.INVISIBLE
         }else{
             logoutBtn.setOnClickListener{
-                Utility.oneLineDialog(this, getString(R.string.logout_confirm)) { doLogout() }
+                Utility.oneLineDialog(this,
+                    getString(R.string.logout_confirm),
+                    getString(R.string.logout_description))
+                { doLogout() }
             }
         }
     }

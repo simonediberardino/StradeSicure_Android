@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.widget.addTextChangedListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -30,9 +31,13 @@ class SearchActivity : SSActivity() {
         results = findViewById(R.id.search_results)
         searchButton = findViewById(R.id.search_button)
 
-        searchButton.setOnClickListener {
+
+        editText.addTextChangedListener {
             val enteredText = editText.text.toString().lowercase()
             results.removeAllViews()
+
+            if(enteredText.isEmpty() || enteredText.length <= 3)
+                return@addTextChangedListener
 
             for(userReference: DatabaseReference in FirebaseClass.userReferences){
                 Thread{

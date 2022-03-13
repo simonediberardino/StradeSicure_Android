@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import com.matthewtamlin.sliding_intro_screen_library.buttons.IntroButton
 import com.matthewtamlin.sliding_intro_screen_library.core.IntroActivity
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.admob.Ads
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
@@ -58,6 +59,13 @@ abstract class SSActivity : IntroActivity() {
             this.setupTopbar()
             Utility.ridimensionamento(this, parent)
         }
+
+        Ads.showBanner(this)
+
+        Utility.runnablePercentage(10){
+            Ads.showInterstitial(this)
+        }
+
     }
 
     abstract fun initializeLayout()

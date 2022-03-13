@@ -24,14 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StradeSicure">
 
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7600619058487116~1172552659"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDr2npyyQLG63fy11NWYUoq8mp6NIHA0rQ" />
@@ -44,6 +40,7 @@
             android:name=".activities.MapsActivity"
             android:theme="@style/Theme.StradeSicureNoActionBar"
             android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -57,7 +54,9 @@
             android:theme="@style/Theme.StradeSicureNoActionBar"
             android:exported="true"
             android:noHistory="true"
-            android:label="@string/app_name">
+            android:windowSoftInputMode="stateHidden|adjustPan"
+
+        android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -68,6 +67,7 @@
 
         <activity
             android:name=".activities.LoginActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -78,6 +78,7 @@
 
         <activity
             android:name=".activities.SearchActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -88,6 +89,7 @@
 
         <activity
             android:name=".activities.AnomaliesActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -99,6 +101,7 @@
 
         <activity
             android:name=".activities.SettingsActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -109,6 +112,7 @@
 
         <activity
             android:name=".activities.RegisterActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -120,6 +124,7 @@
 
         <activity
             android:name=".activities.AccountActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

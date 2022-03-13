@@ -128,4 +128,11 @@ object Utility {
             }
         }
     }
+
+    fun runnablePercentage(percentage: Int, callback: Runnable) {
+        var percentage = percentage
+        if (percentage > 100) percentage = 100 else if (percentage < 0) percentage = 0
+        val numberPicked = (Math.random() * 100).toInt()
+        if (numberPicked <= percentage) callback.run()
+    }
 }

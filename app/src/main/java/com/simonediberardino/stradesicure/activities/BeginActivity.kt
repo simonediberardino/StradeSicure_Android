@@ -10,6 +10,7 @@ import com.matthewtamlin.sliding_intro_screen_library.buttons.IntroButton.Behavi
 import com.matthewtamlin.sliding_intro_screen_library.buttons.IntroButton.ProgressToNextActivity
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.storage.ApplicationData
+import com.simonediberardino.stradesicure.utils.Utility
 
 
 class BeginActivity : SSActivity() {
@@ -21,18 +22,20 @@ class BeginActivity : SSActivity() {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    override fun initializeLayout() {
-        if (false) {
-            val nextActivity = Intent(this, MapsActivity::class.java)
-            startActivity(nextActivity)
-        } else {
-            ApplicationData.isFirstLaunch(false)
-        }
-    }
+    override fun initializeLayout() {}
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun generatePages(savedInstanceState: Bundle?): Collection<Fragment> {
+        currentContext = this
+
+        if (!ApplicationData.isFirstLaunch()) {
+            setContentView(R.layout.activity_loading)
+            Utility.goToMainMenu(this)
+            return ArrayList()
+        }else{
+            ApplicationData.isFirstLaunch(false)
+        }
+
         val pages: ArrayList<Fragment> = ArrayList()
 
         PAGE_IDS.forEach {

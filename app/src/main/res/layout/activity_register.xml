@@ -5,150 +5,165 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/blue_background_gradient"
-    android:padding="8dp">
+    android:background="@drawable/blue_background_gradient">
 
-    <ImageView
-        android:id="@+id/register_logo"
-        android:layout_width="450px"
-        android:layout_height="450px"
-        android:layout_marginTop="40dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/footer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/app_logo" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/register_profile_image"
-        android:layout_width="200px"
-        android:layout_height="200px"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/com_facebook_profile_picture_blank_square"
-        app:civ_border_color="#FF000000"
-        app:civ_border_width="1dp"
-        app:layout_constraintEnd_toEndOf="@+id/register_surname_et"
-        app:layout_constraintStart_toStartOf="@+id/register_name_et"
-        app:layout_constraintTop_toBottomOf="@+id/register_logo" />
+        <ImageView
+            android:id="@+id/register_logo"
+            android:layout_width="450px"
+            android:layout_height="450px"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/app_logo" />
 
-    <ImageView
-        android:id="@+id/register_camera_icon"
-        android:layout_width="50px"
-        android:layout_height="50px"
-        app:layout_constraintBottom_toBottomOf="@+id/register_profile_image"
-        app:layout_constraintEnd_toEndOf="@+id/register_profile_image"
-        app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/register_profile_image"
+            android:layout_width="200px"
+            android:layout_height="200px"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/com_facebook_profile_picture_blank_square"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="1dp"
+            app:layout_constraintEnd_toEndOf="@+id/register_surname_et"
+            app:layout_constraintStart_toStartOf="@+id/register_name_et"
+            app:layout_constraintTop_toBottomOf="@+id/register_logo" />
 
-    <EditText
-        android:id="@+id/register_email_et"
-        android:layout_width="600px"
+        <ImageView
+            android:id="@+id/register_camera_icon"
+            android:layout_width="50px"
+            android:layout_height="50px"
+            app:layout_constraintBottom_toBottomOf="@+id/register_profile_image"
+            app:layout_constraintEnd_toEndOf="@+id/register_profile_image"
+            app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
+
+        <EditText
+            android:id="@+id/register_email_et"
+            android:layout_width="600px"
+            android:layout_height="100px"
+            android:layout_marginTop="16dp"
+            android:background="#11000000"
+            android:drawableLeft="@drawable/ic_baseline_email_24"
+            android:drawablePadding="8dp"
+            android:ems="10"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:padding="8dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver"
+            android:textSize="35px"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/register_name_et" />
+
+        <EditText
+            android:id="@+id/register_name_et"
+            android:layout_width="280px"
+            android:layout_height="100px"
+            android:layout_marginTop="24dp"
+            android:background="#11000000"
+            android:drawableLeft="@drawable/ic_baseline_account_box_24"
+            android:drawablePadding="8dp"
+            android:ems="10"
+            android:hint="@string/nome"
+            android:inputType="textPersonName"
+            android:padding="8dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver"
+            android:textSize="35px"
+            app:layout_constraintStart_toStartOf="@+id/register_email_et"
+            app:layout_constraintTop_toBottomOf="@+id/register_profile_image" />
+
+        <EditText
+            android:id="@+id/register_surname_et"
+            android:layout_width="280px"
+            android:layout_height="100px"
+            android:background="#11000000"
+            android:drawablePadding="8dp"
+            android:ems="10"
+            android:hint="@string/cognome"
+            android:inputType="textPersonName"
+            android:padding="8dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver"
+            android:textSize="35px"
+            app:layout_constraintBottom_toBottomOf="@+id/register_name_et"
+            app:layout_constraintEnd_toEndOf="@+id/register_email_et"
+            app:layout_constraintTop_toTopOf="@+id/register_name_et" />
+
+        <EditText
+            android:id="@+id/register_password_et"
+            android:layout_width="600px"
+            android:layout_height="100px"
+            android:layout_marginTop="16dp"
+            android:background="#11000000"
+            android:drawableLeft="@drawable/ic_baseline_lock_24"
+            android:drawablePadding="8dp"
+            android:ems="10"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:padding="8dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver"
+            android:textSize="35px"
+            app:layout_constraintEnd_toEndOf="@+id/register_email_et"
+            app:layout_constraintStart_toStartOf="@+id/register_email_et"
+            app:layout_constraintTop_toBottomOf="@+id/register_email_et" />
+
+        <TextView
+            android:id="@+id/register_login_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/haigiaaccount"
+            android:textColor="@color/silver"
+            android:textSize="35px"
+            app:layout_constraintEnd_toEndOf="@+id/register_register_button"
+            app:layout_constraintStart_toStartOf="@+id/register_register_button"
+            app:layout_constraintTop_toBottomOf="@+id/register_register_button" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/register_register_button"
+            android:layout_width="650px"
+            android:layout_height="110px"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/register_password_et">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@drawable/pink_background"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/register_register_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register"
+                    android:textColor="@color/white"
+                    android:textSize="40px" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
         android:layout_height="100px"
-        android:layout_marginTop="16dp"
-        android:background="#11000000"
-        android:drawableLeft="@drawable/ic_baseline_email_24"
-        android:drawablePadding="8dp"
-        android:ems="10"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:padding="8dp"
-        android:textColor="@color/silver"
-        android:textColorHint="@color/silver"
-        android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_name_et" />
-
-    <EditText
-        android:id="@+id/register_name_et"
-        android:layout_width="280px"
-        android:layout_height="100px"
-        android:layout_marginTop="24dp"
-        android:background="#11000000"
-        android:drawableLeft="@drawable/ic_baseline_account_box_24"
-        android:drawablePadding="8dp"
-        android:ems="10"
-        android:hint="@string/nome"
-        android:inputType="textPersonName"
-        android:padding="8dp"
-        android:textColor="@color/silver"
-        android:textColorHint="@color/silver"
-        android:textSize="35px"
-        app:layout_constraintStart_toStartOf="@+id/register_email_et"
-        app:layout_constraintTop_toBottomOf="@+id/register_profile_image" />
-
-    <EditText
-        android:id="@+id/register_surname_et"
-        android:layout_width="280px"
-        android:layout_height="100px"
-        android:background="#11000000"
-        android:drawablePadding="8dp"
-        android:ems="10"
-        android:hint="@string/cognome"
-        android:inputType="textPersonName"
-        android:padding="8dp"
-        android:textColor="@color/silver"
-        android:textColorHint="@color/silver"
-        android:textSize="35px"
-        app:layout_constraintBottom_toBottomOf="@+id/register_name_et"
-        app:layout_constraintEnd_toEndOf="@+id/register_email_et"
-        app:layout_constraintTop_toTopOf="@+id/register_name_et" />
-
-    <EditText
-        android:id="@+id/register_password_et"
-        android:layout_width="600px"
-        android:layout_height="100px"
-        android:layout_marginTop="16dp"
-        android:background="#11000000"
-        android:drawableLeft="@drawable/ic_baseline_lock_24"
-        android:drawablePadding="8dp"
-        android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:padding="8dp"
-        android:textColor="@color/silver"
-        android:textColorHint="@color/silver"
-        android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="@+id/register_email_et"
-        app:layout_constraintStart_toStartOf="@+id/register_email_et"
-        app:layout_constraintTop_toBottomOf="@+id/register_email_et" />
-
-    <TextView
-        android:id="@+id/register_login_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/haigiaaccount"
-        android:textColor="@color/silver"
-        android:textSize="35px"
-        app:layout_constraintEnd_toEndOf="@+id/register_register_button"
-        app:layout_constraintStart_toStartOf="@+id/register_register_button"
-        app:layout_constraintTop_toBottomOf="@+id/register_register_button" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/register_register_button"
-        android:layout_width="650px"
-        android:layout_height="110px"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_password_et">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="@drawable/pink_background"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/register_register_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/register"
-                android:textColor="@color/white"
-                android:textSize="40px" />
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
-
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"></LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

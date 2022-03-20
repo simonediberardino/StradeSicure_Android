@@ -22,8 +22,18 @@ import android.R as R1
 
 object Utility {
     fun navigateTo(c: AppCompatActivity, cl: Class<*>?) {
+        navigateTo(c, cl, true)
+    }
+
+    fun navigateTo(c: AppCompatActivity, cl: Class<*>?, animation: Boolean){
         val intent = Intent(c, cl)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        if(animation){
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }else{
+            c.overridePendingTransition(0, 0)
+            intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+        }
 
         val bundle = ActivityOptionsCompat.makeCustomAnimation(c, R1.anim.fade_in, R1.anim.fade_out).toBundle()
         c.startActivity(intent, bundle)
@@ -31,6 +41,10 @@ object Utility {
 
     fun goToMainMenu(c: AppCompatActivity){
         navigateTo(c, MapsActivity::class.java)
+    }
+
+    fun goToMainMenu(c: AppCompatActivity, animation: Boolean){
+        navigateTo(c, MapsActivity::class.java, animation)
     }
 
     fun oneLineDialog(c: AppCompatActivity, title: String){

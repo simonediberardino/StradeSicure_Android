@@ -98,6 +98,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        loadingDialog.show()
         mapsActivity = this
 
         this.setupTTS()
@@ -393,7 +394,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         anomalies = ArrayList()
 
         if(encounteredAnomalies == null) {
-            println("NEWENCOUNTERED")
             encounteredAnomalies = ArrayList()
         }
 
@@ -516,7 +516,9 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         locationManager.lastLocation.addOnSuccessListener(this) {
                 this.onLocationChanged(it)
                 this.removeAnomalyMarker()
-                this.zoomMapToUser()
+                this.zoomMapToUser{
+                    loadingDialog.dismiss()
+                }
             }
             .addOnFailureListener(this) {
                 this.insufficientPermissions()
@@ -665,6 +667,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun zoomMapToUser(){
+        zoomMapToUser(null)
+    }
+
+    private fun zoomMapToUser(callback: Runnable?){
         if(userLocation == null)
             return
 
@@ -672,7 +678,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation!!.latitude, userLocation!!.longitude),
                 MAP_DEFAULT_ZOOM
-            )
+            ),
+            object : GoogleMap.CancelableCallback{
+                override fun onCancel() {
+                    callback?.run()
+                }
+
+                override fun onFinish() {
+                    callback?.run()
+                }
+            }
         )
     }
 

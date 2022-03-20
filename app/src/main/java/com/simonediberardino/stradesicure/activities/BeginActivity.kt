@@ -27,21 +27,17 @@ class BeginActivity : SSActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun generatePages(savedInstanceState: Bundle?): Collection<Fragment> {
         currentContext = this
-
-        if (!ApplicationData.isFirstLaunch()) {
-            setContentView(R.layout.activity_loading)
-            Utility.goToMainMenu(this)
-            return ArrayList()
-        }else{
-            ApplicationData.isFirstLaunch(false)
-        }
-
         val pages: ArrayList<Fragment> = ArrayList()
 
-        PAGE_IDS.forEach {
-            val fragment = BeginFragment()
-            fragment.contentViewId = it
-            pages.add(fragment)
+        if (!ApplicationData.isFirstLaunch()) {
+            Utility.goToMainMenu(this, false)
+        }else{
+            ApplicationData.isFirstLaunch(false)
+            PAGE_IDS.forEach {
+                val fragment = BeginFragment()
+                fragment.contentViewId = it
+                pages.add(fragment)
+            }
         }
 
         return pages

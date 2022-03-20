@@ -16,11 +16,13 @@ import androidx.fragment.app.Fragment
 import com.matthewtamlin.sliding_intro_screen_library.buttons.IntroButton
 import com.matthewtamlin.sliding_intro_screen_library.core.IntroActivity
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.LoadingDialog
 import com.simonediberardino.stradesicure.admob.Ads
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
 
 abstract class SSActivity : IntroActivity() {
+    lateinit var loadingDialog: LoadingDialog
     var uploadedImage: Uri? = null
 
     companion object {
@@ -37,6 +39,7 @@ abstract class SSActivity : IntroActivity() {
         this.registerReceiver(NetworkStatusListener(), intentFilter)
 
         currentContext = this
+        loadingDialog = LoadingDialog(this)
 
         this.initializeLayout()
         this.onPageLoaded()
@@ -62,10 +65,13 @@ abstract class SSActivity : IntroActivity() {
 
         Ads.showBanner(this)
 
+        if(this is MapsActivity){
+            return
+        }
+
         Utility.runnablePercentage(10){
             Ads.showInterstitial(this)
         }
-
     }
 
     abstract fun initializeLayout()

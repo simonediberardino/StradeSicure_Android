@@ -5,6 +5,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CButton
 import com.simonediberardino.stradesicure.UI.CSpinner
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
@@ -73,7 +74,7 @@ class SettingsActivity : SSActivity() {
         button.setOnConfirmListener {
             LoginHandler.doLogout()
             Utility.goToMainMenu(this)
-            Utility.showToast(this, getString(R.string.logout_success))
+            ToastSS.show(this, getString(R.string.logout_success))
         }
 
         button.apply()

@@ -3,7 +3,9 @@ package com.simonediberardino.stradesicure.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.*
 import android.net.Uri
@@ -26,12 +28,9 @@ import com.facebook.Profile
 import com.github.techisfun.android.topsheet.TopSheetBehavior
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.navigation.NavigationView
@@ -41,14 +40,12 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CBottomSheetDialog
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.databinding.ActivityMapsBinding
 import com.simonediberardino.stradesicure.entity.*
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
-import com.simonediberardino.stradesicure.misc.GoogleMapExtended
-import com.simonediberardino.stradesicure.misc.LocationExtended
-import com.simonediberardino.stradesicure.misc.MapInteractions
-import com.simonediberardino.stradesicure.misc.RunnablePar
+import com.simonediberardino.stradesicure.misc.*
 import com.simonediberardino.stradesicure.storage.ApplicationData
 import com.simonediberardino.stradesicure.utils.Utility
 import java.util.*
@@ -57,12 +54,14 @@ import java.util.function.Predicate
 import kotlin.collections.ArrayList
 import kotlin.concurrent.withLock
 
+
+
+
 class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener,
     MapInteractions {
     /** Google map object provided by Google; */
     internal var googleMap: GoogleMapExtended? = null
     internal lateinit var mapBinding: ActivityMapsBinding
-
     /** Wheter markers are shown or not; */
     internal var areMarkerShown = true
     /** Exact user location; */
@@ -79,6 +78,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     internal var threadLocker = ReentrantLock()
     internal var threadLockerCond = threadLocker.newCondition()
     internal var mapFollowsUser = true
+    internal var isGpsSetup = false
 
     /** Whether it has listed the anomalies since the GPS is on atleast once or not */
     internal var hasListedAnomalies = false
@@ -209,7 +209,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                     intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.contact_email)))
                     startActivity(intent)
                 } catch (ex: ActivityNotFoundException) {
-                    Utility.showToast(this, getString(R.string.no_email_app))
+                    ToastSS.show(this, getString(R.string.no_email_app))
                 }
             }
 
@@ -401,6 +401,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
 
         try{
+            this.setupBroadcastGpsReceiver()
             this.setupGPS()
             this.setAnomaliesListener()
         }catch(e: Exception){
@@ -415,11 +416,25 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             this.googleMap!!.map.mapType = ApplicationData.getSavedMapStyle()
     }
 
+    private fun setupBroadcastGpsReceiver(){
+        val br: BroadcastReceiver = LocationProviderChangedReceiver()
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        registerReceiver(br, filter)
+    }
+
     /**
      * Sets up the GPS, called when the map is ready;
      */
+    @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setupGPS() {
+        val locationService = getSystemService(LOCATION_SERVICE) as LocationManager
+
+        if (!locationService.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            insufficientPermissions()
+            return
+        }
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -428,8 +443,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                this,
+            ActivityCompat.requestPermissions(this,
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
@@ -443,6 +457,18 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
+    fun onGpsStatusChanged(flag: Boolean){
+        if(flag) {
+            if(!isGpsSetup){
+                this.setupUserLocation()
+                this.setupMap()
+            }
+        }else {
+            this.insufficientPermissions()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -451,7 +477,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             GEOLOCATION_PERMISSION_CODE -> {
                 if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     this.insufficientPermissions()
-                }else{
+                }else {
                     this.setupUserLocation()
                 }
                 this.setupMap()
@@ -460,7 +486,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun howToReportAnomaly(){
-        Utility.showToast(this, getString(R.string.aggiungi_marker_tut))
+        ToastSS.show(this, getString(R.string.aggiungi_marker_tut))
     }
 
     private fun getStatusDescByValue(value: Int): String {
@@ -477,8 +503,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         statusValueTT.text = getStatusDescByValue(value)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun insufficientPermissions(){
-        Utility.showToast(this, getString(R.string.request_permissions))
+        ToastSS.show(this, getString(R.string.request_permissions))
+        onLocationChanged(null)
+        loadingDialog.dismiss()
     }
 
     private fun removeAnomalyMarker(){
@@ -499,6 +528,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     private fun setupUserLocation(){
+        isGpsSetup = true
+
         val locationRequest = LocationRequest.create()
         locationRequest.interval = 1000
         locationRequest.fastestInterval = 1000
@@ -516,12 +547,16 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         locationManager.lastLocation.addOnSuccessListener(this) {
                 this.onLocationChanged(it)
                 this.removeAnomalyMarker()
-                this.zoomMapToUser{
-                    loadingDialog.dismiss()
+                if(loadingDialog.isShowing){
+                    this.zoomMapToUser(false){
+                        loadingDialog.dismiss()
+                    }
+                }else{
+                    this.zoomMapToUser()
                 }
             }
             .addOnFailureListener(this) {
-                this.insufficientPermissions()
+                loadingDialog.dismiss()
             }
     }
 
@@ -667,28 +702,35 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun zoomMapToUser(){
-        zoomMapToUser(null)
+        zoomMapToUser(true, null)
     }
 
-    private fun zoomMapToUser(callback: Runnable?){
+    private fun zoomMapToUser(animation: Boolean, callback: Runnable?){
         if(userLocation == null)
             return
 
-        googleMap?.map?.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
+        val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation!!.latitude, userLocation!!.longitude),
                 MAP_DEFAULT_ZOOM
-            ),
-            object : GoogleMap.CancelableCallback{
-                override fun onCancel() {
+            )
+
+        if(!animation){
+            googleMap?.map?.moveCamera(
+                cameraUpdateFactory
+            )
+            callback?.run()
+        }else{
+            googleMap?.map?.animateCamera(cameraUpdateFactory, object: GoogleMap.CancelableCallback{
+                override fun onCancel(){
                     callback?.run()
                 }
 
                 override fun onFinish() {
                     callback?.run()
                 }
-            }
-        )
+            })
+        }
+
     }
 
     private fun setMarkersVisibility(flag: Boolean){
@@ -735,14 +777,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             }
         }
 
-        if(mapFollowsUser)
-            zoomMapToUser()
-
         userLocation = newLocation
         userLocCircle?.remove()
         userLocMarker?.remove()
         userLocMarker = googleMap?.map?.addMarker(markerOptions)
         userLocCircle = googleMap?.map?.addCircle(circleOptions)
+
+        if(mapFollowsUser)
+            zoomMapToUser()
 
         refreshLocationCircle()
 
@@ -782,7 +824,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 .replace("{value}", getStatusDescByValue(anomaly.stato).lowercase())
                     .replace("{via}", getSimpleAddress(anomaly.location, this))
 
-        Utility.showToast(this, messageToSay)
+        ToastSS.show(this, messageToSay)
         messageToSay = messageToSay.replace(",","")
         TTS.speak(messageToSay)
     }

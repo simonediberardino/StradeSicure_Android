@@ -11,6 +11,7 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
@@ -101,14 +102,14 @@ class LoginActivity : SSActivity() {
     fun loginSuccess(loggedUser: User?){
         runOnUiThread {
             LoginHandler.doLogin(loggedUser)
-            Utility.showToast(this, this.getString(R.string.login_success))
+            ToastSS.show(this, this.getString(R.string.login_success))
             Utility.goToMainMenu(this)
         }
     }
 
     fun loginError(){
         runOnUiThread {
-            Utility.showToast(this, this.getString(R.string.login_error))
+            ToastSS.show(this, this.getString(R.string.login_error))
         }
     }
 

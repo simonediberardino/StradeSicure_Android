@@ -52,7 +52,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/caricamento"
+        android:text="@string/nessunaanomalia"
         android:textColor="@color/grey"
         android:textSize="38px"
         app:layout_constraintEnd_toStartOf="@+id/dialog_anomaly_more"

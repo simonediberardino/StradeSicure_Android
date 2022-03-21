@@ -4,13 +4,13 @@ import com.facebook.AccessToken
 import com.facebook.Profile
 import com.facebook.login.LoginManager
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.activities.SSActivity
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.User
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
-import com.simonediberardino.stradesicure.utils.Utility
 
 object LoginHandler {
     var deviceUser: User? = null
@@ -58,7 +58,7 @@ object LoginHandler {
     }
 
     fun logoutByError(){
-        Utility.showToast(SSActivity.currentContext, SSActivity.currentContext.getString(R.string.erroreprofilocredenziali))
+        ToastSS.show(SSActivity.currentContext, SSActivity.currentContext.getString(R.string.erroreprofilocredenziali))
         doLogout()
     }
 }

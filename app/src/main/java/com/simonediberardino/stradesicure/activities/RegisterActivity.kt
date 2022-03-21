@@ -17,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.firebase.FirebaseClass
@@ -89,7 +90,7 @@ class RegisterActivity : SSActivity() {
                             val dataSnapshot = p as DataSnapshot?
                             uploadProfilePicToFirebase(this@RegisterActivity, uploadedImage, dataSnapshot!!) {
                                 LoginHandler.doLogin(emailUser)
-                                Utility.showToast(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
+                                ToastSS.show(this@RegisterActivity, this@RegisterActivity.getString(R.string.register_success))
                                 Utility.goToMainMenu(this@RegisterActivity)
                             }
                         }
@@ -160,7 +161,7 @@ class RegisterActivity : SSActivity() {
             uploadTask.addOnSuccessListener {
                 callback.run()
             }.addOnFailureListener{ e ->
-                Utility.showToast(context, e.message.toString())
+                ToastSS.show(context, e.message.toString())
             }.addOnProgressListener { taskSnapshot ->
                val progress: Double = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
                 progressDialog.progress = progress.toInt()

@@ -8,11 +8,11 @@ import androidx.annotation.RequiresApi
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CSpinner
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.activities.MapsActivity.Companion.mapsActivity
 import com.simonediberardino.stradesicure.entity.Anomaly
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
-import com.simonediberardino.stradesicure.utils.Utility
 
 class AnomaliesActivity : SSActivity() {
     lateinit var refreshLayout: SwipeRefreshLayout
@@ -60,7 +60,7 @@ class AnomaliesActivity : SSActivity() {
             .replace("{number}", anomaliesToShow.size.toString())
 
         if(anomaliesToShow.isEmpty()) {
-            Utility.showToast(this, getString(R.string.nessunaanomalia))
+            ToastSS.show(this, getString(R.string.nessunaanomalia))
             return
         }
 

@@ -12,6 +12,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
+import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.Roles
 import com.simonediberardino.stradesicure.entity.User
@@ -158,7 +159,7 @@ class AccountActivity : SSActivity() {
 
     private fun doLogout(){
         LoginHandler.doLogout()
-        Utility.showToast(this, getString(R.string.logout_success))
+        ToastSS.show(this, getString(R.string.logout_success))
         Utility.goToMainMenu(this)
     }
 

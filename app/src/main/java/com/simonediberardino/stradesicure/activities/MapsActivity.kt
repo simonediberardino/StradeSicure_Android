@@ -78,6 +78,12 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     internal var threadLocker = ReentrantLock()
     internal var threadLockerCond = threadLocker.newCondition()
     internal var mapFollowsUser = true
+        set(value){
+            val resetLocationBTN = findViewById<View>(R.id.main_my_location)
+            resetLocationBTN.visibility = if(value) View.INVISIBLE else View.VISIBLE
+            field = value
+        }
+
     internal var isGpsSetup = false
 
     /** Whether it has listed the anomalies since the GPS is on atleast once or not */
@@ -373,7 +379,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
             if(!isTopMenuShown()) {
-                mapFollowsUser = true
+                this.mapFollowsUser = true
                 this.zoomMapToUser()
             }
         }
@@ -673,17 +679,13 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }
     }
 
-    override fun onMapZoomInStartListener(): (Double) -> Unit = {
-        mapFollowsUser = false
-    }
+    override fun onMapZoomInStartListener(): (Double) -> Unit = {}
 
     override fun onMapZoomInEndListener(): (zoomLevel: Double) -> Unit = {
         mapFollowsUser = false
     }
 
-    override fun onMapZoomOutStartListener(): (zoomLevel: Double) -> Unit = {
-        mapFollowsUser = false
-    }
+    override fun onMapZoomOutStartListener(): (zoomLevel: Double) -> Unit = {}
 
     override fun onMapZoomOutEndListener(): (zoomLevel: Double) -> Unit = {
         mapFollowsUser = false

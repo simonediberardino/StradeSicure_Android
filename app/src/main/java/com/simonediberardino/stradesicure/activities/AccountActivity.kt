@@ -169,7 +169,7 @@ class AccountActivity : SSActivity() {
 
     private fun setProfileEmail() {
         emailTW.text =
-            if(deviceUser!! == userToShow || deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true)
+            if(deviceUser == userToShow || deviceUser?.role?.isGreaterOr(Roles.AMMINISTRATORE) == true)
                 userToShow.uniqueId
             else
                 getString(R.string.sconosciuto)

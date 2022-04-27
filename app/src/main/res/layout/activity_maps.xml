@@ -47,6 +47,7 @@
                     android:background="@drawable/round_white_button_shadow"
                     android:elevation="28dp"
                     android:src="@drawable/ic_baseline_my_location_24"
+                    android:visibility="invisible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/map" />
 

@@ -19,6 +19,6 @@ open class User{
     }
 
     override fun equals(other: Any?): Boolean {
-        return this.uniqueId == (other as User).uniqueId
+        return if(other == null) false else this.uniqueId == (other as User).uniqueId
     }
 }

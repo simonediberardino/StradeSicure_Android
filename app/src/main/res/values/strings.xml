@@ -1,6 +1,6 @@
 <resources>
     <string name="facebook_app_id">308870061304393</string> <string name="fb_login_protocol_scheme">fb473625777492322</string>
-    <string name="contact_email">simonediberardino7@gmail.com</string>
+    <string name="contact_email">simonediberardino.bus@gmail.com</string>
     <string name="credits">© Copyright 2022, Simone Di Berardino</string>
     <string-array name="stato">
         <item>Lieve</item>
@@ -93,7 +93,7 @@
     <string name="intro_1_title">Benvenuto a Strada Sicura!</string>
     <string name="intro_1_desc">Strada Sicura è un\'applicazione, gestita dalla community, che permette la segnalazione di anomalie stradali in tempo reale.\nCosa significa? Significa che ogni utente può segnalare i problemi stradali della propria città in ogni momento e che più segnalazioni verranno effettuate, più l\'applicazione sarà affidabile e più verrà garantita un\'esperienza positiva a tutti gli utenti. Contribuisci anche tu!</string>
     <string name="intro_2_title">Sfrutta al massimo l\'applicazione!</string>
-    <string name="intro_2_desc">Per sfruttare al massimo le potenzialità di questa applicazione è necessario che abiliti la geolocalizzazione e che ti registri con un account: potrai farlo nel menu principale successivamente.</string>
+    <string name="intro_2_desc">Per sfruttare al massimo le potenzialità di questa applicazione è necessario che abiliti la geolocalizzazione e che ti registri con un account: potrai farlo nel menu principale successivamente.\nQuesta applicazione richiede l\'accesso alla geolocalizzazione per funzionare correttamente. La geolocalizzazione è utilizzata per mostrare le anomalie stradali nelle vicinanze e per poter effettuare le segnalazioni. I dati relativi alla geolocalizzazione non rimangono memorizzati nel sistema e non vengono condivisi.</string>
     <string name="intro_3_title">Un\'ultima cosa…</string>
     <string name="intro_3_desc">Questa applicazione è stata sviluppata da Simone Di Berardino, studente di Latina. Trovi una sezione dedicata ai contatti nel menu a sinistra successivamente.</string>
     <string name="anomalies_filter">Solo anomalie nella tua città</string>

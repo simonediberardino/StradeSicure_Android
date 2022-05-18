@@ -65,7 +65,7 @@ abstract class SSActivity : IntroActivity() {
 
         Ads.showBanner(this)
 
-        if(this is MapsActivity){
+        if(this is MapsActivity || this is BeginActivity){
             return
         }
 

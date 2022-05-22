@@ -1171,7 +1171,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         activity.getString(R.string.errore),
                         activity.getString(R.string.nonloggato)
                     ) {
-                        Utility.navigateTo(activity, AccountActivity::class.java)
+                        Utility.navigateTo(activity, LoginActivity::class.java)
                     }
                 }
 

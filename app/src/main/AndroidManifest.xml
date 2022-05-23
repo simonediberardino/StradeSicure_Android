@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7600619058487116~1172552659"/>
+            android:value="ca-app-pub-6176890425648385~6568817121"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

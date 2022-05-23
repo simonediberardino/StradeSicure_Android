@@ -8,8 +8,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.simonediberardino.stradesicure.R
 
 object Ads {
-    const val BANNER = /*"ca-app-pub-7600619058487116/8667899292"*/ "ca-app-pub-3940256099942544/6300978111"
-    const val INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712" // TEST
+    const val BANNER = "ca-app-pub-6176890425648385/9583074848"
+    const val INTERSTITIAL = "ca-app-pub-6176890425648385/7886849791"
     fun initializeAds(ctx: Activity){
         MobileAds.initialize(ctx) {}
     }

@@ -1,11 +1,13 @@
 package com.simonediberardino.stradesicure.activities
 
 import android.view.ViewGroup
+import com.facebook.login.Login
 import com.google.android.gms.maps.GoogleMap
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CButton
 import com.simonediberardino.stradesicure.UI.CSpinner
 import com.simonediberardino.stradesicure.UI.ToastSS
+import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.storage.ApplicationData
@@ -17,6 +19,7 @@ class SettingsActivity : SSActivity() {
         this.setupMapThemeSpinner()
         this.setupUpdateAnomaliesSpinner()
         this.setupLogoutBtn()
+        this.setupDeleteAccountButton()
         this.setupLoginButton()
     }
 
@@ -75,6 +78,25 @@ class SettingsActivity : SSActivity() {
             LoginHandler.doLogout()
             Utility.goToMainMenu(this)
             ToastSS.show(this, getString(R.string.logout_success))
+        }
+
+        button.apply()
+    }
+
+    private fun setupDeleteAccountButton(){
+        if(!LoginHandler.isLoggedIn())
+            return
+
+        val mainLayout = findViewById<ViewGroup>(R.id.settings_viewgroup_2)
+        val button = CButton(this, mainLayout)
+
+        button.title = getString(R.string.cancella_account)
+        button.description = getString(R.string.cancella_account_description)
+
+        button.setOnConfirmListener {
+            FirebaseClass.deleteAccountFirebase(LoginHandler.deviceUser!!)
+            LoginHandler.doLogout()
+            ToastSS.show(this, getString(R.string.cancella_account_successo))
         }
 
         button.apply()

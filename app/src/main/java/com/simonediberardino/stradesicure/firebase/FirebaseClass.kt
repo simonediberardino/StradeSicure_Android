@@ -286,6 +286,19 @@ object FirebaseClass {
         } )
     }
 
+    fun deleteAccountFirebase(account: User){
+        if(!Utility.isInternetAvailable()) return
+
+        getGenericUserSnapshotById(account.uniqueId, object : RunnablePar{
+            override fun run(p: Any?) {
+                if(p == null) return
+
+                val dataSnapshot = (p as DataSnapshot).ref
+                deleteFieldFirebase(dataSnapshot, dataSnapshot.ref.key)
+            }
+        } )
+    }
+
     fun deleteFieldFirebase(reference: DatabaseReference, child: String?) {
         if(child != null)
             reference.child(child).removeValue()

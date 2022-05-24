@@ -56,7 +56,7 @@ open class CButton(val context: AppCompatActivity, val parent: ViewGroup) : View
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(
-                context.getString(R.string.logout_confirm)
+                question
             )
             .setPositiveButton(
                 context.getString(R.string.conferma)

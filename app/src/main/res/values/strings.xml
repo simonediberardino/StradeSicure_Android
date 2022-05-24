@@ -127,4 +127,5 @@
     <string name="cancella_account">Cancella account</string>
     <string name="cancella_account_description">Cancella definitivamente il tuo account da Strada Sicura</string>
     <string name="cancella_account_successo">Account eliminato con successo</string>
+    <string name="cancella_account_confirm">Sei sicuro di voler eliminare il tuo account? L\'azione è irreversibile.</string>
 </resources>

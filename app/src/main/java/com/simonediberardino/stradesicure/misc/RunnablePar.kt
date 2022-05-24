@@ -1,5 +1,6 @@
 package com.simonediberardino.stradesicure.misc
 
-interface RunnablePar {
-    fun run(p: Any?)
+abstract class RunnablePar {
+    open fun run(p: Any?) {}
+    open fun run(vararg p: Any?) {}
 }

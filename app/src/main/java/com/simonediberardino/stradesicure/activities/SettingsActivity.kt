@@ -1,7 +1,6 @@
 package com.simonediberardino.stradesicure.activities
 
 import android.view.ViewGroup
-import com.facebook.login.Login
 import com.google.android.gms.maps.GoogleMap
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.CButton
@@ -35,7 +34,7 @@ class SettingsActivity : SSActivity() {
 
         spinner.title = getString(R.string.mapstyle)
         spinner.options = themeNames
-        spinner.setOnChangeListener(object : RunnablePar {
+        spinner.setOnChangeListener(object : RunnablePar() {
             override fun run(p: Any?) {
                 ApplicationData.setSavedMapStyle(themeObjs[p as Int].themeId)
             }
@@ -53,7 +52,7 @@ class SettingsActivity : SSActivity() {
 
         spinner.title = getString(R.string.realtimeupdate)
         spinner.options = options
-        spinner.setOnChangeListener(object : RunnablePar {
+        spinner.setOnChangeListener(object : RunnablePar() {
             override fun run(p: Any?) {
                 ApplicationData.isRealtimeUpdated((p as Int) == 0)
             }
@@ -92,6 +91,7 @@ class SettingsActivity : SSActivity() {
 
         button.title = getString(R.string.cancella_account)
         button.description = getString(R.string.cancella_account_description)
+        button.question = getString(R.string.cancella_account_confirm)
 
         button.setOnConfirmListener {
             FirebaseClass.deleteAccountFirebase(LoginHandler.deviceUser!!)

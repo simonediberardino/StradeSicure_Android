@@ -1,7 +1,7 @@
 package com.simonediberardino.stradesicure.firebase
 
 import android.graphics.BitmapFactory
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -67,7 +67,7 @@ object FirebaseClass {
         emailUsersRef.push().setValue(utente).addOnCompleteListener {
             getSnapshotFromUser(
                 utente,
-                object : RunnablePar{
+                object : RunnablePar(){
                     override fun run(p: Any?) {
                         callback?.run(p as DataSnapshot?)
                     }
@@ -91,6 +91,14 @@ object FirebaseClass {
         return if(user is EmailUser) emailUsersRef else fbUsersRef
     }
 
+    fun isFbUserById(userId: String): Boolean {
+        return userId.isDigitsOnly()
+    }
+
+    fun isEmailUserById(userId: String): Boolean {
+        return !isFbUserById(userId)
+    }
+
     inline fun <reified T: User> getReferenceByUser(): DatabaseReference {
         return if(T::class.java == EmailUser::class.java) emailUsersRef else fbUsersRef
     }
@@ -98,11 +106,11 @@ object FirebaseClass {
     inline fun <reified T: User> updateUserRole(user: T, role: Roles, callback: Runnable?){
         if(!Utility.isInternetAvailable()) return
 
-        getUserSnapshotId<T>(user.uniqueId, object : RunnablePar{
+        getUserSnapshotId<T>(user.uniqueId, object : RunnablePar(){
             override fun run(p: Any?) {
                 val key = p as String
 
-                val updateRole = object : RunnablePar{
+                val updateRole = object : RunnablePar(){
                     override fun run(p: Any?) {
                         val databaseReference = p as DatabaseReference
                         databaseReference.child(key)
@@ -158,14 +166,15 @@ object FirebaseClass {
     fun getGenericUserSnapshotById(userId: String, callback: RunnablePar){
         if(!Utility.isInternetAvailable()) return
 
-        getUserSnapshotById<EmailUser>(userId, callback)
-        getUserSnapshotById<FbUser>(userId, callback)
+        if(isEmailUserById(userId))
+            getUserSnapshotById<EmailUser>(userId, callback)
+        else getUserSnapshotById<FbUser>(userId, callback)
     }
 
     inline fun <reified T: User> getUserSnapshotId(userId: String, callback: RunnablePar){
         if(!Utility.isInternetAvailable()) return
 
-        getUserSnapshotById<T>(userId, object : RunnablePar{
+        getUserSnapshotById<T>(userId, object : RunnablePar() {
             override fun run(p: Any?) {
                 callback.run((p as DataSnapshot?)?.ref?.key)
             }
@@ -184,8 +193,7 @@ object FirebaseClass {
             val userFound = dataSnapshot.result.children.find {
                 it.child("uniqueId").value.toString().equals(userId, ignoreCase = true)
             }
-            if(userFound != null)
-                callback.run(userFound)
+            callback.run(userFound)
         }
     }
 
@@ -199,10 +207,16 @@ object FirebaseClass {
         }
     }
 
+    fun getGenericUserObjectById(userId: String, callback: RunnablePar) {
+        if(isEmailUserById(userId))
+            getUserObjectById<EmailUser>(userId, callback)
+        else getUserObjectById<FbUser>(userId, callback)
+    }
+
     inline fun <reified T: User> getUserObjectById(userId: String, callback: RunnablePar) {
         if(!Utility.isInternetAvailable()) return
 
-        getUserSnapshotById<T>(userId, object : RunnablePar {
+        getUserSnapshotById<T>(userId, object : RunnablePar() {
             override fun run(p: Any?) {
                 val snapshot = p as DataSnapshot?
                 callback.run(snapshot?.getValue(T::class.java))
@@ -232,7 +246,7 @@ object FirebaseClass {
 
         getUserSnapshotId<User>(
             user.uniqueId,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
                     val userId = p as String?
 
@@ -279,7 +293,7 @@ object FirebaseClass {
     fun deleteAnomalyFirebase(anomaly: Anomaly){
         if(!Utility.isInternetAvailable()) return
 
-        getAnomalySnapshot(anomaly, object : RunnablePar{
+        getAnomalySnapshot(anomaly, object : RunnablePar(){
             override fun run(p: Any?) {
                 deleteFieldFirebase(anomaliesRef, (p as DataSnapshot?)?.ref?.key)
             }
@@ -289,12 +303,14 @@ object FirebaseClass {
     fun deleteAccountFirebase(account: User){
         if(!Utility.isInternetAvailable()) return
 
-        getGenericUserSnapshotById(account.uniqueId, object : RunnablePar{
+        getGenericUserSnapshotById(account.uniqueId, object : RunnablePar(){
             override fun run(p: Any?) {
                 if(p == null) return
 
-                val dataSnapshot = (p as DataSnapshot).ref
-                deleteFieldFirebase(dataSnapshot, dataSnapshot.ref.key)
+                val parent = (p as DataSnapshot).ref.parent!!.ref
+                val child = p.ref.key
+
+                deleteFieldFirebase(parent, child)
             }
         } )
     }
@@ -304,7 +320,7 @@ object FirebaseClass {
             reference.child(child).removeValue()
     }
 
-    fun deleteImageFromFirebase(context: AppCompatActivity, dataSnapshot: DataSnapshot, callback: Runnable){
+    fun deleteImageFromFirebase(dataSnapshot: DataSnapshot, callback: Runnable){
         val storageReference = FirebaseStorage.getInstance().reference
         val reference: StorageReference = storageReference.child("images/" + dataSnapshot.ref.key)
 

@@ -129,12 +129,12 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             return
 
         if(LoginHandler.isFacebookLoggedIn()){
-            LoginHandler.waittilFBProfileIsReady(object : RunnablePar{
+            LoginHandler.waittilFBProfileIsReady(object : RunnablePar(){
                 override fun run(p: Any?) {
                     val userId = (p as Profile).id
                     FirebaseClass.getUserObjectById<FbUser>(
                         userId,
-                        object : RunnablePar {
+                        object : RunnablePar() {
                             override fun run(p: Any?) {
                                 val fbUser = p as FbUser?
                                 if(fbUser != null) {
@@ -151,7 +151,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             val storedAccount = ApplicationData.getSavedAccount<EmailUser>() ?: return
             FirebaseClass.getUserObjectById<EmailUser>(
                 storedAccount.uniqueId,
-                object : RunnablePar{
+                object : RunnablePar(){
                     override fun run(p: Any?) {
                         val retrievedUser = p as EmailUser?
                         val passwordOnDatabase = retrievedUser?.password
@@ -260,7 +260,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         topSheetBehavior = TopSheetBehavior.from(topSheet)
         topSheetBehavior.peekHeight = 90
-        topSheetBehavior.isHideable = false
+        topSheetBehavior.isHideable = true
         topSheetBehavior.setTopSheetCallback(object : TopSheetBehavior.TopSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if(isBottomMenuShown() && isTopMenuShown())
@@ -602,7 +602,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             refreshLocationCircle()
         }
 
-        fetchAnomalies(object : RunnablePar {
+        fetchAnomalies(object : RunnablePar() {
             override fun run(p: Any?) {
                 storeAnomaly(p as Anomaly)
                 showAnomaly(p)
@@ -1029,7 +1029,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         topSheetBehavior.state = if(flag){
             TopSheetBehavior.STATE_EXPANDED
         }else{
-            TopSheetBehavior.STATE_COLLAPSED
+            TopSheetBehavior.STATE_HIDDEN
         }
     }
 
@@ -1129,16 +1129,23 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
             FirebaseClass.getUserObjectById<User>(
                 anomaly.spotterId,
-                object : RunnablePar {
+                object : RunnablePar() {
                     override fun run(p: Any?) {
                         val user = p as User?
-                        if(p == null) return
+                        val accountExists = p != null
                         val reporterTemplate = activity.getString(R.string.segnalata_da)
+
                         reporterTW.text = reporterTemplate
                             .replace("{username}",
-                                user?.fullName ?: activity.getString(R.string.account_eliminato))
+                                if(accountExists)
+                                    user!!.fullName
+                                else activity.getString(R.string.account_eliminato))
+
+                        if(!accountExists)
+                            visitAccountBTN.visibility = View.INVISIBLE
                     }
-                })
+                }
+            )
 
             moreBTN.setOnClickListener {
                 setupMoreAnomalyDialog(activity, anomaly)

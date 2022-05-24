@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ToastSS
+import com.simonediberardino.stradesicure.entity.EmailUser
 import com.simonediberardino.stradesicure.entity.FbUser
 import com.simonediberardino.stradesicure.entity.Roles
 import com.simonediberardino.stradesicure.entity.User
@@ -43,11 +44,18 @@ class AccountActivity : SSActivity() {
         this.setContentView(R.layout.activity_account)
         this.setupDialog()
 
-        FirebaseClass.getUserObjectById<User>(
+        FirebaseClass.getGenericUserObjectById(
             intent.extras!!.getString("userToShow")!!,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
-                    userToShow = p as User? ?: return
+                    val isEmailUser = FirebaseClass.isEmailUserById((p as User).uniqueId)
+
+                    userToShow = if(isEmailUser){
+                            p as EmailUser
+                        }else{
+                            p as FbUser
+                        }
+
                     setProfileName()
                     setProfileEmail()
                     showRole()
@@ -139,11 +147,11 @@ class AccountActivity : SSActivity() {
                             getString(R.string.ripristina_immagine_conferma),
                             getString(R.string.azione_non_reversibile)
                         ){
-                            FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar {
+                            FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar() {
                                 @SuppressLint("UseCompatLoadingForDrawables")
                                 override fun run(p: Any?) {
                                     val dataSnapshot = p!! as DataSnapshot
-                                    FirebaseClass.deleteImageFromFirebase(this@AccountActivity, dataSnapshot){
+                                    FirebaseClass.deleteImageFromFirebase(dataSnapshot){
                                         profileImageIV.setImageDrawable(getDrawable(R.drawable.com_facebook_profile_picture_blank_square))
                                     }
                                 }
@@ -182,7 +190,7 @@ class AccountActivity : SSActivity() {
     private fun setAnomaliesNumber() {
         FirebaseClass.getAnomaliesByUser(
             userToShow,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
                     reportsTW.text = (p as Int).toString()
                 }
@@ -193,7 +201,7 @@ class AccountActivity : SSActivity() {
     private fun setReportsNumber() {
         FirebaseClass.getReportsByUser(
             userToShow,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
                     reviewsTW.text = (p as Int).toString()
                 }
@@ -212,7 +220,7 @@ class AccountActivity : SSActivity() {
     private fun setUserId() {
         FirebaseClass.getUserSnapshotId<User>(
             userToShow.uniqueId,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
                     if(p == null) return
 
@@ -225,7 +233,7 @@ class AccountActivity : SSActivity() {
     private fun setProfileImage() {
         FirebaseClass.getProfileImage(
             userToShow,
-            object : RunnablePar{
+            object : RunnablePar(){
                 override fun run(p: Any?) {
                     if(p != null)
                         profileImageIV.setImageBitmap(p as Bitmap)
@@ -236,7 +244,7 @@ class AccountActivity : SSActivity() {
     }
 
     private fun updateProfileImage(uploadedImage: Uri){
-        FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar{
+        FirebaseClass.getSnapshotFromUser(userToShow, object : RunnablePar(){
             override fun run(p: Any?) {
                 val dataSnapshot = p as DataSnapshot?
                 if(dataSnapshot != null){

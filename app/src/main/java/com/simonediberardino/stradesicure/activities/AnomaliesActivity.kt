@@ -82,7 +82,7 @@ class AnomaliesActivity : SSActivity() {
 
         spinner.title = getString(R.string.anomalies_filter)
         spinner.options = options
-        spinner.setOnChangeListener(object : RunnablePar {
+        spinner.setOnChangeListener(object : RunnablePar() {
             @RequiresApi(Build.VERSION_CODES.N)
             override fun run(p: Any?) {
                 ApplicationData.anomaliesInCity((p as Int) == 0)

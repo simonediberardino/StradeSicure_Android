@@ -85,7 +85,7 @@ class RegisterActivity : SSActivity() {
             val finalCallback = Runnable {
                 FirebaseClass.addEmailUserToFirebase(
                     emailUser,
-                    object : RunnablePar {
+                    object : RunnablePar() {
                         override fun run(p: Any?) {
                             val dataSnapshot = p as DataSnapshot?
                             uploadProfilePicToFirebase(this@RegisterActivity, uploadedImage, dataSnapshot!!) {
@@ -116,7 +116,7 @@ class RegisterActivity : SSActivity() {
 
     companion object{
         fun registerFbUser(userId: String, callback: Runnable) {
-            LoginHandler.waittilFBProfileIsReady(object : RunnablePar{
+            LoginHandler.waittilFBProfileIsReady(object : RunnablePar(){
                 override fun run(p: Any?) {
                     val createdUser = Profile.getCurrentProfile()
                     val firstName = createdUser.firstName

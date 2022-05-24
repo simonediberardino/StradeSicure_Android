@@ -68,7 +68,7 @@ class LoginActivity : SSActivity() {
                 val token = loginResult.accessToken
                 val userId = token.userId
 
-                FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar{
+                FirebaseClass.getUserObjectById<FbUser>(userId, object : RunnablePar(){
                     override fun run(p: Any?) {
                         Thread{
                             val loggedUser = p as FbUser?

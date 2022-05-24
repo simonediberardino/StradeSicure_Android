@@ -79,7 +79,7 @@ class SearchActivity : SSActivity() {
         userNameTW.text = user.fullName
         userRoleTW.text = Utility.capitalizeFirstLetter(user.role.toString())
 
-        FirebaseClass.getProfileImage(user, object : RunnablePar{
+        FirebaseClass.getProfileImage(user, object : RunnablePar(){
             override fun run(p: Any?) {
                 if(p != null)
                     userIconIW.setImageBitmap(p as Bitmap)

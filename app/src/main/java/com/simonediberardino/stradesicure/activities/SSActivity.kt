@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -72,6 +73,10 @@ abstract class SSActivity : IntroActivity() {
         Utility.runnablePercentage(10){
             Ads.showInterstitial(this)
         }
+    }
+
+    fun log(event: String){
+        Log.i(this.localClassName, event)
     }
 
     abstract fun initializeLayout()

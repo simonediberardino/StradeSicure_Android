@@ -232,6 +232,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
      */
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setupBottomSheet(){
+        this.log("Loading bottom sheet")
+
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_persistent))
         bottomSheetBehavior.peekHeight = 400
         bottomSheetBehavior.isHideable = false
@@ -256,6 +258,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
      * Initializes the top menu and sets the listeners;
      */
     private fun setupReportSheet(){
+        this.log("Loading top sheet")
         val topSheet = findViewById<View>(R.id.top_sheet_persistent)
 
         topSheetBehavior = TopSheetBehavior.from(topSheet)
@@ -295,6 +298,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         val confirmBtn = findViewById<View>(R.id.report_confirm)
         confirmBtn.setOnClickListener {
             if(LoginHandler.deviceUser == null){
+                this.log("Not enough permissions")
+
                 Utility.oneLineDialog(this,
                     this.getString(R.string.errore),
                     this.getString(R.string.nonloggato),
@@ -378,9 +383,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         val resetLocationBTN = findViewById<View>(R.id.main_my_location)
         resetLocationBTN.setOnClickListener{
+            this.log("Location reset")
             if(!isTopMenuShown()) {
                 this.mapFollowsUser = true
-                this.zoomMapToUser()
+                this.zoomMapTo(userLocation!!)
             }
         }
 
@@ -397,6 +403,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
      */
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onMapReady(googleMap: GoogleMap) {
+        this.log("Loading map")
         anomalies = ArrayList()
 
         if(encounteredAnomalies == null) {
@@ -423,6 +430,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun setupBroadcastGpsReceiver(){
+        this.log("Setting up broadcast receiver")
         val br: BroadcastReceiver = LocationProviderChangedReceiver()
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         registerReceiver(br, filter)
@@ -434,6 +442,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setupGPS() {
+        this.log("Setting up GPS")
         val locationService = getSystemService(LOCATION_SERVICE) as LocationManager
 
         if (!locationService.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -464,6 +473,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onGpsStatusChanged(flag: Boolean){
+        this.log("gps status changed $flag")
         if(flag) {
             if(!isGpsSetup){
                 this.setupUserLocation()
@@ -534,6 +544,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("MissingPermission")
     private fun setupUserLocation(){
+        this.log("setting up user location")
         isGpsSetup = true
 
         val locationRequest = LocationRequest.create()
@@ -554,11 +565,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 this.onLocationChanged(it)
                 this.removeAnomalyMarker()
                 if(loadingDialog.isShowing){
-                    this.zoomMapToUser(false){
+                    zoomMapTo(userLocation!!, false){
                         loadingDialog.dismiss()
                     }
                 }else{
-                    this.zoomMapToUser()
+                    zoomMapTo(userLocation!!)
                 }
             }
             .addOnFailureListener(this) {
@@ -571,7 +582,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         this.googleMap?.map?.setOnMarkerClickListener {
             when (it) {
                 anomalyMarker -> this.setupMoreMarkerDialog(this)
-                userLocMarker -> this.zoomMapToUser()
+                userLocMarker -> this.zoomMapTo(userLocation!!)
                 /* Else it must be an anomaly */
                 else -> {
                     val findAnomalyByMarker = getAnomalyByMarker(it)
@@ -703,18 +714,19 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         return googleMap!!.map.cameraPosition.zoom
     }
 
-    private fun zoomMapToUser(){
-        zoomMapToUser(true, null)
+    private fun zoomMapTo(location: Location){
+        zoomMapTo(location, true, null)
     }
 
-    private fun zoomMapToUser(animation: Boolean, callback: Runnable?){
-        if(userLocation == null)
-            return
+    private fun zoomMapTo(location: Location, animation: Boolean, callback: Runnable?){
+        this.log("zoomming map to ${location.latitude} ${location.longitude}")
+        if(location != userLocation)
+            mapFollowsUser = false
 
         val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(
-                LatLng(userLocation!!.latitude, userLocation!!.longitude),
-                MAP_DEFAULT_ZOOM
-            )
+            LatLng(location.latitude, location.longitude),
+            MAP_DEFAULT_ZOOM
+        )
 
         if(!animation){
             googleMap?.map?.moveCamera(
@@ -732,7 +744,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 }
             })
         }
-
     }
 
     private fun setMarkersVisibility(flag: Boolean){
@@ -786,7 +797,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         userLocCircle = googleMap?.map?.addCircle(circleOptions)
 
         if(mapFollowsUser)
-            zoomMapToUser()
+            zoomMapTo(userLocation!!)
 
         refreshLocationCircle()
 
@@ -829,6 +840,8 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         ToastSS.show(this, messageToSay)
         messageToSay = messageToSay.replace(",","")
         TTS.speak(messageToSay)
+
+        this.log("anomaly in range of $distanceInMetersApprox")
     }
 
     private fun setAnomaliesListener() {
@@ -845,8 +858,10 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                         @RequiresApi(Build.VERSION_CODES.N)
                         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                             index++
-                            if(index <= anomalies.size!!)
+                            if(index <= anomalies.size)
                                 return
+
+                            log("fetched new anomaly from db")
 
                             val anomalyAdded = snapshot.getValue(Anomaly::class.java)
 
@@ -871,25 +886,26 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
         }.start()
     }
 
+    /** Should be coded better */
     private fun setAccountDataListener(){
         val childEventListener = object : ChildEventListener {
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                if(!LoginHandler.isLoggedIn())
+                if(!LoginHandler.isLoggedIn() || LoginHandler.deviceUser !is EmailUser)
                     return
 
                 val user = snapshot.getValue(EmailUser::class.java)
 
-                try{
-                    if(user == LoginHandler.deviceUser){
-                        if(LoginHandler.deviceUser is EmailUser){
-                            if((LoginHandler.deviceUser as EmailUser).password != user!!.password) {
-                                LoginHandler.logoutByError()
-                                return
-                            }
-                        }
-                        LoginHandler.deviceUser = user
-                    }
-                }catch (exception: Exception){}
+                if(user != LoginHandler.deviceUser)
+                    return
+
+                log("user info changed")
+
+                if((LoginHandler.deviceUser as EmailUser).password != user!!.password) {
+                    LoginHandler.logoutByError()
+                    return
+                }
+
+                LoginHandler.deviceUser = user
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot){}
@@ -902,6 +918,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     }
 
     private fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
+        this.log("fetching anomalies")
         FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
             if(!Utility.isInternetAvailable()) return@addOnCompleteListener
 
@@ -961,10 +978,6 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     fun sortByDistance(arrayList: ArrayList<Anomaly>){
         sortByDistance(arrayList.toTypedArray())
-    }
-
-    fun sortAnomalies(){
-        sortByDistance(anomalies)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -1084,7 +1097,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
         return anomalies.filter {
             isInSameCity(it.location)
-        }!!.toTypedArray()
+        }.toTypedArray()
     }
 
     internal fun isInSameCity(location : Location) : Boolean{
@@ -1146,6 +1159,11 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                     }
                 }
             )
+
+            parentView.setOnClickListener {
+                if(activity is MapsActivity)
+                    activity.zoomMapTo(anomaly.location)
+            }
 
             moreBTN.setOnClickListener {
                 setupMoreAnomalyDialog(activity, anomaly)

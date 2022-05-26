@@ -22,6 +22,7 @@ import android.R as R1
 
 object Utility {
     fun navigateTo(c: AppCompatActivity, cl: Class<*>?) {
+        if(c is SSActivity) c.log("Starting activity ${cl?.name.toString()}")
         navigateTo(c, cl, true)
     }
 

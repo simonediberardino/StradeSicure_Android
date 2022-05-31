@@ -11,8 +11,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.simonediberardino.stradesicure.R
 
 object Ads {
-    const val BANNER = "ca-app-pub-8127014379524615/7681801822"
-    const val INTERSTITIAL = "ca-app-pub-8127014379524615/1157552230"
+    const val BANNER = "ca-app-pub-8375280762525890/3318001080"
+    const val INTERSTITIAL = "ca-app-pub-8375280762525890/7065674406"
 
     fun showBanner(ctx: Activity){
         val layout = ctx.findViewById<ViewGroup>(R.id.footer) ?: return

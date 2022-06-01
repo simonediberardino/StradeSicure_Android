@@ -8,8 +8,10 @@ import androidx.annotation.RequiresApi
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.login.LoginBehavior
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import com.google.firebase.storage.internal.Util
 import com.simonediberardino.stradesicure.R
 import com.simonediberardino.stradesicure.UI.ToastSS
 import com.simonediberardino.stradesicure.entity.EmailUser
@@ -57,10 +59,11 @@ class LoginActivity : SSActivity() {
         }
     }
 
-    fun handleLoginFB(){
+    private fun handleLoginFB(){
         callbackManager = CallbackManager.Factory.create()
 
         val loginButton = findViewById<LoginButton>(R.id.login_facebook_button)
+        loginButton.loginBehavior = LoginBehavior.WEB_ONLY
 
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -72,16 +75,13 @@ class LoginActivity : SSActivity() {
                     override fun run(p: Any?) {
                         Thread{
                             val loggedUser = p as FbUser?
-
-                            val doLogin = {
-                                loginSuccess(loggedUser)
-                            }
+                            val doLogin = { loginSuccess(loggedUser) }
 
                             if(loggedUser != null){
-                                doLogin()
+                                doLogin.invoke()
                             }else{
                                 RegisterActivity.registerFbUser(userId){
-                                    doLogin()
+                                    doLogin.invoke()
                                 }
                             }
                         }.start()

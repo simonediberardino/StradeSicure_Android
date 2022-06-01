@@ -44,17 +44,25 @@ class AccountActivity : SSActivity() {
         this.setContentView(R.layout.activity_account)
         this.setupDialog()
 
+        val userIdToShow = intent.extras!!.getString("userToShow") ?: deviceUser?.uniqueId
+
+        if(userIdToShow.isNullOrEmpty()){
+            Utility.showToast(this, getString(R.string.account_inesistente))
+            Utility.goToMainMenu(this)
+            return
+        }
+
         FirebaseClass.getGenericUserObjectById(
-            intent.extras!!.getString("userToShow")!!,
-            object : RunnablePar(){
+            userIdToShow,
+            object : RunnablePar() {
                 override fun run(p: Any?) {
                     val isEmailUser = FirebaseClass.isEmailUserById((p as User).uniqueId)
 
-                    userToShow = if(isEmailUser){
-                            p as EmailUser
-                        }else{
-                            p as FbUser
-                        }
+                    userToShow = if (isEmailUser) {
+                        p as EmailUser
+                    } else {
+                        p as FbUser
+                    }
 
                     setProfileName()
                     setProfileEmail()

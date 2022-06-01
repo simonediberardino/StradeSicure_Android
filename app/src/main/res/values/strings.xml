@@ -106,6 +106,7 @@
     <string name="googlestreet">Google Street</string>
     <string name="recensione">Recensione</string>
     <string name="rimuovi">Rimuovi</string>
+    <string name="account_inesistente"/>
     <string name="no_email_app">Hai bisogno di un client per email per utilizzare questa funzione.</string>
     <string name="erroreprofilocredenziali">Sei stato disconnesso: le credenziali del tuo profilo non sono più valide.</string>
     <string name="citynotfound">Città sconosciuta</string>

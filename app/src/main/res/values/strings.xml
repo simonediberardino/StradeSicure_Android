@@ -124,7 +124,7 @@
     <string name="dialog_conferma_eliminazione_title">Sei sicuro di voler rimuovere questa segnalazione?</string>
     <string name="ban_warning">Ricorda che l\'abuso di questa funzionalità causerà un ban permanente dall\'applicazione.</string>
     <string name="dialog_conferma_anomalia_title">Sei sicuro di voler segnalare questa anomalia?</string>
-    <string name="connessione_persa">La tua connessione internet è al momento inattiva e non potrai utilizzare tutte le funzionalità di questa app.</string>
+    <string name="connessione_persa">La tua connessione internet è al momento inattiva.</string>
     <string name="cancella_account">Cancella account</string>
     <string name="cancella_account_description">Cancella definitivamente il tuo account da Strada Sicura</string>
     <string name="cancella_account_successo">Account eliminato con successo</string>

@@ -784,7 +784,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
             .strokeWidth(10f)
 
         if(userLocation != null){
-            if(intervalUserLocation == null || userLocation!!.distanceTo(intervalUserLocation) >= updateDistance){
+            if(intervalUserLocation == null || userLocation!!.distanceTo(intervalUserLocation!!) >= updateDistance){
                 intervalUserLocation = userLocation
                 checkNearbyAnomalies()
             }
@@ -812,14 +812,14 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     private fun checkNearbyAnomalies(){
         val nearestAnomaly = getNearestNotWarnedAnomaly() ?: return
 
-        if(nearestAnomaly.location.distanceTo(userLocation) < WARN_RADIUS)
+        if(nearestAnomaly.location.distanceTo(userLocation!!) < WARN_RADIUS)
             warnAnomaly(nearestAnomaly)
     }
 
     private fun getNearestNotWarnedAnomaly(): Anomaly? {
         val notEncounteredAnomalies = getNotEncounteredAnomalies()
         return if(notEncounteredAnomalies.isNotEmpty())
-            notEncounteredAnomalies.sortedBy { it.location.distanceTo(userLocation) }[0]
+            notEncounteredAnomalies.sortedBy { it.location.distanceTo(userLocation!!) }[0]
         else null
     }
 
@@ -830,7 +830,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
     private fun warnAnomaly(anomaly: Anomaly){
         encounteredAnomalies!!.add(anomaly)
 
-        val distanceInMeters = anomaly.location.distanceTo(userLocation).toInt()
+        val distanceInMeters = anomaly.location.distanceTo(userLocation!!).toInt()
         val distanceInMetersApprox = ((distanceInMeters/10.0f).toInt())*10
         var messageToSay = getString(R.string.anomalia_in_range)
             .replace("{meters}", distanceInMetersApprox.toString())
@@ -919,16 +919,23 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     private fun fetchAnomalies(callback: RunnablePar, onCompleteCallback: Runnable) {
         this.log("fetching anomalies")
-        FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
-            if(!Utility.isInternetAvailable()) return@addOnCompleteListener
+        try {
+            FirebaseClass.anomaliesRef.get().addOnCompleteListener { task ->
+                if(!Utility.isInternetAvailable()) return@addOnCompleteListener
 
-            for(it : DataSnapshot in task.result.children){
-                val anomaly = it.getValue(Anomaly::class.java)
-                callback.run(anomaly!!)
+                try{
+                    for(it : DataSnapshot in task.result.children){
+                        val anomaly = it.getValue(Anomaly::class.java)
+                        callback.run(anomaly!!)
+                    }
+                }catch (_: java.lang.Exception) {}
+
+                onCompleteCallback.run()
             }
-
-            onCompleteCallback.run()
+        }catch (e: java.lang.Exception) {
+            callback.run()
         }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -973,7 +980,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
 
     fun sortByDistance(array: Array<Anomaly>){
         if(userLocation != null)
-            array.sortBy { it.location.distanceTo(userLocation) }
+            array.sortBy { it.location.distanceTo(userLocation!!) }
     }
 
     fun sortByDistance(arrayList: ArrayList<Anomaly>){
@@ -1229,7 +1236,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 location.latitude,
                 location.longitude,
                 1
-            )[0].locality
+            )?.get(0)!!.locality
 
             return if(city == null || city.trim().isEmpty())
                 return activity.getString(R.string.citynotfound)
@@ -1241,7 +1248,7 @@ class MapsActivity : SSActivity(), OnMapReadyCallback, NavigationView.OnNavigati
                 location.latitude,
                 location.longitude,
                 1
-            )[0].getAddressLine(0)
+            )?.get(0)?.getAddressLine(0) ?: ""
         }
 
         fun getSimpleAddress(location: Location, activity: AppCompatActivity): String {

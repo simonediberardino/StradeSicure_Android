@@ -21,6 +21,7 @@ import com.simonediberardino.stradesicure.UI.LoadingDialog
 import com.simonediberardino.stradesicure.admob.Ads
 import com.simonediberardino.stradesicure.misc.NetworkStatusListener
 import com.simonediberardino.stradesicure.utils.Utility
+import java.lang.Exception
 
 abstract class SSActivity : IntroActivity() {
     lateinit var loadingDialog: LoadingDialog
@@ -64,15 +65,13 @@ abstract class SSActivity : IntroActivity() {
             Utility.ridimensionamento(this, parent)
         }
 
-        Ads.showBanner(this)
-
         if(this is MapsActivity || this is BeginActivity){
             return
         }
 
-        Utility.runnablePercentage(10){
+/*        Utility.runnablePercentage(10){
             Ads.showInterstitial(this)
-        }
+        }*/
     }
 
     fun log(event: String){

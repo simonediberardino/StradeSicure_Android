@@ -21,6 +21,7 @@ import com.simonediberardino.stradesicure.firebase.FirebaseClass
 import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
+import java.lang.Exception
 
 
 class LoginActivity : SSActivity() {
@@ -35,7 +36,10 @@ class LoginActivity : SSActivity() {
         }
 
         val loginButton = this.findViewById<View>(R.id.login_login_button)
-        loginButton.setOnClickListener { handleLoginEmail() }
+        loginButton.setOnClickListener {
+            this.log("PROVAAAA")
+            handleLoginEmail()
+        }
 
         this.handleLoginFB()
     }
@@ -45,17 +49,33 @@ class LoginActivity : SSActivity() {
         val enteredPassword = this.findViewById<EditText>(R.id.login_password_et).text.toString().lowercase()
         val encryptedPassword = Utility.getMD5(enteredPassword)
 
+        if(!Utility.isInternetAvailable()) {
+            val message = this.getString(R.string.connessione_persa)
+            Utility.oneLineDialog(this, message)
+            return
+        }
+
         FirebaseClass.emailUsersRef.get().addOnCompleteListener { users ->
-            val matchedUser: EmailUser? =
+            val matchedUser =
+            try {
                 users.result.children.find {
-                it.child("uniqueId").value.toString().equals(enteredEmail, ignoreCase = true)
-            }?.getValue(EmailUser::class.java)
+                    it.child("uniqueId").value.toString().equals(enteredEmail, ignoreCase = true)
+                }?.getValue(EmailUser::class.java)
+            }catch (e: Exception) {
+                val message = this.getString(R.string.connessione_persa)
+                Utility.oneLineDialog(this, message)
+                return@addOnCompleteListener
+            }
 
             if(matchedUser == null || matchedUser.password != encryptedPassword){
                 Utility.oneLineDialog(this, this.getString(R.string.credenzialierrate))
             }else{
                 loginSuccess(matchedUser)
             }
+        }.addOnFailureListener {
+            val message = this.getString(R.string.connessione_persa) + "\n" + it.message
+            Utility.oneLineDialog(this, message)
+            return@addOnFailureListener
         }
     }
 

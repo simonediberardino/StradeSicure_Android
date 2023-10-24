@@ -9,22 +9,27 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.simonediberardino.stradesicure.R
+import java.lang.Exception
 
 object Ads {
     const val BANNER = "ca-app-pub-5725383971112097/7660393163"
     const val INTERSTITIAL = "ca-app-pub-5725383971112097/4706340037"
 
     fun showBanner(ctx: Activity){
-        val layout = ctx.findViewById<ViewGroup>(R.id.footer) ?: return
+        try{
+            val layout = ctx.findViewById<ViewGroup>(R.id.footer) ?: return
 
-        val adView = AdView(ctx)
-        adView.adSize = AdSize.BANNER
-        adView.adUnitId = BANNER
+            val adView = AdView(ctx)
+            adView.setAdSize(AdSize.BANNER)
+            adView.adUnitId = BANNER
 
-        val adRequest = AdRequest.Builder().build()
+            val adRequest = AdRequest.Builder().build()
 
-        layout.addView(adView)
-        adView.loadAd(adRequest)
+            layout.addView(adView)
+            adView.loadAd(adRequest)
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun showInterstitial(ctx: Activity){

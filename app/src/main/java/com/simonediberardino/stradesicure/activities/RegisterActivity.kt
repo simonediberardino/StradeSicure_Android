@@ -25,6 +25,7 @@ import com.simonediberardino.stradesicure.login.LoginHandler
 import com.simonediberardino.stradesicure.misc.RunnablePar
 import com.simonediberardino.stradesicure.utils.Utility
 import java.io.ByteArrayOutputStream
+import java.lang.Exception
 
 
 class RegisterActivity : SSActivity() {
@@ -69,10 +70,23 @@ class RegisterActivity : SSActivity() {
 
         val passwordEncrypted = Utility.getMD5(passwordRaw)
 
+        if(!Utility.isInternetAvailable()) {
+            val message = this.getString(R.string.connessione_persa)
+            Utility.oneLineDialog(this, message)
+            return
+        }
+
         FirebaseClass.emailUsersRef.get().addOnCompleteListener { snap ->
-            val isEmailRegistered: Boolean = snap.result.children.any{
-                it.child("email").value.toString().equals(email, ignoreCase = true)
+            val isEmailRegistered = try {
+                snap.result.children.any{
+                    it.child("email").value.toString().equals(email, ignoreCase = true)
+                }
+            }catch (e: Exception) {
+                val message = this.getString(R.string.connessione_persa)
+                Utility.oneLineDialog(this, message)
+                return@addOnCompleteListener
             }
+
 
             if(isEmailRegistered) {
                 val message = this.getString(R.string.emailgiaregistrata)
